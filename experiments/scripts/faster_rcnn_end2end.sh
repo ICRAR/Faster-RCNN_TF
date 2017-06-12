@@ -22,6 +22,9 @@ len=${#array[@]}
 EXTRA_ARGS=${array[@]:4:$len}
 EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 
+BASEDIR=/group/pawsey0129/cwu/Faster-RCNN_TF
+PY_PATH=/group/pawsey0129/software/dlpyws/bin/python
+
 case $DATASET in
   pascal_voc)
     TRAIN_IMDB="voc_2007_trainval"
@@ -44,15 +47,15 @@ case $DATASET in
     ;;
 esac
 
-LOG="experiments/logs/faster_rcnn_end2end_${NET}_${EXTRA_ARGS_SLUG}.txt.`date +'%Y-%m-%d_%H-%M-%S'`"
+LOG="${BASEDIR}/experiments/logs/faster_rcnn_end2end_${NET}_${EXTRA_ARGS_SLUG}.txt.`date +'%Y-%m-%d_%H-%M-%S'`"
 exec &> >(tee -a "$LOG")
 echo Logging output to "$LOG"
 
-time python ./tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
-  --weights data/pretrain_model/VGG_imagenet.npy \
+time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
+  --weights ${BASEDIR}/data/pretrain_model/VGG_imagenet.npy \
   --imdb ${TRAIN_IMDB} \
   --iters ${ITERS} \
-  --cfg experiments/cfgs/faster_rcnn_end2end.yml \
+  --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
   --network VGGnet_train \
   ${EXTRA_ARGS}
 
@@ -60,9 +63,9 @@ set +x
 NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`
 set -x
 
-time python ./tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
+time python ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
   --weights ${NET_FINAL} \
   --imdb ${TEST_IMDB} \
-  --cfg experiments/cfgs/faster_rcnn_end2end.yml \
+  --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
   --network VGGnet_test \
   ${EXTRA_ARGS}

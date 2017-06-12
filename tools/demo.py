@@ -1,10 +1,13 @@
 import _init_paths
+import matplotlib
+#matplotlib.use('pdf')
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import tensorflow as tf
 from fast_rcnn.config import cfg
 from fast_rcnn.test import im_detect
 from fast_rcnn.nms_wrapper import nms
 from utils.timer import Timer
-import matplotlib.pyplot as plt
 import numpy as np
 import os, sys, cv2
 import argparse
@@ -96,6 +99,8 @@ def parse_args():
                         default='VGGnet_test')
     parser.add_argument('--model', dest='model', help='Model path',
                         default=' ')
+    parser.add_argument('--figure', dest='fig_path', help='Figure path',
+                        default='/group/pawsey0129/cwu/output')
 
     args = parser.parse_args()
 
@@ -107,7 +112,7 @@ if __name__ == '__main__':
 
     if args.model == ' ':
         raise IOError(('Error: Model not found.\n'))
-        
+
     # init session
     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
     # load network
@@ -115,7 +120,7 @@ if __name__ == '__main__':
     # load model
     saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
     saver.restore(sess, args.model)
-   
+
     #sess.run(tf.initialize_all_variables())
 
     print '\n\nLoaded network {:s}'.format(args.model)
@@ -129,10 +134,12 @@ if __name__ == '__main__':
                 '001763.jpg', '004545.jpg']
 
 
-    for im_name in im_names:
+    for i, im_name in enumerate(im_names):
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         print 'Demo for data/demo/{}'.format(im_name)
         demo(sess, net, im_name)
-
-    plt.show()
-
+        plt.savefig('%s/demo%d.pdf' % (args.fig_path, i))
+        try:
+            plt.close()
+        except:
+            pass
