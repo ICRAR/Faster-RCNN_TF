@@ -41,7 +41,7 @@ class SolverWrapper(object):
         # For checkpoint
         self.saver = saver
 
-    def snapshot(self, sess, iter):
+    def snapshot(self, sess, iter_num):
         """Take a snapshot of the network after unnormalizing the learned
         bounding-box regression weights. This enables easy use at test-time.
         """
@@ -66,12 +66,14 @@ class SolverWrapper(object):
 
         infix = ('_' + cfg.TRAIN.SNAPSHOT_INFIX
                  if cfg.TRAIN.SNAPSHOT_INFIX != '' else '')
-        filename = (cfg.TRAIN.SNAPSHOT_PREFIX + infix +
-                    '_iter_{:d}'.format(iter+1) + '.ckpt')
-        filename = os.path.join(self.output_dir, filename)
+        # remove iter_num in the file name, let tensorflow manage it via global_step
+        modelname = (cfg.TRAIN.SNAPSHOT_PREFIX + infix)# +
+                    #'_iter_num_{:d}'.format(iter_num+1) + '.ckpt)
+        modelname = os.path.join(self.output_dir, modelname)
 
-        self.saver.save(sess, filename)
-        print 'Wrote snapshot to: {:s}'.format(filename)
+        snapshot_file = self.saver.save(sess, modelname,
+                                        global_step=iter_num + 1)
+        print 'Wrote snapshot to: {:s}'.format(snapshot_file)
 
         if cfg.TRAIN.BBOX_REG and net.layers.has_key('bbox_pred'):
             with tf.variable_scope('bbox_pred', reuse=True):
@@ -121,7 +123,7 @@ class SolverWrapper(object):
 
         rpn_smooth_l1 = self._modified_smooth_l1(3.0, rpn_bbox_pred, rpn_bbox_targets, rpn_bbox_inside_weights, rpn_bbox_outside_weights)
         rpn_loss_box = tf.reduce_mean(tf.reduce_sum(rpn_smooth_l1, reduction_indices=[1, 2, 3]))
- 
+
         # R-CNN
         # classification loss
         cls_score = self.net.get_output('cls_score')
@@ -258,6 +260,19 @@ def train_net(network, imdb, roidb, output_dir, pretrained_model=None, max_iters
     """Train a Fast R-CNN network."""
     roidb = filter_roidb(roidb)
     saver = tf.train.Saver(max_to_keep=100)
+    """
+    For Tensorflow 1.0 (in fact after v0.12RC), the Saver should be used as such
+    See:
+    https://stackoverflow.com/questions/41048819/\
+    how-to-restore-a-model-by-filename-in-tensorflow-r12
+
+    https://github.com/smallcorgi/Faster-RCNN_TF/issues/79#issuecomment-279273421
+
+    https://www.tensorflow.org/api_docs/python/tf/train/Saver
+
+    from tensorflow.core.protobuf import saver_pb2
+    saver = tf.train.Saver(max_to_keep=100, write_version=saver_pb2.SaverDef.V1)
+    """
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
         sw = SolverWrapper(sess, saver, network, imdb, roidb, output_dir, pretrained_model=pretrained_model)
         print 'Solving...'
