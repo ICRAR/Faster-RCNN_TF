@@ -22,7 +22,7 @@ len=${#array[@]}
 EXTRA_ARGS=${array[@]:4:$len}
 EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 
-BASEDIR=/group/pawsey0129/cwu/Faster-RCNN_TF
+BASEDIR=/group/pawsey0129/cwu/rgz-faster-rcnn
 PY_PATH=/group/pawsey0129/software/dlpyws/bin/python
 
 case $DATASET in
