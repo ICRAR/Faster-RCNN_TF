@@ -13,6 +13,7 @@ from .kitti import kitti
 from .kitti_tracking import kitti_tracking
 from .nissan import nissan
 from .nthu import nthu
+from .rgz import rgz
 from . import factory
 
 import os.path as osp
