@@ -2,6 +2,7 @@
 data sets for the RGZ project
 """
 import os
+import uuid
 
 from datasets.imdb import imdb
 from datasets.pascal_voc import pascal_voc
