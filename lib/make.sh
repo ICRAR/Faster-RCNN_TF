@@ -1,9 +1,11 @@
 module unload gcc
+module load cuda
 TF_INC=$(python -c 'import tensorflow as tf; print(tf.sysconfig.get_include())')
 
 #CUDA_PATH=/usr/local/cuda/
 CUDA_PATH=/group/pawsey0129/software/sles11sp4/apps/gcc/4.8.5/cuda/7.5.18
 CXXFLAGS=''
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/group/pawsey0129/software/sles11sp4/apps/gcc/4.8.5/cuda/7.5.18/lib64
 
 if [[ "$OSTYPE" =~ ^darwin ]]; then
 	CXXFLAGS+='-undefined dynamic_lookup'
