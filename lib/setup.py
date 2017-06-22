@@ -53,6 +53,7 @@ def locate_cuda():
     return cudaconfig
 
 CUDA = locate_cuda()
+print('Found cuda lib = {0}'.format(CUDA['lib64']))
 
 # Obtain the numpy include directory.  This logic works across numpy versions.
 try:
