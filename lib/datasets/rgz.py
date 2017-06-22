@@ -8,7 +8,7 @@ from fast_rcnn.config import cfg
 
 class rgz(pascal_voc):
     def __init__(self, image_set, year, devkit_path=None):
-        super(rgz_imdb, self).__init__(image_set, year, devkit_path)
+        super(rgz, self).__init__(image_set, year, devkit_path)
         # self._classes = ('__background__', # always index 0
         #                  '1C_1P', '1C_2P', '1C_3P', '1C_4P', '1C_>4P',
         #                  '2C_2P', '2C_3P', '2C_3P', '2C_4P', '2C_>4P',
