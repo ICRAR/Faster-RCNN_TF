@@ -6,7 +6,7 @@ import os
 from datasets.pascal_voc import pascal_voc
 from fast_rcnn.config import cfg
 
-class rgz_imdb(pascal_voc):
+class rgz(pascal_voc):
     def __init__(self, image_set, year, devkit_path=None):
         super(rgz_imdb, self).__init__(image_set, year, devkit_path)
         # self._classes = ('__background__', # always index 0
