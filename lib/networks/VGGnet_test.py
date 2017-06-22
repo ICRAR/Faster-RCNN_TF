@@ -1,9 +1,9 @@
 import tensorflow as tf
 from networks.network import Network
 
-n_classes = 21
+n_classes = 6
 _feat_stride = [16,]
-anchor_scales = [8, 16, 32] 
+anchor_scales = [8, 16, 32]
 
 class VGGnet_test(Network):
     def __init__(self, trainable=True):
@@ -51,7 +51,7 @@ class VGGnet_test(Network):
 
         (self.feed('rpn_cls_prob_reshape','rpn_bbox_pred','im_info')
              .proposal_layer(_feat_stride, anchor_scales, 'TEST', name = 'rois'))
-        
+
         (self.feed('conv5_3', 'rois')
              .roi_pool(7, 7, 1.0/16, name='pool_5')
              .fc(4096, name='fc6')
@@ -61,4 +61,3 @@ class VGGnet_test(Network):
 
         (self.feed('fc7')
              .fc(n_classes*4, relu=False, name='bbox_pred'))
-

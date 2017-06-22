@@ -4,7 +4,7 @@ from networks.network import Network
 
 #define
 
-n_classes = 21
+n_classes = 6
 _feat_stride = [16,]
 anchor_scales = [8, 16, 32]
 
@@ -89,4 +89,3 @@ class VGGnet_train(Network):
 
         (self.feed('drop7')
              .fc(n_classes*4, relu=False, name='bbox_pred'))
-
