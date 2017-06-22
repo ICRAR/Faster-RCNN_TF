@@ -4,7 +4,7 @@ from networks.network import Network
 
 #define
 
-n_classes = 6
+n_classes = 7
 _feat_stride = [16,]
 anchor_scales = [8, 16, 32]
 
