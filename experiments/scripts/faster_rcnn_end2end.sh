@@ -26,6 +26,12 @@ BASEDIR=/group/pawsey0129/cwu/Faster-RCNN_TF
 PY_PATH=/group/pawsey0129/software/dlpyws/bin/python
 
 case $DATASET in
+  rgz)
+    TRAIN_IMDB="rgz_2017_train"
+    TEST_IMDB="rgz_2017_test"
+    PT_DIR="rgz"
+    ITERS=50000
+    ;;
   pascal_voc)
     TRAIN_IMDB="voc_2007_trainval"
     TEST_IMDB="voc_2007_test"
@@ -51,8 +57,15 @@ LOG="${BASEDIR}/experiments/logs/faster_rcnn_end2end_${NET}_${EXTRA_ARGS_SLUG}.t
 exec &> >(tee -a "$LOG")
 echo Logging output to "$LOG"
 
+# time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
+#   --weights ${BASEDIR}/data/pretrain_model/VGG_imagenet.npy \
+#   --imdb ${TRAIN_IMDB} \
+#   --iters ${ITERS} \
+#   --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
+#   --network VGGnet_train \
+#   ${EXTRA_ARGS}
+
 time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
-  --weights ${BASEDIR}/data/pretrain_model/VGG_imagenet.npy \
   --imdb ${TRAIN_IMDB} \
   --iters ${ITERS} \
   --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \

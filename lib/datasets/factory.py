@@ -75,6 +75,14 @@ for split in ['71', '370']:
     __sets[name] = (lambda split=split:
             datasets.nthu(split))
 
+# RGZ dataset
+for year in ['2017']:
+    for split in ['train', 'test']:
+        name = 'rgz_{}_{}'.format(year, split)
+        print name
+        __sets[name] = (lambda split=split, year=year:
+                datasets.rgz(split, year))
+
 
 def get_imdb(name):
     """Get an imdb (image database) by name."""
