@@ -4,6 +4,7 @@ data sets for the RGZ project
 import os
 import uuid
 import cPickle
+import numpy as np
 
 from datasets.imdb import imdb
 from datasets.pascal_voc import pascal_voc
