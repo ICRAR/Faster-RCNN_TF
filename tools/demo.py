@@ -68,10 +68,10 @@ def demo(sess, net, image_name, input_path):
 
     # Visualize detections for each class
     im = im[:, :, (2, 1, 0)]
-    fig, ax = plt.subplots(figsize=(12, 12))
+    fig, ax = plt.subplots(figsize=(4, 4))
     ax.imshow(im, aspect='equal')
 
-    CONF_THRESH = 0.5
+    CONF_THRESH = 0.3
     NMS_THRESH = 0.3
     for cls_ind, cls in enumerate(CLASSES[1:]):
         cls_ind += 1 # because we skipped background
