@@ -16,7 +16,7 @@ DEV=$1
 DEV_ID=$2
 NET=$3
 DATASET=$4
-LOG=$5
+NET_FINAL=$5
 
 array=( $@ )
 len=${#array[@]}
@@ -54,9 +54,9 @@ case $DATASET in
     ;;
 esac
 
-set +x
-NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`
-set -x
+# set +x
+# NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`
+# set -x
 
 time $PY_PATH ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
   --weights ${NET_FINAL} \
