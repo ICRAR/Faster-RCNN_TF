@@ -98,7 +98,9 @@ def parse_args():
     parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
                         default='VGGnet_test')
     parser.add_argument('--model', dest='model', help='Model path',
-                        default=' ')
+                        default='/group/pawsey0129/cwu/rgz-faster-rcnn/output/faster_rcnn_end2end/rgz_2017_train/VGGnet_fast_rcnn-50000')
+    parser.add_argument('--input', dest='input_path', help='Input PNG path',
+                        default='/home/cwu/rgz-faster-rcnn/data/RGZdevkit2017/RGZ2017/PNGImages')
     parser.add_argument('--figure', dest='fig_path', help='Figure path',
                         default='/group/pawsey0129/cwu/output')
 
@@ -130,15 +132,21 @@ if __name__ == '__main__':
     for i in xrange(2):
         _, _= im_detect(sess, net, im)
 
-    im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
-                '001763.jpg', '004545.jpg']
-
+    im_names = ['FIRSTJ094204.6+480448_radio.png',  'FIRSTJ122547.1+594111_radio.png',  'FIRSTJ145825.3+484239_radio.png',  'FIRSTJ233909.5+113426_radio.png',
+'FIRSTJ094206.5+544626_radio.png',  'FIRSTJ122547.8+051905_radio.png',  'FIRSTJ145826.0+522419_radio.png',  'FIRSTJ233912.1+105429_radio.png',
+'FIRSTJ094207.6+433848_radio.png',  'FIRSTJ122549.6+163347_radio.png',  'FIRSTJ145834.8+215228_radio.png',  'FIRSTJ233921.6+064203_radio.png',
+'FIRSTJ094213.8+124534_radio.png',  'FIRSTJ122552.1+634005_radio.png',  'FIRSTJ145852.0+433709_radio.png',  'FIRSTJ233939.4+020030_radio.png',
+'FIRSTJ094215.3+062820_radio.png',  'FIRSTJ122555.1+153436_radio.png',  'FIRSTJ145858.8+260859_radio.png',  'FIRSTJ233954.0+115948_radio.png',
+'FIRSTJ094220.3+163949_radio.png',  'FIRSTJ122600.9+084106_radio.png',  'FIRSTJ145901.3+271124_radio.png',  'FIRSTJ234004.0+021817_radio.png',
+'FIRSTJ094224.1+222307_radio.png',  'FIRSTJ122608.8+473711_radio.png',  'FIRSTJ145901.5+231026_radio.png',  'FIRSTJ234235.1+103235_radio.png',
+'FIRSTJ094226.6+340231_radio.png',  'FIRSTJ122609.5+584421_radio.png',  'FIRSTJ145905.9+392409_radio.png',  'FIRSTJ234247.4+142649_radio.png',
+'FIRSTJ094228.0+340243_radio.png',  'FIRSTJ122612.8+062727_radio.png',  'FIRSTJ145908.0+381509_radio.png',  'FIRSTJ234253.1+094248_radio.png']
 
     for i, im_name in enumerate(im_names):
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         print 'Demo for data/demo/{}'.format(im_name)
         demo(sess, net, im_name)
-        plt.savefig('%s/demo%d.pdf' % (args.fig_path, i))
+        plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')))
         try:
             plt.close()
         except:
