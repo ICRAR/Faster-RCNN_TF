@@ -54,11 +54,12 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     plt.draw()
 
 
-def demo(sess, net, image_name):
+def demo(sess, net, image_name, input_path):
     """Detect object classes in an image using pre-computed object proposals."""
 
     # Load the demo image
-    im_file = os.path.join(cfg.DATA_DIR, 'demo', image_name)
+    # im_file = os.path.join(cfg.DATA_DIR, 'demo', image_name)
+    im_file = os.path.join(input_path, image_name)
     #im_file = os.path.join('/home/corgi/Lab/label/pos_frame/ACCV/training/000001/',image_name)
     im = cv2.imread(im_file)
 
@@ -145,7 +146,7 @@ if __name__ == '__main__':
     for i, im_name in enumerate(im_names):
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         print 'Demo for data/demo/{}'.format(im_name)
-        demo(sess, net, im_name)
+        demo(sess, net, im_name, args.input_path)
         plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')))
         try:
             plt.close()
