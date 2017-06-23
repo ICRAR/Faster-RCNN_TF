@@ -13,13 +13,8 @@ import os, sys, cv2
 import argparse
 from networks.factory import get_network
 
-
-CLASSES = ('__background__',
-           'aeroplane', 'bicycle', 'bird', 'boat',
-           'bottle', 'bus', 'car', 'cat', 'chair',
-           'cow', 'diningtable', 'dog', 'horse',
-           'motorbike', 'person', 'pottedplant',
-           'sheep', 'sofa', 'train', 'tvmonitor')
+CLASSES =  ('__background__', # always index 0
+                            '1_1', '1_2', '1_3', '2_2', '2_3', '3_3')
 
 
 #CLASSES = ('__background__','person','bike','motorbike','car','bus')
