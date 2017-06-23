@@ -16,6 +16,7 @@ DEV=$1
 DEV_ID=$2
 NET=$3
 DATASET=$4
+LOG=$5
 
 array=( $@ )
 len=${#array[@]}
@@ -53,30 +54,11 @@ case $DATASET in
     ;;
 esac
 
-LOG="${BASEDIR}/experiments/logs/faster_rcnn_end2end_${NET}_${EXTRA_ARGS_SLUG}.txt.`date +'%Y-%m-%d_%H-%M-%S'`"
-exec &> >(tee -a "$LOG")
-echo Logging output to "$LOG"
-
-# time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
-#   --weights ${BASEDIR}/data/pretrain_model/VGG_imagenet.npy \
-#   --imdb ${TRAIN_IMDB} \
-#   --iters ${ITERS} \
-#   --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
-#   --network VGGnet_train \
-#   ${EXTRA_ARGS}
-
-time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
-  --imdb ${TRAIN_IMDB} \
-  --iters ${ITERS} \
-  --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
-  --network VGGnet_train \
-  ${EXTRA_ARGS}
-
 set +x
 NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`
 set -x
 
-time $PY_PATH python ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
+time $PY_PATH ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
   --weights ${NET_FINAL} \
   --imdb ${TEST_IMDB} \
   --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
