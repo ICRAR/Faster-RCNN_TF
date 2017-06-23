@@ -20,7 +20,7 @@ NET_FINAL=$5
 
 array=( $@ )
 len=${#array[@]}
-EXTRA_ARGS=${array[@]:4:$len}
+EXTRA_ARGS=${array[@]:5:$len}
 EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 
 BASEDIR=/group/pawsey0129/cwu/rgz-faster-rcnn
