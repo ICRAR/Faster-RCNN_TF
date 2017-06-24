@@ -53,9 +53,9 @@ case $DATASET in
     ;;
 esac
 
-LOG="${BASEDIR}/experiments/logs/faster_rcnn_end2end_${NET}_${EXTRA_ARGS_SLUG}.txt.`date +'%Y-%m-%d_%H-%M-%S'`"
-exec &> >(tee -a "$LOG")
-echo Logging output to "$LOG"
+# LOG="${BASEDIR}/experiments/logs/faster_rcnn_end2end_${NET}_${EXTRA_ARGS_SLUG}.txt.`date +'%Y-%m-%d_%H-%M-%S'`"
+# exec &> >(tee -a "$LOG")
+# echo Logging output to "$LOG"
 
 # time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
 #   --weights ${BASEDIR}/data/pretrain_model/VGG_imagenet.npy \
