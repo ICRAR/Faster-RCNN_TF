@@ -27,10 +27,10 @@ PY_PATH=/group/pawsey0129/software/dlpyws/bin/python
 
 case $DATASET in
   rgz)
-    TRAIN_IMDB="rgz_2017_train"
+    TRAIN_IMDB="rgz_2017_trainsecond"
     TEST_IMDB="rgz_2017_test"
     PT_DIR="rgz"
-    ITERS=50000
+    ITERS=60000
     ;;
   pascal_voc)
     TRAIN_IMDB="voc_2007_trainval"
@@ -72,13 +72,13 @@ time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID
   --network VGGnet_train \
   ${EXTRA_ARGS}
 
-set +x
-NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`
-set -x
-
-time $PY_PATH python ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
-  --weights ${NET_FINAL} \
-  --imdb ${TEST_IMDB} \
-  --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
-  --network VGGnet_test \
-  ${EXTRA_ARGS}
+# set +x
+# NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`
+# set -x
+#
+# time $PY_PATH python ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
+#   --weights ${NET_FINAL} \
+#   --imdb ${TEST_IMDB} \
+#   --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
+#   --network VGGnet_test \
+#   ${EXTRA_ARGS}
