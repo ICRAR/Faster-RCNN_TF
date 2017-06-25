@@ -88,8 +88,8 @@ class VGGnet_train(Network):
         (self.feed('drop7')
              .fc(n_classes*4, relu=False, name='bbox_pred'))
 
-class VGGnet_trainsmall(VGGnet_train):
-    def __init__(self, trainable=True):
-        super(VGGnet_trainsmall, self).__init__(trainable=trainable,
-                                                    anchor_scales=[2, 4, 8],
-                                                    feat_stride=[4,])
+# class VGGnet_trainsmall(VGGnet_train):
+#     def __init__(self, trainable=True):
+#         super(VGGnet_trainsmall, self).__init__(trainable=trainable,
+#                                                     anchor_scales=[2, 4, 8],
+#                                                     feat_stride=[4,])
