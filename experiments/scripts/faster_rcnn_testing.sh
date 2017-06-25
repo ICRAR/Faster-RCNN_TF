@@ -57,14 +57,14 @@ esac
 # set +x
 # NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print $4}'`
 # set -x
-mycommand=$PY_PATH ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
-  --weights ${NET_FINAL} \
-  --imdb ${TEST_IMDB} \
-  --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
-  --network VGGnet_test \
-  ${EXTRA_ARGS}
-
-echo $mycommand
+# mycommand=$PY_PATH ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
+#   --weights ${NET_FINAL} \
+#   --imdb ${TEST_IMDB} \
+#   --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
+#   --network VGGnet_test \
+#   ${EXTRA_ARGS}
+#
+# echo $mycommand
 
 time $PY_PATH ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID} \
   --weights ${NET_FINAL} \
