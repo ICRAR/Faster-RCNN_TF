@@ -53,7 +53,7 @@ class VGGnet_train(Network):
              .conv(1,1,len(self._anchor_scales)*3*2 ,1 , 1, padding='VALID', relu = False, name='rpn_cls_score'))
 
         (self.feed('rpn_cls_score','gt_boxes','im_info','data')
-             .anchor_target_layer(self._feat_stride, anchor_scales, name = 'rpn-data' ))
+             .anchor_target_layer(self._feat_stride, self._anchor_scales, name = 'rpn-data' ))
 
         # Loss of rpn_cls & rpn_boxes
 
@@ -69,7 +69,7 @@ class VGGnet_train(Network):
              .reshape_layer(len(self._anchor_scales)*3*2,name = 'rpn_cls_prob_reshape'))
 
         (self.feed('rpn_cls_prob_reshape','rpn_bbox_pred','im_info')
-             .proposal_layer(self._feat_stride, anchor_scales, 'TRAIN',name = 'rpn_rois'))
+             .proposal_layer(self._feat_stride, self._anchor_scales, 'TRAIN',name = 'rpn_rois'))
 
         (self.feed('rpn_rois','gt_boxes')
              .proposal_target_layer(n_classes,name = 'roi-data'))
