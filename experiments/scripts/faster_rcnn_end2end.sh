@@ -14,7 +14,7 @@ export PYTHONUNBUFFERED="True"
 
 DEV=$1
 DEV_ID=$2
-NET=$3
+NETWORK=$3  # e.g. VGGnet_train
 DATASET=$4
 
 array=( $@ )
@@ -69,7 +69,7 @@ time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID
   --imdb ${TRAIN_IMDB} \
   --iters ${ITERS} \
   --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
-  --network VGGnet_train \
+  --network ${NETWORK} \
   ${EXTRA_ARGS}
 
 # set +x

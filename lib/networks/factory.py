@@ -29,6 +29,8 @@ def get_network(name):
        return networks.VGGnet_test()
     elif name.split('_')[1] == 'train':
        return networks.VGGnet_train()
+    elif name.split('_')[1] == 'trainsmall':
+       return networks.VGGnet_trainsmall()
     else:
        raise KeyError('Unknown dataset: {}'.format(name))
 
