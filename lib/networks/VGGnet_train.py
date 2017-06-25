@@ -1,16 +1,14 @@
 import tensorflow as tf
 from networks.network import Network
 
-
-#define
-
 n_classes = 7
-_feat_stride = [16,]
-anchor_scales = [8, 16, 32]
 
 class VGGnet_train(Network):
-    def __init__(self, trainable=True):
+    def __init__(self, trainable=True, anchor_scales=[8, 16, 32],
+                feat_stride=[16,]):
         self.inputs = []
+        self._anchor_scales = anchor_scales
+        self._feat_stride = feat_stride
         self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
         self.im_info = tf.placeholder(tf.float32, shape=[None, 3])
         self.gt_boxes = tf.placeholder(tf.float32, shape=[None, 5])
@@ -52,15 +50,15 @@ class VGGnet_train(Network):
         #========= RPN ============
         (self.feed('conv5_3')
              .conv(3,3,512,1,1,name='rpn_conv/3x3')
-             .conv(1,1,len(anchor_scales)*3*2 ,1 , 1, padding='VALID', relu = False, name='rpn_cls_score'))
+             .conv(1,1,len(self._anchor_scales)*3*2 ,1 , 1, padding='VALID', relu = False, name='rpn_cls_score'))
 
         (self.feed('rpn_cls_score','gt_boxes','im_info','data')
-             .anchor_target_layer(_feat_stride, anchor_scales, name = 'rpn-data' ))
+             .anchor_target_layer(self._feat_stride, anchor_scales, name = 'rpn-data' ))
 
         # Loss of rpn_cls & rpn_boxes
 
         (self.feed('rpn_conv/3x3')
-             .conv(1,1,len(anchor_scales)*3*4, 1, 1, padding='VALID', relu = False, name='rpn_bbox_pred'))
+             .conv(1,1,len(self._anchor_scales)*3*4, 1, 1, padding='VALID', relu = False, name='rpn_bbox_pred'))
 
         #========= RoI Proposal ============
         (self.feed('rpn_cls_score')
@@ -68,10 +66,10 @@ class VGGnet_train(Network):
              .softmax(name='rpn_cls_prob'))
 
         (self.feed('rpn_cls_prob')
-             .reshape_layer(len(anchor_scales)*3*2,name = 'rpn_cls_prob_reshape'))
+             .reshape_layer(len(self._anchor_scales)*3*2,name = 'rpn_cls_prob_reshape'))
 
         (self.feed('rpn_cls_prob_reshape','rpn_bbox_pred','im_info')
-             .proposal_layer(_feat_stride, anchor_scales, 'TRAIN',name = 'rpn_rois'))
+             .proposal_layer(self._feat_stride, anchor_scales, 'TRAIN',name = 'rpn_rois'))
 
         (self.feed('rpn_rois','gt_boxes')
              .proposal_target_layer(n_classes,name = 'roi-data'))
@@ -89,3 +87,9 @@ class VGGnet_train(Network):
 
         (self.feed('drop7')
              .fc(n_classes*4, relu=False, name='bbox_pred'))
+
+class VGGnet_trainsmall(VGGnet_train):
+    def __init__(self, trainable=True):
+        super(VGGnet_trainsmall, self).__init__(trainable=trainable,
+                                                    anchor_scales=[2, 4, 8],
+                                                    feat_stride=[4,])
