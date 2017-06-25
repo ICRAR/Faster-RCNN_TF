@@ -14,7 +14,7 @@ export PYTHONUNBUFFERED="True"
 
 DEV=$1
 DEV_ID=$2
-NET=$3
+NETWORK=$3 # e.g. VGGnet_test
 DATASET=$4
 NET_FINAL=$5
 
@@ -28,10 +28,16 @@ PY_PATH=/group/pawsey0129/software/dlpyws/bin/python
 
 case $DATASET in
   rgz)
-    TRAIN_IMDB="rgz_2017_trainthird"
+    TRAIN_IMDB="rgz_2017_trainfourth"
+    TEST_IMDB="rgz_2017_testfourth"
+    PT_DIR="rgz"
+    ITERS=60000
+    ;;
+  rgzsmall)
+    TRAIN_IMDB="rgz_2017_trainthirdsmall"
     TEST_IMDB="rgz_2017_testthird"
     PT_DIR="rgz"
-    ITERS=50000
+    ITERS=60000
     ;;
   pascal_voc)
     TRAIN_IMDB="voc_2007_trainval"
@@ -70,5 +76,5 @@ time $PY_PATH ${BASEDIR}/tools/test_net.py --device ${DEV} --device_id ${DEV_ID}
   --weights ${NET_FINAL} \
   --imdb ${TEST_IMDB} \
   --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
-  --network VGGnet_test \
+  --network ${NETWORK} \
   ${EXTRA_ARGS}

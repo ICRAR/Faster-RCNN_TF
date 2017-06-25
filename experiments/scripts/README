@@ -6,6 +6,7 @@ train_size 3730
 test_size 3169
 anchor_size [8, 16, 32]
 feature stride size [16,]
+logfile slurm-2153455.out, slurm-2155783.out, slurm-2156848.out
 
 [Second]
 132 x 132 png files, plus additional 3845 standalone '1_x' images,
@@ -18,6 +19,7 @@ train_size 3730 + 3845 = 7575
 test_size 3169
 anchor_size [8, 16, 32]
 feature stride size [16,]
+logfile slurm-2160201.out, slurm-2163383.out
 
 [Third]
 132 x 132 png files, plus additional 3845 '1_x' images, 2411 of which are added
@@ -29,6 +31,7 @@ train_size 3730 + 2411 = 6141
 test_size 3169 + 1434 = 4603
 anchor_size [8, 16, 32]
 feature stride size [16,]
+logfile slurm-2163554.out
 
 [Thirdsmall]
 The same as [Third] except that using a smaller anchor scale and a smaller
@@ -41,12 +44,13 @@ train_size 3730 + 2411 = 6141
 test_size 3169 + 1434 = 4603
 anchor_size [2, 4, 8]
 feature stride size [4,]
+logfile slurm-2164121.out
 
 [Fourth]
 500 x 500 png files, plus additional 3845 '1_x' images, 2411 of which are added
 to the training set (trainfourth.txt), and 1434 of which are added to the
 testing set (trainfourth.txt).
-==========================
+============================
 png pixel size 500
 train_size 3730 + 2411 = 6141
 test_size 3169 + 1434 = 4603

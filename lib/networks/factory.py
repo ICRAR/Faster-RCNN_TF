@@ -18,7 +18,6 @@ import tensorflow as tf
 
 #__sets['VGGnet_test'] = networks.VGGnet_test()
 
-
 def get_network(name):
     """Get a network by name."""
     #if not __sets.has_key(name):
@@ -30,6 +29,9 @@ def get_network(name):
        return networks.VGGnet_train()
     elif name.split('_')[1] == 'trainsmall':
        return networks.VGGnet_train(anchor_scales=[2, 4, 8],
+                                    feat_stride=[4,])
+    elif name.split('_')[1] == 'testsmall':
+       return networks.VGGnet_test(anchor_scales=[2, 4, 8],
                                     feat_stride=[4,])
     else:
        raise KeyError('Unknown dataset: {}'.format(name))
