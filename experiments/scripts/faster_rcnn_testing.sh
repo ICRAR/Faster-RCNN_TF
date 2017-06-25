@@ -28,8 +28,8 @@ PY_PATH=/group/pawsey0129/software/dlpyws/bin/python
 
 case $DATASET in
   rgz)
-    TRAIN_IMDB="rgz_2017_train"
-    TEST_IMDB="rgz_2017_test"
+    TRAIN_IMDB="rgz_2017_trainthird"
+    TEST_IMDB="rgz_2017_testthird"
     PT_DIR="rgz"
     ITERS=50000
     ;;
