@@ -11,7 +11,6 @@ __sets = {}
 
 import networks.VGGnet_train
 import networks.VGGnet_test
-import networks.VGGnet_trainsmall
 import pdb
 import tensorflow as tf
 
