@@ -311,8 +311,10 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300, thresh=0.05,
                 plt.imshow(image)
 
             # skip j = 0, because it's the background class
+            ttt = 0
             for j in xrange(1, imdb.num_classes):
                 inds = np.where(scores[:, j] > thresh)[0]
+                ttt += len(inds)
                 cls_scores = scores[inds, j]
                 cls_boxes = boxes[inds, j*4:(j+1)*4]
                 cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
@@ -335,12 +337,12 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300, thresh=0.05,
                         all_boxes[j][i] = all_boxes[j][i][keep, :]
             _t['misc'].toc()
 
-            print 'im_detect: {:d}/{:d} {:d} boxes {:.3f}s {:.3f}s' \
-                  .format(i + 1, num_images, len(boxes), _t['im_detect'].average_time,
+            print 'im_detect: {:d}/{:d} {:d} detection {:.3f}s {:.3f}s' \
+                  .format(i + 1, num_images, ttt, _t['im_detect'].average_time,
                           _t['misc'].average_time)
 
-            with open(det_file, 'wb') as f:
-                cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+        with open(det_file, 'wb') as f:
+            cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
     else:
         with open(det_file, 'r') as fin:
             all_boxes = cPickle.load(fin)
