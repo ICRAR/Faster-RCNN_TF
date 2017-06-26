@@ -31,7 +31,7 @@ train_size 3730 + 2411 = 6141
 test_size 3169 + 1434 = 4603
 anchor_size [8, 16, 32]
 feature stride size [16,]
-logfile slurm-2163554.out
+logfile slurm-2163554.out, slurm-2164344.out
 
 [Thirdsmall]
 The same as [Third] except that using a smaller anchor scale and a smaller

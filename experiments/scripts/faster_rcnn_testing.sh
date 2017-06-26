@@ -35,7 +35,7 @@ case $DATASET in
     ;;
   rgzsmall)
     TRAIN_IMDB="rgz_2017_trainthirdsmall"
-    TEST_IMDB="rgz_2017_testthird"
+    TEST_IMDB="rgz_2017_testthirdsmall"
     PT_DIR="rgz"
     ITERS=60000
     ;;
