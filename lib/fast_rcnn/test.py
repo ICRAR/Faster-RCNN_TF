@@ -335,8 +335,8 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300, thresh=0.05,
                         all_boxes[j][i] = all_boxes[j][i][keep, :]
             _t['misc'].toc()
 
-            print 'im_detect: {:d}/{:d} {:.3f}s {:.3f}s' \
-                  .format(i + 1, num_images, _t['im_detect'].average_time,
+            print 'im_detect: {:d}/{:d} {:d} boxes {:.3f}s {:.3f}s' \
+                  .format(i + 1, num_images, len(boxes), _t['im_detect'].average_time,
                           _t['misc'].average_time)
 
             with open(det_file, 'wb') as f:
