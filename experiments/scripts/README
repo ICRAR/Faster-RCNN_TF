@@ -57,3 +57,21 @@ train_size 3730 + 2411 = 6141
 test_size 3169 + 1434 = 4603
 anchor_size [8, 16, 32]
 feature stride size [16,]
+
+AP for 1_1 = 0.5265
+AP for 1_2 = 0.1275
+AP for 1_3 = 0.1919
+AP for 2_2 = 0.4597
+AP for 2_3 = 0.4076
+AP for 3_3 = 0.5094
+Mean AP = 0.3704
+~~~~~~~~
+Results:
+0.527
+0.127
+0.192
+0.460
+0.408
+0.509
+0.370
+~~~~~~~~

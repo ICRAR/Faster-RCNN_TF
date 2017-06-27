@@ -27,7 +27,7 @@ def get_network(name):
        return networks.VGGnet_test()
     elif name.split('_')[1] == 'train':
        return networks.VGGnet_train()
-   elif name.split('_')[1] in ['trainsmall', 'trainfifth']:
+    elif name.split('_')[1] in ['trainsmall', 'trainfifth']:
        return networks.VGGnet_train(anchor_scales=[2, 4, 8],
                                     feat_stride=[4,])
     elif name.split('_')[1] in ['trainsmall', 'trainfifth']:
