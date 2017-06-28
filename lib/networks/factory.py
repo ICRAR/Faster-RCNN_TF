@@ -24,16 +24,15 @@ def get_network(name):
     #    raise KeyError('Unknown dataset: {}'.format(name))
     #return __sets[name]
     if name.split('_')[1] == 'test':
-       return networks.VGGnet_test()
+        return networks.VGGnet_test()
     elif name.split('_')[1] == 'train':
-       return networks.VGGnet_train()
-   elif name.split('_')[1] in ['trainsmall', 'trainfifth', 'trainsixth']:
-       return networks.VGGnet_train(anchor_scales=[2, 4, 8])
-   elif name.split('_')[1] in ['testsmall', 'testfifth', 'testsixth']:
-       return networks.VGGnet_test(anchor_scales=[2, 4, 8])
+        return networks.VGGnet_train()
+    elif name.split('_')[1] in ['trainsmall', 'trainfifth', 'trainsixth']:
+        return networks.VGGnet_train(anchor_scales=[2, 4, 8])
+    elif name.split('_')[1] in ['testsmall', 'testfifth', 'testsixth']:
+        return networks.VGGnet_test(anchor_scales=[2, 4, 8])
     else:
-       raise KeyError('Unknown dataset: {}'.format(name))
-
+        raise KeyError('Unknown dataset: {}'.format(name))
 
 def list_networks():
     """List all registered imdbs."""
