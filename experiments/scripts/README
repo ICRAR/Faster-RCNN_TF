@@ -94,3 +94,9 @@ ra-dec bbox,
 change config to 132 x 132
 140000 iterations
 No result
+
+[07]
+132 png files
+anchor_size [8, 16, 32]
+feature stride size [16,]
+still uses the ra-dec bbox (no any adjustment)
