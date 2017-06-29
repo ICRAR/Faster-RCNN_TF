@@ -20,12 +20,15 @@ import tensorflow as tf
 
 def get_network(name):
     """Get a network by name."""
+    nwnm = name.split('_')[1]
     #if not __sets.has_key(name):
     #    raise KeyError('Unknown dataset: {}'.format(name))
     #return __sets[name]
-    if name.split('_')[1].find('test') > -1:
+    if (nwnm in ['train07', 'test07']):
+        return networks.VGGnet_test(anchor_scales=[4, 8])
+    if nwnm.find('test') > -1:
         return networks.VGGnet_test()
-    elif name.split('_')[1].find('train') > -1:
+    elif nwnm.find('train') > -1:
         return networks.VGGnet_train()
     # elif name.split('_')[1] in ['trainsmall', 'trainfifth', 'trainsixth']:
     #     return networks.VGGnet_train(anchor_scales=[2, 4, 8])
