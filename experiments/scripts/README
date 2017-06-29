@@ -46,6 +46,7 @@ test_size 3169 + 1434 = 4603
 anchor_size [2, 4, 8]
 feature stride size [4,]
 logfile slurm-2164121.out, slurm-2165140.out
+no result
 
 [Fourth]
 500 x 500 png files, plus additional 3845 '1_x' images, 2411 of which are added
@@ -75,3 +76,21 @@ Results:
 0.509
 0.370
 ~~~~~~~~
+
+[Fifth]
+132 png files
+components-based bbox,
+change config to 132 x 132
+70000 iterations
+No result
+anchor_size [2, 4, 8]
+feature stride size [16,]
+
+[Sixth]
+132 png files
+anchor_size [2, 4, 8]
+feature stride size [16,]
+ra-dec bbox,
+change config to 132 x 132
+140000 iterations
+No result
