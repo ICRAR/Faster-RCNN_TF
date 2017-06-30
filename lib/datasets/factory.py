@@ -82,7 +82,7 @@ for year in ['2017']:
                   'trainthird', 'testthird', 'trainthirdsmall',
                   'trainfourth', 'testfourth', 'testthirdsmall',
                   'trainfifth', 'testfifth', 'trainsixth', 'testsixth',
-                  'train07', 'test07']:
+                  'train07', 'test07', 'train08', 'test08']:
         name = 'rgz_{}_{}'.format(year, split)
         print name
         __sets[name] = (lambda split=split, year=year:
