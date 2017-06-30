@@ -100,3 +100,4 @@ No result
 anchor_size [8, 16, 32]
 feature stride size [16,]
 still uses the ra-dec bbox (no any adjustment)
+but change the side back to s=600
