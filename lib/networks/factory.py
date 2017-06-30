@@ -27,6 +27,14 @@ def get_network(name):
     if (nwnm == 'train07'):
         # we have to re-train low-level ConvNet from scratch
         return networks.VGGnet_train(low_level_trainable=True)
+    elif (nwnm == 'train08'):
+        return networks.VGGnet_train(low_level_trainable=True,
+                                     anchor_scales=[2, 4, 8],
+                                     anchor_ratios=[1])
+    elif (nwnm == 'test08'):
+        return networks.VGGnet_test(low_level_trainable=True,
+                                     anchor_scales=[2, 4, 8],
+                                     anchor_ratios=[1])
     elif nwnm.find('test') > -1:
         return networks.VGGnet_test()
     elif nwnm.find('train') > -1:

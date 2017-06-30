@@ -17,12 +17,14 @@ import pdb
 
 DEBUG = False
 
-def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, _feat_stride = [16,], anchor_scales = [4 ,8, 16, 32]):
+def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data,
+                       _feat_stride = [16,], anchor_scales=[4, 8, 16, 32],
+                       anchor_ratios=[0.5, 1, 2]):
     """
     Assign anchors to ground-truth targets. Produces anchor classification
     labels and bounding-box regression targets.
     """
-    _anchors = generate_anchors(scales=np.array(anchor_scales))
+    _anchors = generate_anchors(ratios=anchor_ratios, scales=np.array(anchor_scales))
     _num_anchors = _anchors.shape[0]
 
     if DEBUG:

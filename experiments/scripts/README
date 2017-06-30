@@ -96,8 +96,11 @@ change config to 132 x 132
 No result
 
 [07]
-132 png files
+132 png file
 anchor_size [8, 16, 32]
 feature stride size [16,]
 still uses the ra-dec bbox (no any adjustment)
+trainable = True for low-level ConvNets
 but change the side back to s=600
+
+[08]

@@ -19,7 +19,9 @@ DEBUG = False
 Outputs object detection proposals by applying estimated bounding-box
 transformations to a set of regular boxes (called "anchors").
 """
-def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,_feat_stride = [16,],anchor_scales = [8, 16, 32]):
+def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,
+                  _feat_stride = [16,],anchor_scales=[8, 16, 32],
+                  anchor_ratios=[0.5, 1, 2]):
     # Algorithm:
     #
     # for each (H, W) location i
@@ -33,7 +35,7 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,_feat_stri
     # take after_nms_topN proposals after NMS
     # return the top proposals (-> RoIs top, scores top)
     #layer_params = yaml.load(self.param_str_)
-    _anchors = generate_anchors(scales=np.array(anchor_scales))
+    _anchors = generate_anchors(ratios=anchor_ratios, scales=np.array(anchor_scales))
     _num_anchors = _anchors.shape[0]
     rpn_cls_prob_reshape = np.transpose(rpn_cls_prob_reshape,[0,3,1,2])
     rpn_bbox_pred = np.transpose(rpn_bbox_pred,[0,3,1,2])

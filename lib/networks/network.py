@@ -156,20 +156,22 @@ class Network(object):
                                     name=name)[0]
 
     @layer
-    def proposal_layer(self, input, _feat_stride, anchor_scales, cfg_key, name):
+    def proposal_layer(self, input, _feat_stride, anchor_scales, anchor_ratios, cfg_key, name):
         if isinstance(input[0], tuple):
             input[0] = input[0][0]
-        return tf.reshape(tf.py_func(proposal_layer_py,[input[0],input[1],input[2], cfg_key, _feat_stride, anchor_scales], [tf.float32]),[-1,5],name =name)
+        return tf.reshape(tf.py_func(proposal_layer_py,[input[0],input[1],input[2], cfg_key, _feat_stride, anchor_scales, anchor_ratios], [tf.float32]),[-1,5],name =name)
 
 
     @layer
-    def anchor_target_layer(self, input, _feat_stride, anchor_scales, name):
+    def anchor_target_layer(self, input, _feat_stride, anchor_scales, anchor_ratios, name):
         if isinstance(input[0], tuple):
             input[0] = input[0][0]
 
         with tf.variable_scope(name) as scope:
 
-            rpn_labels,rpn_bbox_targets,rpn_bbox_inside_weights,rpn_bbox_outside_weights = tf.py_func(anchor_target_layer_py,[input[0],input[1],input[2],input[3], _feat_stride, anchor_scales],[tf.float32,tf.float32,tf.float32,tf.float32])
+            rpn_labels,rpn_bbox_targets,rpn_bbox_inside_weights,rpn_bbox_outside_weights =\
+             tf.py_func(anchor_target_layer_py,[input[0],input[1],input[2],input[3],
+             _feat_stride, anchor_scales, anchor_ratios],[tf.float32,tf.float32,tf.float32,tf.float32])
 
             rpn_labels = tf.convert_to_tensor(tf.cast(rpn_labels,tf.int32), name = 'rpn_labels')
             rpn_bbox_targets = tf.convert_to_tensor(rpn_bbox_targets, name = 'rpn_bbox_targets')
@@ -188,13 +190,13 @@ class Network(object):
 
             rois,labels,bbox_targets,bbox_inside_weights,bbox_outside_weights = tf.py_func(proposal_target_layer_py,[input[0],input[1],classes],[tf.float32,tf.float32,tf.float32,tf.float32,tf.float32])
 
-            rois = tf.reshape(rois,[-1,5] , name = 'rois') 
+            rois = tf.reshape(rois,[-1,5] , name = 'rois')
             labels = tf.convert_to_tensor(tf.cast(labels,tf.int32), name = 'labels')
             bbox_targets = tf.convert_to_tensor(bbox_targets, name = 'bbox_targets')
             bbox_inside_weights = tf.convert_to_tensor(bbox_inside_weights, name = 'bbox_inside_weights')
             bbox_outside_weights = tf.convert_to_tensor(bbox_outside_weights, name = 'bbox_outside_weights')
 
-           
+
             return rois, labels, bbox_targets, bbox_inside_weights, bbox_outside_weights
 
 

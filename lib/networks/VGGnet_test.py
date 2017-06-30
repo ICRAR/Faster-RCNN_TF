@@ -5,7 +5,8 @@ n_classes = 7
 
 class VGGnet_test(Network):
     def __init__(self, trainable=True, anchor_scales=[8, 16, 32],
-                feat_stride=[16,]):
+                feat_stride=[16,], low_level_trainable=False,
+                anchor_ratios=[0.5, 1, 2]):
         self.inputs = []
         self._anchor_scales = anchor_scales
         self._feat_stride = feat_stride
@@ -14,15 +15,18 @@ class VGGnet_test(Network):
         self.keep_prob = tf.placeholder(tf.float32)
         self.layers = dict({'data':self.data, 'im_info':self.im_info})
         self.trainable = trainable
+        self.low_level_trainable = low_level_trainable
+        self.anchor_ratio_size = len(anchor_ratios)
+        self.anchor_ratios = anchor_ratios
         self.setup()
 
     def setup(self):
         (self.feed('data')
-             .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=False)
-             .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=False)
+             .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=self.low_level_trainable)
+             .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool1')
-             .conv(3, 3, 128, 1, 1, name='conv2_1', trainable=False)
-             .conv(3, 3, 128, 1, 1, name='conv2_2', trainable=False)
+             .conv(3, 3, 128, 1, 1, name='conv2_1', trainable=self.low_level_trainable)
+             .conv(3, 3, 128, 1, 1, name='conv2_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool2')
              .conv(3, 3, 256, 1, 1, name='conv3_1')
              .conv(3, 3, 256, 1, 1, name='conv3_2')
@@ -38,20 +42,20 @@ class VGGnet_test(Network):
 
         (self.feed('conv5_3')
              .conv(3,3,512,1,1,name='rpn_conv/3x3')
-             .conv(1,1,len(self._anchor_scales)*3*2,1,1,padding='VALID',relu = False,name='rpn_cls_score'))
+             .conv(1,1,len(self._anchor_scales)*self.anchor_ratio_size*2,1,1,padding='VALID',relu = False,name='rpn_cls_score'))
 
         (self.feed('rpn_conv/3x3')
-             .conv(1,1,len(self._anchor_scales)*3*4,1,1,padding='VALID',relu = False,name='rpn_bbox_pred'))
+             .conv(1,1,len(self._anchor_scales)*self.anchor_ratio_size*4,1,1,padding='VALID',relu = False,name='rpn_bbox_pred'))
 
         (self.feed('rpn_cls_score')
              .reshape_layer(2,name = 'rpn_cls_score_reshape')
              .softmax(name='rpn_cls_prob'))
 
         (self.feed('rpn_cls_prob')
-             .reshape_layer(len(self._anchor_scales)*3*2,name = 'rpn_cls_prob_reshape'))
+             .reshape_layer(len(self._anchor_scales)*self.anchor_ratio_size*2,name = 'rpn_cls_prob_reshape'))
 
         (self.feed('rpn_cls_prob_reshape','rpn_bbox_pred','im_info')
-             .proposal_layer(self._feat_stride, self._anchor_scales, 'TEST', name = 'rois'))
+             .proposal_layer(self._feat_stride, self._anchor_scales, self.anchor_ratios, 'TEST', name = 'rois'))
 
         (self.feed('conv5_3', 'rois')
              .roi_pool(7, 7, 1.0/16, name='pool_5')

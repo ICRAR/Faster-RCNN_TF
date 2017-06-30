@@ -5,7 +5,8 @@ n_classes = 7
 
 class VGGnet_train(Network):
     def __init__(self, trainable=True, anchor_scales=[8, 16, 32],
-                feat_stride=[16,], low_level_trainable=False):
+                feat_stride=[16,], low_level_trainable=False,
+                anchor_ratios=[0.5, 1, 2]):
         self.inputs = []
         self._anchor_scales = anchor_scales
         self._feat_stride = feat_stride
@@ -16,6 +17,8 @@ class VGGnet_train(Network):
         self.layers = dict({'data':self.data, 'im_info':self.im_info, 'gt_boxes':self.gt_boxes})
         self.trainable = trainable
         self.low_level_trainable = low_level_trainable
+        self.anchor_ratio_size = len(anchor_ratios)
+        self.anchor_ratios = anchor_ratios
         self.setup()
 
         # create ops and placeholders for bbox normalization process
@@ -50,31 +53,33 @@ class VGGnet_train(Network):
              .conv(3, 3, 512, 1, 1, name='conv5_3'))
         #========= RPN ============
         (self.feed('conv5_3')
-             .conv(3,3,512,1,1,name='rpn_conv/3x3')
-             .conv(1,1,len(self._anchor_scales)*3*2 ,1 , 1, padding='VALID', relu = False, name='rpn_cls_score'))
+             .conv(3, 3, 512, 1, 1, name='rpn_conv/3x3')
+             .conv(1,1,len(self._anchor_scales) * self.anchor_ratio_size * 2, 1,
+                   1, padding='VALID', relu=False, name='rpn_cls_score'))
 
         (self.feed('rpn_cls_score','gt_boxes','im_info','data')
-             .anchor_target_layer(self._feat_stride, self._anchor_scales, name = 'rpn-data' ))
+             .anchor_target_layer(self._feat_stride, self._anchor_scales, self.anchor_ratios, name='rpn-data'))
 
         # Loss of rpn_cls & rpn_boxes
 
         (self.feed('rpn_conv/3x3')
-             .conv(1,1,len(self._anchor_scales)*3*4, 1, 1, padding='VALID', relu = False, name='rpn_bbox_pred'))
+             .conv(1,1,len(self._anchor_scales) * self.anchor_ratio_size * 4, 1,
+                   1, padding='VALID', relu=False, name='rpn_bbox_pred'))
 
         #========= RoI Proposal ============
         (self.feed('rpn_cls_score')
-             .reshape_layer(2,name = 'rpn_cls_score_reshape')
+             .reshape_layer(2, name='rpn_cls_score_reshape')
              .softmax(name='rpn_cls_prob'))
 
         (self.feed('rpn_cls_prob')
-             .reshape_layer(len(self._anchor_scales)*3*2,name = 'rpn_cls_prob_reshape'))
+             .reshape_layer(len(self._anchor_scales) * self.anchor_ratio_size * 2,
+                            name='rpn_cls_prob_reshape'))
 
         (self.feed('rpn_cls_prob_reshape','rpn_bbox_pred','im_info')
-             .proposal_layer(self._feat_stride, self._anchor_scales, 'TRAIN',name = 'rpn_rois'))
+             .proposal_layer(self._feat_stride, self._anchor_scales, self.anchor_ratios, 'TRAIN', name='rpn_rois'))
 
         (self.feed('rpn_rois','gt_boxes')
              .proposal_target_layer(n_classes,name = 'roi-data'))
-
 
         #========= RCNN ============
         (self.feed('conv5_3', 'roi-data')
@@ -88,9 +93,3 @@ class VGGnet_train(Network):
 
         (self.feed('drop7')
              .fc(n_classes*4, relu=False, name='bbox_pred'))
-
-# class VGGnet_trainsmall(VGGnet_train):
-#     def __init__(self, trainable=True):
-#         super(VGGnet_trainsmall, self).__init__(trainable=trainable,
-#                                                     anchor_scales=[2, 4, 8],
-#                                                     feat_stride=[4,])
