@@ -5,7 +5,7 @@ n_classes = 7
 
 class VGGnet_train(Network):
     def __init__(self, trainable=True, anchor_scales=[8, 16, 32],
-                feat_stride=[16,]):
+                feat_stride=[16,], low_level_trainable=False):
         self.inputs = []
         self._anchor_scales = anchor_scales
         self._feat_stride = feat_stride
@@ -15,6 +15,7 @@ class VGGnet_train(Network):
         self.keep_prob = tf.placeholder(tf.float32)
         self.layers = dict({'data':self.data, 'im_info':self.im_info, 'gt_boxes':self.gt_boxes})
         self.trainable = trainable
+        self.low_level_trainable = low_level_trainable
         self.setup()
 
         # create ops and placeholders for bbox normalization process
@@ -30,11 +31,11 @@ class VGGnet_train(Network):
 
     def setup(self):
         (self.feed('data')
-             .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=False)
-             .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=False)
+             .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=self.low_level_trainable)
+             .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool1')
-             .conv(3, 3, 128, 1, 1, name='conv2_1', trainable=False)
-             .conv(3, 3, 128, 1, 1, name='conv2_2', trainable=False)
+             .conv(3, 3, 128, 1, 1, name='conv2_1', trainable=self.low_level_trainable)
+             .conv(3, 3, 128, 1, 1, name='conv2_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool2')
              .conv(3, 3, 256, 1, 1, name='conv3_1')
              .conv(3, 3, 256, 1, 1, name='conv3_2')

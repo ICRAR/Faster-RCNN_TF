@@ -25,19 +25,12 @@ def get_network(name):
     #    raise KeyError('Unknown dataset: {}'.format(name))
     #return __sets[name]
     if (nwnm == 'train07'):
-        print('Using networks.VGGnet_train(anchor_scales=[4, 8]')
-        return networks.VGGnet_train(anchor_scales=[4, 8])
-    elif (nwnm == 'teset07'):
-        print('Using networks.VGGnet_test(anchor_scales=[4, 8])')
-        return networks.VGGnet_test(anchor_scales=[4, 8])
+        # we have to re-train low-level ConvNet from scratch
+        return networks.VGGnet_train(low_level_trainable=True)
     elif nwnm.find('test') > -1:
         return networks.VGGnet_test()
     elif nwnm.find('train') > -1:
         return networks.VGGnet_train()
-    # elif name.split('_')[1] in ['trainsmall', 'trainfifth', 'trainsixth']:
-    #     return networks.VGGnet_train(anchor_scales=[2, 4, 8])
-    # elif name.split('_')[1] in ['testsmall', 'testfifth', 'testsixth']:
-    #     return networks.VGGnet_test(anchor_scales=[2, 4, 8])
     else:
         raise KeyError('Unknown dataset: {}'.format(name))
 
