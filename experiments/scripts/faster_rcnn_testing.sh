@@ -30,8 +30,10 @@ PY_PATH=/group/pawsey0129/software/dlpyws/bin/python
 case $IMG_SIDE in
   132)
     CONFIG_EXT="_132pix.yml"
+    ;;
   600)
     CONFIG_EXT=".yml"
+    ;;
   *)
     echo "No valid image side given"
     exit
