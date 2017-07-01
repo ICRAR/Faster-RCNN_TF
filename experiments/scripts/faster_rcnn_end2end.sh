@@ -16,14 +16,26 @@ DEV=$1
 DEV_ID=$2
 NETWORK=$3  # e.g. VGGnet_train
 DATASET=$4
+IMG_SIDE=$5
 
 array=( $@ )
 len=${#array[@]}
-EXTRA_ARGS=${array[@]:4:$len}
+EXTRA_ARGS=${array[@]:5:$len}
 EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 
 BASEDIR=/group/pawsey0129/cwu/rgz-faster-rcnn
 PY_PATH=/group/pawsey0129/software/dlpyws/bin/python
+
+case $IMG_SIDE in
+  132)
+    CONFIG_EXT="_132pix.yml"
+  600)
+    CONFIG_EXT=".yml"
+  *)
+    echo "No valid image side given"
+    exit
+    ;;
+esac
 
 case $DATASET in
   rgz)
@@ -92,7 +104,7 @@ esac
 time $PY_PATH ${BASEDIR}/tools/train_net.py --device ${DEV} --device_id ${DEV_ID} \
   --imdb ${TRAIN_IMDB} \
   --iters ${ITERS} \
-  --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end.yml \
+  --cfg ${BASEDIR}/experiments/cfgs/faster_rcnn_end2end${CONFIG_EXT} \
   --network ${NETWORK} \
   ${EXTRA_ARGS}
 
