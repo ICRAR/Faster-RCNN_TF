@@ -269,7 +269,8 @@ def apply_nms(all_boxes, thresh):
     return nms_boxes
 
 
-def test_net(sess, net, imdb, weights_filename , max_per_image=300, thresh=0.05, vis=False):
+def test_net(sess, net, imdb, weights_filename , max_per_image=300,
+             thresh=0.05, vis=False, force=False):
     """Test a Fast R-CNN network on an image database."""
     num_images = len(imdb.image_index)
     # all detections are collected into:
@@ -280,6 +281,8 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300, thresh=0.05,
 
     output_dir = get_output_dir(imdb, weights_filename)
     det_file = os.path.join(output_dir, 'detections.pkl')
+    if (force and os.path.exists(det_file)):
+        os.remove(det_file)
     if (not os.path.exists(det_file)):
         # timers
         _t = {'im_detect' : Timer(), 'misc' : Timer()}

@@ -102,8 +102,12 @@ feature stride size [16,]
 used the ra-dec bbox with adjustment
 trainable = True for low-level ConvNets
 but change the side back to s=600
+currently in the third round of training after (110K iterations, 24 hours)
 
 [08]
 change side to s=132 again
 anchor_size [2, 4, 8]
 feature stride size [16,]
+
+[09]
+THe same as 07 except it uses logminmax scaled png directly from FITS

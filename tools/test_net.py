@@ -36,8 +36,8 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--cfg', dest='cfg_file',
                         help='optional config file', default=None, type=str)
-    parser.add_argument('--wait', dest='wait',
-                        help='wait until net file exists',
+    parser.add_argument('--force', dest='force',
+                        help='force to remove the existing .det file',
                         default=True, type=bool)
     parser.add_argument('--imdb', dest='imdb_name',
                         help='dataset to test',
@@ -96,4 +96,5 @@ if __name__ == '__main__':
     saver.restore(sess, args.model)
     print ('Loading model weights from {:s}').format(args.model)
 
-    test_net(sess, network, imdb, weights_filename, thresh=args.thresh)
+    test_net(sess, network, imdb, weights_filename,
+             thresh=args.thresh, force=args.force)
