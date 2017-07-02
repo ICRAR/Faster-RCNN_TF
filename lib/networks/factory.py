@@ -30,10 +30,10 @@ def get_network(name):
     elif (nwnm in ['test07', 'test09']):
         # we have to re-train low-level ConvNet from scratch
         return networks.VGGnet_test(low_level_trainable=True)
-    elif (nwnm == 'train08'):
+    elif (nwnm in ['train08', 'train10']):
         return networks.VGGnet_train(low_level_trainable=True,
                                      anchor_scales=[2, 4, 8])
-    elif (nwnm == 'test08'):
+    elif (nwnm in ['test08', 'test10']):
         return networks.VGGnet_test(low_level_trainable=True,
                                      anchor_scales=[2, 4, 8])
     elif nwnm.find('test') > -1:

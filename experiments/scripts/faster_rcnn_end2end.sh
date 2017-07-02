@@ -82,6 +82,12 @@ case $DATASET in
     PT_DIR="rgz"
     ITERS=80000
     ;;
+  rgz10)
+    TRAIN_IMDB="rgz_2017_train10"
+    TEST_IMDB="rgz_2017_test10"
+    PT_DIR="rgz"
+    ITERS=220000
+    ;;
   pascal_voc)
     TRAIN_IMDB="voc_2007_trainval"
     TEST_IMDB="voc_2007_test"
