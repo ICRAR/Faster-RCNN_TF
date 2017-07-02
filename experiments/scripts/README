@@ -104,9 +104,28 @@ trainable = True for low-level ConvNets
 but change the side back to s=600
 currently in the third round of training after (110K iterations, 24 hours)
 
+test07_2nd (110k iterations)
+AP for 1_1 = 0.3915
+AP for 1_2 = 0.4812
+AP for 1_3 = 0.7695
+AP for 2_2 = 0.4841
+AP for 2_3 = 0.4449
+AP for 3_3 = 0.6207
+Mean AP = 0.5320
+
+test07_3rd (160k iterations)
+AP for 1_1 = 0.3914
+AP for 1_2 = 0.4932
+AP for 1_3 = 0.7830
+AP for 2_2 = 0.4880
+AP for 2_3 = 0.4913
+AP for 3_3 = 0.4794
+Mean AP = 0.5210
+
 [08]
 change side to s=132 again
 anchor_size [2, 4, 8]
+scale [1] only
 feature stride size [16,]
 
 [09]
