@@ -125,8 +125,15 @@ Mean AP = 0.5210
 [08]
 change side to s=132 again
 anchor_size [2, 4, 8]
-scale [1] only
 feature stride size [16,]
 
 [09]
 THe same as 07 except it uses logminmax scaled png directly from FITS
+After 55K iterations
+AP for 1_1 = 0.3769
+AP for 1_2 = 0.5523
+AP for 1_3 = 0.7012
+AP for 2_2 = 0.3207
+AP for 2_3 = 0.4410
+AP for 3_3 = 0.6884
+Mean AP = 0.5134

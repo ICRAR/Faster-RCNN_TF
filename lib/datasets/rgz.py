@@ -30,8 +30,8 @@ class rgz(pascal_voc):
         self._salt = str(uuid.uuid4())
         self._comp_id = 'comp4'
 
-        # PASCAL specific config options
-        self.config = {'cleanup'     : True,
+        # RGZ specific config options
+        self.config = {'cleanup'     : False,
                        'use_salt'    : True,
                        'use_diff'    : False,
                        'matlab_eval' : False,
