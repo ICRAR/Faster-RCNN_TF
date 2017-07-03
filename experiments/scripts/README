@@ -144,6 +144,7 @@ Mean AP = 0.5134
 change to the new mean based on log_minmax scale  (235, 128, 24)
 similar to 09, it uses log_minmax scaled png
 similar to 08, it uses s=132
+Does not work!
 
 [11]
 The same as 10, BUT with s=600
