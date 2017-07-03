@@ -126,8 +126,10 @@ Mean AP = 0.5210
 change side to s=132 again
 anchor_size [2, 4, 8]
 feature stride size [16,]
+It still uses z-scale
 
 [09]
+s=600
 THe same as 07 except it uses logminmax scaled png directly from FITS
 After 55K iterations
 AP for 1_1 = 0.3769
@@ -137,3 +139,11 @@ AP for 2_2 = 0.3207
 AP for 2_3 = 0.4410
 AP for 3_3 = 0.6884
 Mean AP = 0.5134
+
+[10]
+change to the new mean based on log_minmax scale  (235, 128, 24)
+similar to 09, it uses log_minmax scaled png
+similar to 08, it uses s=132
+
+[11]
+The same as 10, BUT with s=600

@@ -24,10 +24,10 @@ def get_network(name):
     #if not __sets.has_key(name):
     #    raise KeyError('Unknown dataset: {}'.format(name))
     #return __sets[name]
-    if (nwnm in ['train07', 'train09']):
+    if (nwnm in ['train07', 'train09', 'train11']):
         # we have to re-train low-level ConvNet from scratch
         return networks.VGGnet_train(low_level_trainable=True)
-    elif (nwnm in ['test07', 'test09']):
+    elif (nwnm in ['test07', 'test09', 'test11']):
         # we have to re-train low-level ConvNet from scratch
         return networks.VGGnet_test(low_level_trainable=True)
     elif (nwnm in ['train08', 'train10']):
