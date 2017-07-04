@@ -24,11 +24,11 @@ def get_network(name):
     #if not __sets.has_key(name):
     #    raise KeyError('Unknown dataset: {}'.format(name))
     #return __sets[name]
-    if (nwnm in ['train12']):
+    if (nwnm in ['train12', 'train13', 'train14']):
         return networks.VGGnet_train(low_level_trainable=True,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
-    elif (nwnm in ['test12']):
+    elif (nwnm in ['test12', 'test13', 'test14']):
         return networks.VGGnet_test(low_level_trainable=True,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])

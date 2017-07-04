@@ -160,6 +160,7 @@ Mean AP = 0.4584
 The same as 11, BUT
 anchor_scales=[1, 2, 4, 8, 16, 32]
 anchor_ratios=[1]
+RPN_BATCHSIZE is still 256
 55K iterations:
 -------------------
 AP for 1_1 = 0.5186
@@ -179,3 +180,9 @@ AP for 2_2 = 0.5021
 AP for 2_3 = 0.5364
 AP for 3_3 = 0.7506
 Mean AP = 0.5809
+
+[12.1]
+now running train12 with learning rate 0.00025
+
+[13]
+The same as [12.1] but with RPN_BATCHSIZE = 64
