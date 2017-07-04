@@ -148,3 +148,34 @@ Does not work!
 
 [11]
 The same as 10, BUT with s=600
+AP for 1_1 = 0.3701
+AP for 1_2 = 0.4665
+AP for 1_3 = 0.6128
+AP for 2_2 = 0.2377
+AP for 2_3 = 0.4292
+AP for 3_3 = 0.6339
+Mean AP = 0.4584
+
+[12]
+The same as 11, BUT
+anchor_scales=[1, 2, 4, 8, 16, 32]
+anchor_ratios=[1]
+55K iterations:
+-------------------
+AP for 1_1 = 0.5186
+AP for 1_2 = 0.5417
+AP for 1_3 = 0.6363
+AP for 2_2 = 0.3562
+AP for 2_3 = 0.4369
+AP for 3_3 = 0.5244
+Mean AP = 0.5023
+
+105K Iterations
+-------------------
+AP for 1_1 = 0.2887
+AP for 1_2 = 0.6552
+AP for 1_3 = 0.7526
+AP for 2_2 = 0.5021
+AP for 2_3 = 0.5364
+AP for 3_3 = 0.7506
+Mean AP = 0.5809
