@@ -48,6 +48,9 @@ class Network(object):
         else: # load pre-grained vgg-net convnet model (for feature extraction)
             data_dict = np.load(data_path).item()
             for key in data_dict:
+                if (key in ['fc6', 'fc7']):
+                    print("Skipping %s" % key)
+                    continue
                 with tf.variable_scope(key, reuse=True):
                     for subkey in data_dict[key]:
                         try:

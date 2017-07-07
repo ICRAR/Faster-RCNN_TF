@@ -188,6 +188,12 @@ Mean AP = 0.5809
 The same as [12] but loading the original VGGnet feature ConvNet
 low_level_trainable is still TRUE
 
+[13.1]
+do not load pretrained weights for fc6 and fc7 (Skipping)
+
 [14]
 The same as [13] but loading the original VGGnet feature ConvNet
 low_level_trainable is set to FALSE
+
+[14.1]
+do not load pretrained weights for fc6 and fc7 (Skipping)
