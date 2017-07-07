@@ -43,21 +43,22 @@ class Network(object):
 
     def load(self, data_path, session, saver, ignore_missing=False):
         #if data_path.endswith('.ckpt'):
-        saver.restore(session, data_path)
-        # else:
-        #     data_dict = np.load(data_path).item()
-        #     for key in data_dict:
-        #         with tf.variable_scope(key, reuse=True):
-        #             for subkey in data_dict[key]:
-        #                 try:
-        #                     var = tf.get_variable(subkey)
-        #                     session.run(var.assign(data_dict[key][subkey]))
-        #                     print "assign pretrain model "+subkey+ " to "+key
-        #                 except ValueError:
-        #                     print "ignore "+key
-        #                     if not ignore_missing:
-        #
-        #                         raise
+        if (not data_path.endswith('.npy')):
+            saver.restore(session, data_path)
+        else: # load pre-grained vgg-net convnet model (for feature extraction)
+            data_dict = np.load(data_path).item()
+            for key in data_dict:
+                with tf.variable_scope(key, reuse=True):
+                    for subkey in data_dict[key]:
+                        try:
+                            var = tf.get_variable(subkey)
+                            session.run(var.assign(data_dict[key][subkey]))
+                            print "assign pretrain model "+subkey+ " to "+key
+                        except ValueError:
+                            print "ignore "+key
+                            if not ignore_missing:
+                                raise
+
 
     def feed(self, *args):
         assert len(args)!=0

@@ -53,6 +53,9 @@ def parse_args():
     parser.add_argument('--set', dest='set_cfgs',
                         help='set config keys', default=None,
                         nargs=argparse.REMAINDER)
+    parser.add_argument('--lr', dest='learning_rate',
+                        help='learning rate',
+                        default=0.0, type=float)
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -90,6 +93,9 @@ if __name__ == '__main__':
 
     network = get_network(args.network_name)
     print 'Use network `{:s}` in training'.format(args.network_name)
+
+    if (args.learning_rate > 0):
+        cfg.TRAIN.LEARNING_RATE = args.learning_rate
 
     train_net(network, imdb, roidb, output_dir,
               pretrained_model=args.pretrained_model,

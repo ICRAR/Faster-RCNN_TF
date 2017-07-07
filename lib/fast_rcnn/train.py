@@ -19,6 +19,7 @@ import sys
 from tensorflow.python.client import timeline
 import time
 
+
 class SolverWrapper(object):
     """A simple wrapper around Caffe's solver.
     This wrapper gives us control over he snapshotting process, which we
@@ -35,7 +36,8 @@ class SolverWrapper(object):
 
         print 'Computing bounding-box regression targets...'
         if cfg.TRAIN.BBOX_REG:
-            self.bbox_means, self.bbox_stds = rdl_roidb.add_bbox_regression_targets(roidb)
+            self.bbox_means, self.bbox_stds = rdl_roidb.add_bbox_regression_targets(
+                roidb)
         print 'done'
 
         # For checkpoint
@@ -58,8 +60,10 @@ class SolverWrapper(object):
 
             # scale and shift with bbox reg unnormalization; then save snapshot
             weights_shape = weights.get_shape().as_list()
-            sess.run(net.bbox_weights_assign, feed_dict={net.bbox_weights: orig_0 * np.tile(self.bbox_stds, (weights_shape[0], 1))})
-            sess.run(net.bbox_bias_assign, feed_dict={net.bbox_biases: orig_1 * self.bbox_stds + self.bbox_means})
+            sess.run(net.bbox_weights_assign, feed_dict={
+                     net.bbox_weights: orig_0 * np.tile(self.bbox_stds, (weights_shape[0], 1))})
+            sess.run(net.bbox_bias_assign, feed_dict={
+                     net.bbox_biases: orig_1 * self.bbox_stds + self.bbox_means})
 
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -67,8 +71,8 @@ class SolverWrapper(object):
         infix = ('_' + cfg.TRAIN.SNAPSHOT_INFIX
                  if cfg.TRAIN.SNAPSHOT_INFIX != '' else '')
         # remove iter_num in the file name, let tensorflow manage it via global_step
-        modelname = (cfg.TRAIN.SNAPSHOT_PREFIX + infix)# +
-                    #'_iter_num_{:d}'.format(iter_num+1) + '.ckpt)
+        modelname = (cfg.TRAIN.SNAPSHOT_PREFIX + infix)  # +
+        #'_iter_num_{:d}'.format(iter_num+1) + '.ckpt)
         modelname = os.path.join(self.output_dir, modelname)
 
         snapshot_file = self.saver.save(sess, modelname,
@@ -78,8 +82,10 @@ class SolverWrapper(object):
         if cfg.TRAIN.BBOX_REG and net.layers.has_key('bbox_pred'):
             with tf.variable_scope('bbox_pred', reuse=True):
                 # restore net to original state
-                sess.run(net.bbox_weights_assign, feed_dict={net.bbox_weights: orig_0})
-                sess.run(net.bbox_bias_assign, feed_dict={net.bbox_biases: orig_1})
+                sess.run(net.bbox_weights_assign, feed_dict={
+                         net.bbox_weights: orig_0})
+                sess.run(net.bbox_bias_assign, feed_dict={
+                         net.bbox_biases: orig_1})
 
     def _modified_smooth_l1(self, sigma, bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights):
         """
@@ -89,10 +95,13 @@ class SolverWrapper(object):
         """
         sigma2 = sigma * sigma
 
-        inside_mul = tf.multiply(bbox_inside_weights, tf.subtract(bbox_pred, bbox_targets))
+        inside_mul = tf.multiply(
+            bbox_inside_weights, tf.subtract(bbox_pred, bbox_targets))
 
-        smooth_l1_sign = tf.cast(tf.less(tf.abs(inside_mul), 1.0 / sigma2), tf.float32)
-        smooth_l1_option1 = tf.multiply(tf.multiply(inside_mul, inside_mul), 0.5 * sigma2)
+        smooth_l1_sign = tf.cast(
+            tf.less(tf.abs(inside_mul), 1.0 / sigma2), tf.float32)
+        smooth_l1_option1 = tf.multiply(
+            tf.multiply(inside_mul, inside_mul), 0.5 * sigma2)
         smooth_l1_option2 = tf.subtract(tf.abs(inside_mul), 0.5 / sigma2)
         smooth_l1_result = tf.add(tf.multiply(smooth_l1_option1, smooth_l1_sign),
                                   tf.multiply(smooth_l1_option2, tf.abs(tf.subtract(smooth_l1_sign, 1.0))))
@@ -101,7 +110,6 @@ class SolverWrapper(object):
 
         return outside_mul
 
-
     def train_model(self, sess, max_iters):
         """Network training loop."""
 
@@ -109,26 +117,36 @@ class SolverWrapper(object):
 
         # RPN
         # classification loss
-        rpn_cls_score = tf.reshape(self.net.get_output('rpn_cls_score_reshape'),[-1,2])
-        rpn_label = tf.reshape(self.net.get_output('rpn-data')[0],[-1])
-        rpn_cls_score = tf.reshape(tf.gather(rpn_cls_score,tf.where(tf.not_equal(rpn_label,-1))),[-1,2])
-        rpn_label = tf.reshape(tf.gather(rpn_label,tf.where(tf.not_equal(rpn_label,-1))),[-1])
-        rpn_cross_entropy = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=rpn_cls_score, labels=rpn_label))
+        rpn_cls_score = tf.reshape(self.net.get_output(
+            'rpn_cls_score_reshape'), [-1, 2])
+        rpn_label = tf.reshape(self.net.get_output('rpn-data')[0], [-1])
+        rpn_cls_score = tf.reshape(
+            tf.gather(rpn_cls_score, tf.where(tf.not_equal(rpn_label, -1))), [-1, 2])
+        rpn_label = tf.reshape(
+            tf.gather(rpn_label, tf.where(tf.not_equal(rpn_label, -1))), [-1])
+        rpn_cross_entropy = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
+            logits=rpn_cls_score, labels=rpn_label))
 
         # bounding box regression L1 loss
         rpn_bbox_pred = self.net.get_output('rpn_bbox_pred')
-        rpn_bbox_targets = tf.transpose(self.net.get_output('rpn-data')[1],[0,2,3,1])
-        rpn_bbox_inside_weights = tf.transpose(self.net.get_output('rpn-data')[2],[0,2,3,1])
-        rpn_bbox_outside_weights = tf.transpose(self.net.get_output('rpn-data')[3],[0,2,3,1])
+        rpn_bbox_targets = tf.transpose(
+            self.net.get_output('rpn-data')[1], [0, 2, 3, 1])
+        rpn_bbox_inside_weights = tf.transpose(
+            self.net.get_output('rpn-data')[2], [0, 2, 3, 1])
+        rpn_bbox_outside_weights = tf.transpose(
+            self.net.get_output('rpn-data')[3], [0, 2, 3, 1])
 
-        rpn_smooth_l1 = self._modified_smooth_l1(3.0, rpn_bbox_pred, rpn_bbox_targets, rpn_bbox_inside_weights, rpn_bbox_outside_weights)
-        rpn_loss_box = tf.reduce_mean(tf.reduce_sum(rpn_smooth_l1, reduction_indices=[1, 2, 3]))
+        rpn_smooth_l1 = self._modified_smooth_l1(
+            3.0, rpn_bbox_pred, rpn_bbox_targets, rpn_bbox_inside_weights, rpn_bbox_outside_weights)
+        rpn_loss_box = tf.reduce_mean(tf.reduce_sum(
+            rpn_smooth_l1, reduction_indices=[1, 2, 3]))
 
         # R-CNN
         # classification loss
         cls_score = self.net.get_output('cls_score')
-        label = tf.reshape(self.net.get_output('roi-data')[1],[-1])
-        cross_entropy = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=cls_score, labels=label))
+        label = tf.reshape(self.net.get_output('roi-data')[1], [-1])
+        cross_entropy = tf.reduce_mean(
+            tf.nn.sparse_softmax_cross_entropy_with_logits(logits=cls_score, labels=label))
 
         # bounding box regression L1 loss
         bbox_pred = self.net.get_output('bbox_pred')
@@ -136,8 +154,10 @@ class SolverWrapper(object):
         bbox_inside_weights = self.net.get_output('roi-data')[3]
         bbox_outside_weights = self.net.get_output('roi-data')[4]
 
-        smooth_l1 = self._modified_smooth_l1(1.0, bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights)
-        loss_box = tf.reduce_mean(tf.reduce_sum(smooth_l1, reduction_indices=[1]))
+        smooth_l1 = self._modified_smooth_l1(
+            1.0, bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights)
+        loss_box = tf.reduce_mean(tf.reduce_sum(
+            smooth_l1, reduction_indices=[1]))
 
         # final loss
         loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box
@@ -147,7 +167,8 @@ class SolverWrapper(object):
         lr = tf.train.exponential_decay(cfg.TRAIN.LEARNING_RATE, global_step,
                                         cfg.TRAIN.STEPSIZE, 0.1, staircase=True)
         momentum = cfg.TRAIN.MOMENTUM
-        train_op = tf.train.MomentumOptimizer(lr, momentum).minimize(loss, global_step=global_step)
+        train_op = tf.train.MomentumOptimizer(
+            lr, momentum).minimize(loss, global_step=global_step)
 
         # iintialize variables
         sess.run(tf.global_variables_initializer())
@@ -163,41 +184,49 @@ class SolverWrapper(object):
             blobs = data_layer.forward()
 
             # Make one SGD update
-            feed_dict={self.net.data: blobs['data'], self.net.im_info: blobs['im_info'], self.net.keep_prob: 0.5, \
-                           self.net.gt_boxes: blobs['gt_boxes']}
+            feed_dict = {self.net.data: blobs['data'],
+                         self.net.im_info: blobs['im_info'],
+                         self.net.keep_prob: 0.5,
+                         self.net.gt_boxes: blobs['gt_boxes']}
 
             run_options = None
             run_metadata = None
             if cfg.TRAIN.DEBUG_TIMELINE:
-                run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+                run_options = tf.RunOptions(
+                    trace_level=tf.RunOptions.FULL_TRACE)
                 run_metadata = tf.RunMetadata()
 
             timer.tic()
 
-            rpn_loss_cls_value, rpn_loss_box_value,loss_cls_value, loss_box_value, _ = sess.run([rpn_cross_entropy, rpn_loss_box, cross_entropy, loss_box, train_op],
-                                                                                                feed_dict=feed_dict,
-                                                                                                options=run_options,
-                                                                                                run_metadata=run_metadata)
+            rpn_loss_cls_value, rpn_loss_box_value, loss_cls_value, loss_box_value, _\
+             = sess.run([rpn_cross_entropy, rpn_loss_box, cross_entropy, loss_box, train_op],
+                        feed_dict=feed_dict,
+                        options=run_options,
+                        run_metadata=run_metadata)
 
             timer.toc()
 
             if cfg.TRAIN.DEBUG_TIMELINE:
                 trace = timeline.Timeline(step_stats=run_metadata.step_stats)
-                trace_file = open(str(long(time.time() * 1000)) + '-train-timeline.ctf.json', 'w')
-                trace_file.write(trace.generate_chrome_trace_format(show_memory=False))
+                trace_file = open(str(long(time.time() * 1000)) +
+                                  '-train-timeline.ctf.json', 'w')
+                trace_file.write(
+                    trace.generate_chrome_trace_format(show_memory=False))
                 trace_file.close()
 
-            if (iter+1) % (cfg.TRAIN.DISPLAY) == 0:
-                print 'iter: %d / %d, total loss: %.4f, rpn_loss_cls: %.4f, rpn_loss_box: %.4f, loss_cls: %.4f, loss_box: %.4f, lr: %f'%\
-                        (iter+1, max_iters, rpn_loss_cls_value + rpn_loss_box_value + loss_cls_value + loss_box_value ,rpn_loss_cls_value, rpn_loss_box_value,loss_cls_value, loss_box_value, lr.eval())
+            if (iter + 1) % (cfg.TRAIN.DISPLAY) == 0:
+                print 'iter: %d / %d, total loss: %.4f, rpn_loss_cls: %.4f, rpn_loss_box: %.4f, loss_cls: %.4f, loss_box: %.4f, lr: %f' %\
+                    (iter + 1, max_iters, rpn_loss_cls_value + rpn_loss_box_value + loss_cls_value + loss_box_value,
+                     rpn_loss_cls_value, rpn_loss_box_value, loss_cls_value, loss_box_value, lr.eval())
                 print 'speed: {:.3f}s / iter'.format(timer.average_time)
 
-            if (iter+1) % cfg.TRAIN.SNAPSHOT_ITERS == 0:
+            if (iter + 1) % cfg.TRAIN.SNAPSHOT_ITERS == 0:
                 last_snapshot_iter = iter
                 self.snapshot(sess, iter)
 
         if last_snapshot_iter != iter:
             self.snapshot(sess, iter)
+
 
 def get_training_roidb(imdb):
     """Returns a roidb (Region of Interest database) for use in training."""
@@ -230,6 +259,7 @@ def get_data_layer(roidb, num_classes):
         layer = RoIDataLayer(roidb, num_classes)
 
     return layer
+
 
 def filter_roidb(roidb):
     """Remove roidb entries that have no usable RoIs."""
@@ -274,7 +304,8 @@ def train_net(network, imdb, roidb, output_dir, pretrained_model=None, max_iters
     saver = tf.train.Saver(max_to_keep=100, write_version=saver_pb2.SaverDef.V1)
     """
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
-        sw = SolverWrapper(sess, saver, network, imdb, roidb, output_dir, pretrained_model=pretrained_model)
+        sw = SolverWrapper(sess, saver, network, imdb, roidb,
+                           output_dir, pretrained_model=pretrained_model)
         print 'Solving...'
         sw.train_model(sess, max_iters)
         print 'done solving'

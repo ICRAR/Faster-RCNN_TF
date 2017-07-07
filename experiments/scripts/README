@@ -171,7 +171,7 @@ AP for 2_3 = 0.4369
 AP for 3_3 = 0.5244
 Mean AP = 0.5023
 
-105K Iterations
+105K Iterations (with a starting LR 0.001 for the second round)
 -------------------
 AP for 1_1 = 0.2887
 AP for 1_2 = 0.6552
@@ -181,8 +181,13 @@ AP for 2_3 = 0.5364
 AP for 3_3 = 0.7506
 Mean AP = 0.5809
 
-[12.1]
-now running train12 with learning rate 0.00025
+100K Iterations (with a starting LR 0.0001 for the second round)
+???
 
 [13]
-The same as [12.1] but with RPN_BATCHSIZE = 64
+The same as [12] but loading the original VGGnet feature ConvNet
+low_level_trainable is still TRUE
+
+[14]
+The same as [13] but loading the original VGGnet feature ConvNet
+low_level_trainable is set to FALSE
