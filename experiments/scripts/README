@@ -187,6 +187,16 @@ Mean AP = 0.5809
 [13]
 The same as [12] but loading the original VGGnet feature ConvNet
 low_level_trainable is still TRUE
+50K iteration
+AP for 1_1 = 0.5088
+AP for 1_2 = 0.7385
+AP for 1_3 = 0.8281
+AP for 2_2 = 0.5242
+AP for 2_3 = 0.6716
+AP for 3_3 = 0.7821
+Mean AP = 0.6755
+
+100K iteration (with a starting LR 0.0001)
 
 [13.1]
 do not load pretrained weights for fc6 and fc7 (Skipping)
@@ -194,6 +204,14 @@ do not load pretrained weights for fc6 and fc7 (Skipping)
 [14]
 The same as [13] but loading the original VGGnet feature ConvNet
 low_level_trainable is set to FALSE
+70K iteration
+AP for 1_1 = 0.4616
+AP for 1_2 = 0.7060
+AP for 1_3 = 0.8937
+AP for 2_2 = 0.6699
+AP for 2_3 = 0.7823
+AP for 3_3 = 0.9114
+Mean AP = 0.7375
 
-[14.1]
-do not load pretrained weights for fc6 and fc7 (Skipping)
+[15]
+The same as [14] but do not load pretrained weights for fc6 and fc7 (Skipping)
