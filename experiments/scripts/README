@@ -197,13 +197,22 @@ AP for 3_3 = 0.7821
 Mean AP = 0.6755
 
 100K iteration (with a starting LR 0.0001)
+AP for 1_1 = 0.4789
+AP for 1_2 = 0.7137
+AP for 1_3 = 0.8989
+AP for 2_2 = 0.7050
+AP for 2_3 = 0.7712
+AP for 3_3 = 0.9068
+Mean AP = 0.7458
 
 [13.1]
 do not load pretrained weights for fc6 and fc7 (Skipping)
+not running yet
 
 [14]
 The same as [13] but loading the original VGGnet feature ConvNet
 low_level_trainable is set to FALSE
+do not skip fc6 and fc7
 70K iteration
 AP for 1_1 = 0.4616
 AP for 1_2 = 0.7060
@@ -213,5 +222,17 @@ AP for 2_3 = 0.7823
 AP for 3_3 = 0.9114
 Mean AP = 0.7375
 
+[14.1]
+reduce RPN_MIN_SIZE to 4
+skip fc6 and fc7
+
 [15]
 The same as [14] but do not load pretrained weights for fc6 and fc7 (Skipping)
+70k iterations
+AP for 1_1 = 0.5043
+AP for 1_2 = 0.7019
+AP for 1_3 = 0.8868
+AP for 2_2 = 0.6430
+AP for 2_3 = 0.7432
+AP for 3_3 = 0.8831
+Mean AP = 0.7270
