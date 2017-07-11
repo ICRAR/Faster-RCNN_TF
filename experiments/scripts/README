@@ -224,7 +224,50 @@ Mean AP = 0.7375
 
 [14.1]
 reduce RPN_MIN_SIZE to 4
-skip fc6 and fc7
+skip fc6 and fc7, after 65K iterations
+AP for 1_1 = 0.8088
+AP for 1_2 = 0.6969
+AP for 1_3 = 0.8922
+AP for 2_2 = 0.7113
+AP for 2_3 = 0.7184
+AP for 3_3 = 0.8847
+Mean AP = 0.7854
+
+after 80K Iterations
+AP for 1_1 = 0.8068
+AP for 1_2 = 0.7099
+AP for 1_3 = 0.8972
+AP for 2_2 = 0.7165
+AP for 2_3 = 0.7041
+AP for 3_3 = 0.8878
+Mean AP = 0.7870
+
+after 80K iterations, TEST.RPN_POST_NMS_TOP_N = 30
+AP for 1_1 = 0.8060
+AP for 1_2 = 0.7116
+AP for 1_3 = 0.8886
+AP for 2_2 = 0.7243
+AP for 2_3 = 0.7165
+AP for 3_3 = 0.8921
+Mean AP = 0.7899
+
+after 105K, TEST.RPN_POST_NMS_TOP_N = 30
+AP for 1_1 = 0.7951
+AP for 1_2 = 0.6762
+AP for 1_3 = 0.8907
+AP for 2_2 = 0.7084
+AP for 2_3 = 0.7395
+AP for 3_3 = 0.8844
+Mean AP = 0.7824
+
+140K iterations, TEST.RPN_POST_NMS_TOP_N = 5
+AP for 1_1 = 0.8245
+AP for 1_2 = 0.6901
+AP for 1_3 = 0.8837
+AP for 2_2 = 0.7461
+AP for 2_3 = 0.7349
+AP for 3_3 = 0.8794
+Mean AP = 0.7931
 
 [15]
 The same as [14] but do not load pretrained weights for fc6 and fc7 (Skipping)
@@ -236,3 +279,12 @@ AP for 2_2 = 0.6430
 AP for 2_3 = 0.7432
 AP for 3_3 = 0.8831
 Mean AP = 0.7270
+
+140 iterations, LR starting at 0.0001/2 = 0.00005
+AP for 1_1 = 0.4405
+AP for 1_2 = 0.7017
+AP for 1_3 = 0.8935
+AP for 2_2 = 0.7011
+AP for 2_3 = 0.7337
+AP for 3_3 = 0.8968
+Mean AP = 0.7279
