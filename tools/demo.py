@@ -55,7 +55,7 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     plt.axis('off')
     plt.tight_layout()
     plt.draw()
-    eturn len(inds)
+    return len(inds)
 
 
 def demo(sess, net, image_name, input_path, conf_thresh=0.8):
