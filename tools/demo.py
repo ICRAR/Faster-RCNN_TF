@@ -157,7 +157,7 @@ if __name__ == '__main__':
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
     cfg.TEST.RPN_MIN_SIZE = 4
     cfg.TEST.RPN_POST_NMS_TOP_N = 4
-    cfg.TEST.NMS = 0.6
+    cfg.TEST.NMS = 0.3
 
     args = parse_args()
 
