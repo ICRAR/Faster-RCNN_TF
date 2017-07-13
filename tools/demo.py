@@ -21,12 +21,12 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     inds = np.where(dets[:, -1] >= thresh)[0]
     if len(inds) == 0:
         # get a box with a highest score
-        try:
-            max_score = np.max(dets[:, -1])
-            inds = np.where(dets[:, -1] == max_score)[0][0:1]
-        except Exception as exp:
-            print('inds == 0, but %s' % str(exp))
-            return
+        # try:
+        #     max_score = np.max(dets[:, -1])
+        #     inds = np.where(dets[:, -1] == max_score)[0][0:1]
+        # except Exception as exp:
+        #     print('inds == 0, but %s' % str(exp))
+        return
 
     for i in inds:
         bbox = dets[i, :4]
@@ -60,6 +60,9 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
     # Load the demo image
     # im_file = os.path.join(cfg.DATA_DIR, 'demo', image_name)
     im_file = os.path.join(input_path, image_name)
+    if (not os.path.exists(im_file)):
+        print('%s cannot be found' % (im_file))
+        return
     #im_file = os.path.join('/home/corgi/Lab/label/pos_frame/ACCV/training/000001/',image_name)
     im = cv2.imread(im_file)
 
