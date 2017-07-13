@@ -168,6 +168,8 @@ def parse_args():
                         default='/group/pawsey0129/cwu/output')
     parser.add_argument('--threshold', dest='conf_thresh', help='confidence threshold',
                         default=0.8, type=float)
+    parser.add_argument('--imgindex', dest='img_index', help='Image index path',
+                        default='/home/cwu/rgz-ml-ws/data/RGZdevkit2017/RGZ2017/ImageSets/Main/test14.txt')
 
     args = parser.parse_args()
 
@@ -201,19 +203,26 @@ if __name__ == '__main__':
     for i in xrange(2):
         _, _= im_detect(sess, net, im)
 
-    im_names = ['FIRSTJ094204.6+480448_logminmax_radio.png',  'FIRSTJ122547.1+594111_logminmax_radio.png',  'FIRSTJ145825.3+484239_logminmax_radio.png',  'FIRSTJ233909.5+113426_logminmax_radio.png',
-'FIRSTJ094206.5+544626_logminmax_radio.png',  'FIRSTJ122547.8+051905_logminmax_radio.png',  'FIRSTJ145826.0+522419_logminmax_radio.png',  'FIRSTJ233912.1+105429_logminmax_radio.png',
-'FIRSTJ094207.6+433848_logminmax_radio.png',  'FIRSTJ122549.6+163347_logminmax_radio.png',  'FIRSTJ145834.8+215228_logminmax_radio.png',  'FIRSTJ233921.6+064203_logminmax_radio.png',
-'FIRSTJ094213.8+124534_logminmax_radio.png',  'FIRSTJ122552.1+634005_logminmax_radio.png',  'FIRSTJ145852.0+433709_logminmax_radio.png',  'FIRSTJ233939.4+020030_logminmax_radio.png',
-'FIRSTJ094215.3+062820_logminmax_radio.png',  'FIRSTJ122555.1+153436_logminmax_radio.png',  'FIRSTJ145858.8+260859_logminmax_radio.png',  'FIRSTJ233954.0+115948_logminmax_radio.png',
-'FIRSTJ094220.3+163949_logminmax_radio.png',  'FIRSTJ122600.9+084106_logminmax_radio.png',  'FIRSTJ145901.3+271124_logminmax_radio.png',  'FIRSTJ234004.0+021817_logminmax_radio.png',
-'FIRSTJ094224.1+222307_logminmax_radio.png',  'FIRSTJ122608.8+473711_logminmax_radio.png',  'FIRSTJ145901.5+231026_logminmax_radio.png',  'FIRSTJ234235.1+103235_logminmax_radio.png',
-'FIRSTJ094226.6+340231_logminmax_radio.png',  'FIRSTJ122609.5+584421_logminmax_radio.png',  'FIRSTJ145905.9+392409_logminmax_radio.png',  'FIRSTJ234247.4+142649_logminmax_radio.png',
-'FIRSTJ094228.0+340243_logminmax_radio.png',  'FIRSTJ122612.8+062727_logminmax_radio.png',  'FIRSTJ145908.0+381509_logminmax_radio.png',  'FIRSTJ234253.1+094248_logminmax_radio.png']
+#     im_names = ['FIRSTJ094204.6+480448_logminmax_radio.png',  'FIRSTJ122547.1+594111_logminmax_radio.png',  'FIRSTJ145825.3+484239_logminmax_radio.png',  'FIRSTJ233909.5+113426_logminmax_radio.png',
+# 'FIRSTJ094206.5+544626_logminmax_radio.png',  'FIRSTJ122547.8+051905_logminmax_radio.png',  'FIRSTJ145826.0+522419_logminmax_radio.png',  'FIRSTJ233912.1+105429_logminmax_radio.png',
+# 'FIRSTJ094207.6+433848_logminmax_radio.png',  'FIRSTJ122549.6+163347_logminmax_radio.png',  'FIRSTJ145834.8+215228_logminmax_radio.png',  'FIRSTJ233921.6+064203_logminmax_radio.png',
+# 'FIRSTJ094213.8+124534_logminmax_radio.png',  'FIRSTJ122552.1+634005_logminmax_radio.png',  'FIRSTJ145852.0+433709_logminmax_radio.png',  'FIRSTJ233939.4+020030_logminmax_radio.png',
+# 'FIRSTJ094215.3+062820_logminmax_radio.png',  'FIRSTJ122555.1+153436_logminmax_radio.png',  'FIRSTJ145858.8+260859_logminmax_radio.png',  'FIRSTJ233954.0+115948_logminmax_radio.png',
+# 'FIRSTJ094220.3+163949_logminmax_radio.png',  'FIRSTJ122600.9+084106_logminmax_radio.png',  'FIRSTJ145901.3+271124_logminmax_radio.png',  'FIRSTJ234004.0+021817_logminmax_radio.png',
+# 'FIRSTJ094224.1+222307_logminmax_radio.png',  'FIRSTJ122608.8+473711_logminmax_radio.png',  'FIRSTJ145901.5+231026_logminmax_radio.png',  'FIRSTJ234235.1+103235_logminmax_radio.png',
+# 'FIRSTJ094226.6+340231_logminmax_radio.png',  'FIRSTJ122609.5+584421_logminmax_radio.png',  'FIRSTJ145905.9+392409_logminmax_radio.png',  'FIRSTJ234247.4+142649_logminmax_radio.png',
+# 'FIRSTJ094228.0+340243_logminmax_radio.png',  'FIRSTJ122612.8+062727_logminmax_radio.png',  'FIRSTJ145908.0+381509_logminmax_radio.png',  'FIRSTJ234253.1+094248_logminmax_radio.png']
+
+    im_names = []
+    with open(args.img_index, 'r') as fin:
+        for line in fin:
+            #print(line)
+            fid = line.strip()
+            im_names.append(fid + '_radio.png')
 
     for i, im_name in enumerate(im_names):
-        print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-        print 'Demo for data/demo/{}'.format(im_name)
+        #print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+        #print 'Demo for data/demo/{}'.format(im_name)
         ret = demo(sess, net, im_name, args.input_path, conf_thresh=args.conf_thresh)
         if (-1 == ret):
             continue
