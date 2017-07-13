@@ -97,6 +97,8 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
         cls_scores = scores[box_ind:box_ind + 1, cls_ind]
         dets = np.hstack((cls_boxes,
                           cls_scores[:, np.newaxis])).astype(np.float32)
+        keep = nms(dets, NMS_THRESH)
+        dets = dets[keep, :]
         vis_detections(im, cls, dets, ax)
     else:
         # for each box, find a class with the highest score after filtering
@@ -111,8 +113,11 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
             #print("box_ind = {2}, cls_boxes.shape = {0}, cls_scores[box_ind:box_ind + 1,"\
             #" np.newaxis].shape = {1}").format(cls_boxes.shape, cls_scores[box_ind:box_ind + 1,
             #                                   np.newaxis].shape, box_ind)
+
             dets = np.hstack((cls_boxes,
                               cls_scores[:, np.newaxis])).astype(np.float32)
+            keep = nms(dets, NMS_THRESH)
+            dets = dets[keep, :]
             vis_detections(im, cls, dets, ax)
 
     # for cls_ind, cls in enumerate(CLASSES[1:]):
