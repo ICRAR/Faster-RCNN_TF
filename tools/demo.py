@@ -16,14 +16,17 @@ from networks.factory import get_network
 CLASSES =  ('__background__', # always index 0
                             '1_1', '1_2', '1_3', '2_2', '2_3', '3_3')
 
-
-#CLASSES = ('__background__','person','bike','motorbike','car','bus')
-
 def vis_detections(im, class_name, dets,ax, thresh=0.5):
     """Draw detected bounding boxes."""
     inds = np.where(dets[:, -1] >= thresh)[0]
     if len(inds) == 0:
-        return
+        # get a box with a highest score
+        try:
+            max_score = np.max(det[:, -1])
+            inds = np.where(det[:, -1] == max_score)[0][0:1]
+        except Exception as exp:
+            print('inds == 0, but %s' % str(exp))
+            return
 
     for i in inds:
         bbox = dets[i, :4]
@@ -33,8 +36,10 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
             plt.Rectangle((bbox[0], bbox[1]),
                           bbox[2] - bbox[0],
                           bbox[3] - bbox[1], fill=False,
-                          edgecolor='red', linewidth=3.5)
+                          edgecolor=plt.cm.rainbow(i), linewidth=2.5)
             )
+        cns = class_name.split('_')
+        class_name = '%sC%sP' % (cns[0], cns[1])
         ax.text(bbox[0], bbox[1] - 2,
                 '{:s} {:.3f}'.format(class_name, score),
                 bbox=dict(facecolor='blue', alpha=0.5),
@@ -49,7 +54,7 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     plt.draw()
 
 
-def demo(sess, net, image_name, input_path):
+def demo(sess, net, image_name, input_path, conf_thresh=0.8):
     """Detect object classes in an image using pre-computed object proposals."""
 
     # Load the demo image
@@ -68,11 +73,11 @@ def demo(sess, net, image_name, input_path):
 
     # Visualize detections for each class
     im = im[:, :, (2, 1, 0)]
-    fig, ax = plt.subplots(figsize=(4, 4))
+    fig, ax = plt.subplots(figsize=(6, 6))
     ax.imshow(im, aspect='equal')
 
-    CONF_THRESH = 0.3
-    NMS_THRESH = 0.3
+    #CONF_THRESH = 0.3
+    NMS_THRESH = cfg.TEST.NMS #cfg.TEST.RPN_NMS_THRESH # 0.3
     for cls_ind, cls in enumerate(CLASSES[1:]):
         cls_ind += 1 # because we skipped background
         cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
@@ -81,7 +86,7 @@ def demo(sess, net, image_name, input_path):
                           cls_scores[:, np.newaxis])).astype(np.float32)
         keep = nms(dets, NMS_THRESH)
         dets = dets[keep, :]
-        vis_detections(im, cls, dets, ax, thresh=CONF_THRESH)
+        vis_detections(im, cls, dets, ax, thresh=conf_thresh)
 
 def parse_args():
     """Parse input arguments."""
@@ -92,19 +97,23 @@ def parse_args():
                         help='Use CPU mode (overrides --gpu)',
                         action='store_true')
     parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
-                        default='VGGnet_test')
+                        default='test14')
     parser.add_argument('--model', dest='model', help='Model path',
                         default='/group/pawsey0129/cwu/rgz-faster-rcnn/output/faster_rcnn_end2end/rgz_2017_train/VGGnet_fast_rcnn-50000')
     parser.add_argument('--input', dest='input_path', help='Input PNG path',
                         default='/home/cwu/rgz-faster-rcnn/data/RGZdevkit2017/RGZ2017/PNGImages')
     parser.add_argument('--figure', dest='fig_path', help='Figure path',
                         default='/group/pawsey0129/cwu/output')
+    parser.add_argument('--threshold', dest='conf_thresh', help='confidence threshold',
+                        default=0.8, type=float)
 
     args = parser.parse_args()
 
     return args
 if __name__ == '__main__':
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
+    cfg.TEST.RPN_MIN_SIZE = 4
+    cfg.TEST.RPN_POST_NMS_TOP_N = 4
 
     args = parse_args()
 
@@ -141,7 +150,7 @@ if __name__ == '__main__':
     for i, im_name in enumerate(im_names):
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         print 'Demo for data/demo/{}'.format(im_name)
-        demo(sess, net, im_name, args.input_path)
+        demo(sess, net, im_name, args.input_path, conf_thresh=args.conf_thresh)
         plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')))
         try:
             plt.close()
