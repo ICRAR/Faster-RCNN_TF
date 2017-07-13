@@ -12,9 +12,12 @@ import numpy as np
 import os, sys, cv2
 import argparse
 from networks.factory import get_network
+from itertools import cycle
 
 CLASSES =  ('__background__', # always index 0
                             '1_1', '1_2', '1_3', '2_2', '2_3', '3_3')
+
+colors_ = ['r', 'c', 'm', 'y', 'w']
 
 def vis_detections(im, class_name, dets,ax, thresh=0.5):
     """Draw detected bounding boxes."""
@@ -36,7 +39,7 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
             plt.Rectangle((bbox[0], bbox[1]),
                           bbox[2] - bbox[0],
                           bbox[3] - bbox[1], fill=False,
-                          edgecolor=plt.cm.rainbow(i), linewidth=2.5)
+                          edgecolor=cycle(colors_), linewidth=2.5)
             )
         #cns = class_name.split('_')
         #class_name = '%sC%sP' % (cns[0], cns[1])
@@ -62,7 +65,7 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
     im_file = os.path.join(input_path, image_name)
     if (not os.path.exists(im_file)):
         print('%s cannot be found' % (im_file))
-        return
+        return -1
     #im_file = os.path.join('/home/corgi/Lab/label/pos_frame/ACCV/training/000001/',image_name)
     im = cv2.imread(im_file)
 
@@ -90,6 +93,7 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
         keep = nms(dets, NMS_THRESH)
         dets = dets[keep, :]
         vis_detections(im, cls, dets, ax, thresh=conf_thresh)
+    return 0
 
 def parse_args():
     """Parse input arguments."""
@@ -153,7 +157,9 @@ if __name__ == '__main__':
     for i, im_name in enumerate(im_names):
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         print 'Demo for data/demo/{}'.format(im_name)
-        demo(sess, net, im_name, args.input_path, conf_thresh=args.conf_thresh)
+        ret = demo(sess, net, im_name, args.input_path, conf_thresh=args.conf_thresh)
+        if (-1 == ret):
+            continue
         plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')))
         try:
             plt.close()
