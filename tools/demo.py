@@ -17,7 +17,7 @@ from itertools import cycle
 CLASSES =  ('__background__', # always index 0
                             '1_1', '1_2', '1_3', '2_2', '2_3', '3_3')
 
-colors_ = ['r', 'c', 'm', 'y', 'w']
+colors_ = cycle(['red', 'cyan', 'magenta', 'yellow', 'white'])
 
 def vis_detections(im, class_name, dets,ax, thresh=0.5):
     """Draw detected bounding boxes."""
@@ -39,7 +39,7 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
             plt.Rectangle((bbox[0], bbox[1]),
                           bbox[2] - bbox[0],
                           bbox[3] - bbox[1], fill=False,
-                          edgecolor=cycle(colors_), linewidth=2.5)
+                          edgecolor=next(colors_), linewidth=2.5)
             )
         #cns = class_name.split('_')
         #class_name = '%sC%sP' % (cns[0], cns[1])
@@ -48,10 +48,10 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
                 bbox=dict(facecolor='blue', alpha=0.5),
                 fontsize=14, color='white')
 
-    ax.set_title(('{} detections with '
-                  'p({} | box) >= {:.1f}').format(class_name, class_name,
-                                                  thresh),
-                  fontsize=14)
+    # ax.set_title(('{} detections with '
+    #               'p({} | box) >= {:.1f}').format(class_name, class_name,
+    #                                               thresh),
+    #               fontsize=14)
     plt.axis('off')
     plt.tight_layout()
     plt.draw()
