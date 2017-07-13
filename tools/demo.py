@@ -30,7 +30,7 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     #     # except Exception as exp:
     #     #     print('inds == 0, but %s' % str(exp))
     #     return
-
+    inds = range(dets.shape[0])
     for i in inds:
         bbox = dets[i, :4]
         score = dets[i, -1]
