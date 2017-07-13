@@ -137,15 +137,15 @@ if __name__ == '__main__':
     for i in xrange(2):
         _, _= im_detect(sess, net, im)
 
-    im_names = ['FIRSTJ094204.6+480448_radio.png',  'FIRSTJ122547.1+594111_radio.png',  'FIRSTJ145825.3+484239_radio.png',  'FIRSTJ233909.5+113426_radio.png',
-'FIRSTJ094206.5+544626_radio.png',  'FIRSTJ122547.8+051905_radio.png',  'FIRSTJ145826.0+522419_radio.png',  'FIRSTJ233912.1+105429_radio.png',
-'FIRSTJ094207.6+433848_radio.png',  'FIRSTJ122549.6+163347_radio.png',  'FIRSTJ145834.8+215228_radio.png',  'FIRSTJ233921.6+064203_radio.png',
-'FIRSTJ094213.8+124534_radio.png',  'FIRSTJ122552.1+634005_radio.png',  'FIRSTJ145852.0+433709_radio.png',  'FIRSTJ233939.4+020030_radio.png',
-'FIRSTJ094215.3+062820_radio.png',  'FIRSTJ122555.1+153436_radio.png',  'FIRSTJ145858.8+260859_radio.png',  'FIRSTJ233954.0+115948_radio.png',
-'FIRSTJ094220.3+163949_radio.png',  'FIRSTJ122600.9+084106_radio.png',  'FIRSTJ145901.3+271124_radio.png',  'FIRSTJ234004.0+021817_radio.png',
-'FIRSTJ094224.1+222307_radio.png',  'FIRSTJ122608.8+473711_radio.png',  'FIRSTJ145901.5+231026_radio.png',  'FIRSTJ234235.1+103235_radio.png',
-'FIRSTJ094226.6+340231_radio.png',  'FIRSTJ122609.5+584421_radio.png',  'FIRSTJ145905.9+392409_radio.png',  'FIRSTJ234247.4+142649_radio.png',
-'FIRSTJ094228.0+340243_radio.png',  'FIRSTJ122612.8+062727_radio.png',  'FIRSTJ145908.0+381509_radio.png',  'FIRSTJ234253.1+094248_radio.png']
+    im_names = ['FIRSTJ094204.6+480448_logminmax_radio.png',  'FIRSTJ122547.1+594111_logminmax_radio.png',  'FIRSTJ145825.3+484239_logminmax_radio.png',  'FIRSTJ233909.5+113426_logminmax_radio.png',
+'FIRSTJ094206.5+544626_logminmax_radio.png',  'FIRSTJ122547.8+051905_logminmax_radio.png',  'FIRSTJ145826.0+522419_logminmax_radio.png',  'FIRSTJ233912.1+105429_logminmax_radio.png',
+'FIRSTJ094207.6+433848_logminmax_radio.png',  'FIRSTJ122549.6+163347_logminmax_radio.png',  'FIRSTJ145834.8+215228_logminmax_radio.png',  'FIRSTJ233921.6+064203_logminmax_radio.png',
+'FIRSTJ094213.8+124534_logminmax_radio.png',  'FIRSTJ122552.1+634005_logminmax_radio.png',  'FIRSTJ145852.0+433709_logminmax_radio.png',  'FIRSTJ233939.4+020030_logminmax_radio.png',
+'FIRSTJ094215.3+062820_logminmax_radio.png',  'FIRSTJ122555.1+153436_logminmax_radio.png',  'FIRSTJ145858.8+260859_logminmax_radio.png',  'FIRSTJ233954.0+115948_logminmax_radio.png',
+'FIRSTJ094220.3+163949_logminmax_radio.png',  'FIRSTJ122600.9+084106_logminmax_radio.png',  'FIRSTJ145901.3+271124_logminmax_radio.png',  'FIRSTJ234004.0+021817_logminmax_radio.png',
+'FIRSTJ094224.1+222307_logminmax_radio.png',  'FIRSTJ122608.8+473711_logminmax_radio.png',  'FIRSTJ145901.5+231026_logminmax_radio.png',  'FIRSTJ234235.1+103235_logminmax_radio.png',
+'FIRSTJ094226.6+340231_logminmax_radio.png',  'FIRSTJ122609.5+584421_logminmax_radio.png',  'FIRSTJ145905.9+392409_logminmax_radio.png',  'FIRSTJ234247.4+142649_logminmax_radio.png',
+'FIRSTJ094228.0+340243_logminmax_radio.png',  'FIRSTJ122612.8+062727_logminmax_radio.png',  'FIRSTJ145908.0+381509_logminmax_radio.png',  'FIRSTJ234253.1+094248_logminmax_radio.png']
 
     for i, im_name in enumerate(im_names):
         print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
