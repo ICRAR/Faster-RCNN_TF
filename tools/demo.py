@@ -44,9 +44,9 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
         #cns = class_name.split('_')
         #class_name = '%sC%sP' % (cns[0], cns[1])
         ax.text(bbox[0], bbox[1] - 2,
-                '{:s} {:.3f}'.format(class_name, score),
-                bbox=dict(facecolor='blue', alpha=0.5),
-                fontsize=14, color='white')
+                '{:s} {:.2f}'.format(class_name.replace('_', 'C_') + 'P', score),
+                bbox=dict(facecolor='blue', alpha=0.4),
+                fontsize=13, color='white')
 
     # ax.set_title(('{} detections with '
     #               'p({} | box) >= {:.1f}').format(class_name, class_name,
@@ -74,7 +74,7 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
     timer = Timer()
     timer.tic()
     scores, boxes = im_detect(sess, net, im)
-    print("scores.shape = {0}, boxes.shape = {1}".format(scores.shape, boxes.shape))
+    #print("scores.shape = {0}, boxes.shape = {1}".format(scores.shape, boxes.shape))
     timer.toc()
     print ('Detection took {:.3f}s for '
            '{:d} object proposals').format(timer.total_time, boxes.shape[0])
