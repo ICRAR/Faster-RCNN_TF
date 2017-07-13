@@ -22,8 +22,8 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     if len(inds) == 0:
         # get a box with a highest score
         try:
-            max_score = np.max(det[:, -1])
-            inds = np.where(det[:, -1] == max_score)[0][0:1]
+            max_score = np.max(dets[:, -1])
+            inds = np.where(dets[:, -1] == max_score)[0][0:1]
         except Exception as exp:
             print('inds == 0, but %s' % str(exp))
             return
@@ -38,8 +38,8 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
                           bbox[3] - bbox[1], fill=False,
                           edgecolor=plt.cm.rainbow(i), linewidth=2.5)
             )
-        cns = class_name.split('_')
-        class_name = '%sC%sP' % (cns[0], cns[1])
+        #cns = class_name.split('_')
+        #class_name = '%sC%sP' % (cns[0], cns[1])
         ax.text(bbox[0], bbox[1] - 2,
                 '{:s} {:.3f}'.format(class_name, score),
                 bbox=dict(facecolor='blue', alpha=0.5),
@@ -97,7 +97,7 @@ def parse_args():
                         help='Use CPU mode (overrides --gpu)',
                         action='store_true')
     parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
-                        default='test14')
+                        default='VGGnet_test14')
     parser.add_argument('--model', dest='model', help='Model path',
                         default='/group/pawsey0129/cwu/rgz-faster-rcnn/output/faster_rcnn_end2end/rgz_2017_train/VGGnet_fast_rcnn-50000')
     parser.add_argument('--input', dest='input_path', help='Input PNG path',
