@@ -108,8 +108,9 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
             cls = CLASSES[cls_ind]
             cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
             cls_scores = scores[box_ind:box_ind + 1, cls_ind]
-            print("cls_boxes.shape = {0}, cls_scores[box_ind:box_ind + 1,"\
-            " np.newaxis].shape = {1}").format(cls_boxes.shape, cls_scores[box_ind:box_ind + 1, np.newaxis].shape)
+            print("box_ind = {2}, cls_boxes.shape = {0}, cls_scores[box_ind:box_ind + 1,"\
+            " np.newaxis].shape = {1}").format(cls_boxes.shape, cls_scores[box_ind:box_ind + 1,
+                                               np.newaxis].shape, box_ind)
             dets = np.hstack((cls_boxes,
                               cls_scores[box_ind:box_ind + 1, np.newaxis])).astype(np.float32)
             vis_detections(im, cls, dets, ax)
