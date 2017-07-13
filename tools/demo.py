@@ -21,16 +21,16 @@ colors_ = cycle(['red', 'cyan', 'magenta', 'yellow', 'white'])
 
 def vis_detections(im, class_name, dets,ax, thresh=0.5):
     """Draw detected bounding boxes."""
-    # inds = np.where(dets[:, -1] >= thresh)[0]
-    # if len(inds) == 0:
-    #     # get a box with a highest score
-    #     # try:
-    #     #     max_score = np.max(dets[:, -1])
-    #     #     inds = np.where(dets[:, -1] == max_score)[0][0:1]
-    #     # except Exception as exp:
-    #     #     print('inds == 0, but %s' % str(exp))
-    #     return
-    inds = range(dets.shape[0])
+    inds = np.where(dets[:, -1] >= thresh)[0]
+    if len(inds) == 0:
+        # get a box with a highest score
+        # try:
+        #     max_score = np.max(dets[:, -1])
+        #     inds = np.where(dets[:, -1] == max_score)[0][0:1]
+        # except Exception as exp:
+        #     print('inds == 0, but %s' % str(exp))
+        return len(inds)
+    #inds = range(dets.shape[0])
     for i in inds:
         bbox = dets[i, :4]
         score = dets[i, -1]
@@ -55,6 +55,7 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     plt.axis('off')
     plt.tight_layout()
     plt.draw()
+    eturn len(inds)
 
 
 def demo(sess, net, image_name, input_path, conf_thresh=0.8):
@@ -86,10 +87,56 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
     #CONF_THRESH = 0.3
     NMS_THRESH = cfg.TEST.NMS #cfg.TEST.RPN_NMS_THRESH # 0.3
 
-    box_scores = scores[:, 1:] # get rid of background score
-    if (np.where(box_scores >= conf_thresh)[0].shape[0] == 0):
-        print('No box is greater than {0}'.format(conf_thresh))
-        # get the box with a highest score
+    # box_scores = scores[:, 1:] # get rid of background score
+    #
+    # if (np.where(box_scores >= conf_thresh)[0].shape[0] == 0):
+    #     print('No box is greater than {0}'.format(conf_thresh))
+    #     # get the box with a highest score
+    #     box_ind, cls_ind = np.unravel_index(np.argmax(box_scores), box_scores.shape)
+    #     cls_ind += 1# because we skipped background
+    #     cls = CLASSES[cls_ind]
+    #     cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
+    #     cls_scores = scores[box_ind:box_ind + 1, cls_ind]
+    #     dets = np.hstack((cls_boxes,
+    #                       cls_scores[:, np.newaxis])).astype(np.float32)
+    #     keep = nms(dets, NMS_THRESH)
+    #     dets = dets[keep, :]
+    #     vis_detections(im, cls, dets, ax)
+    # else:
+    #     # for each box, find a class with the highest score after filtering
+    #     # based on conf_thresh
+    #     dets_list = []
+    #     for box_ind in range(boxes.shape[0]):
+    #         if (np.where(box_scores[box_ind] >= conf_thresh)[0].shape[0] == 0):
+    #             continue
+    #         cls_ind = np.argmax(box_scores[box_ind]) + 1 # because we skipped background
+    #         cls = CLASSES[cls_ind]
+    #         cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
+    #         cls_scores = scores[box_ind:box_ind + 1, cls_ind]
+    #         #print("box_ind = {2}, cls_boxes.shape = {0}, cls_scores[box_ind:box_ind + 1,"\
+    #         #" np.newaxis].shape = {1}").format(cls_boxes.shape, cls_scores[box_ind:box_ind + 1,
+    #         #                                   np.newaxis].shape, box_ind)
+    #
+    #         dets = np.hstack((cls_boxes,
+    #                           cls_scores[:, np.newaxis])).astype(np.float32)
+    #
+    #     keep = nms(dets, NMS_THRESH)
+    #     dets = dets[keep, :]
+    #     vis_detections(im, cls, dets, ax)
+
+    tt_vis = 0
+    for cls_ind, cls in enumerate(CLASSES[1:]):
+        cls_ind += 1 # because we skipped background
+        cls_boxes = boxes[:, 4 * cls_ind : 4 * (cls_ind + 1)]
+        cls_scores = scores[:, cls_ind]
+        dets = np.hstack((cls_boxes,
+                          cls_scores[:, np.newaxis])).astype(np.float32)
+        keep = nms(dets, NMS_THRESH)
+        dets = dets[keep, :]
+        tt_vis += vis_detections(im, cls, dets, ax, thresh=conf_thresh)
+
+    if (tt_vis == 0):
+        box_scores = scores[:, 1:]
         box_ind, cls_ind = np.unravel_index(np.argmax(box_scores), box_scores.shape)
         cls_ind += 1# because we skipped background
         cls = CLASSES[cls_ind]
@@ -97,38 +144,10 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
         cls_scores = scores[box_ind:box_ind + 1, cls_ind]
         dets = np.hstack((cls_boxes,
                           cls_scores[:, np.newaxis])).astype(np.float32)
-        keep = nms(dets, NMS_THRESH)
-        dets = dets[keep, :]
-        vis_detections(im, cls, dets, ax)
-    else:
-        # for each box, find a class with the highest score after filtering
-        # based on conf_thresh
-        for box_ind in range(boxes.shape[0]):
-            if (np.where(box_scores[box_ind] >= conf_thresh)[0].shape[0] == 0):
-                continue
-            cls_ind = np.argmax(box_scores[box_ind]) + 1 # because we skipped background
-            cls = CLASSES[cls_ind]
-            cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
-            cls_scores = scores[box_ind:box_ind + 1, cls_ind]
-            #print("box_ind = {2}, cls_boxes.shape = {0}, cls_scores[box_ind:box_ind + 1,"\
-            #" np.newaxis].shape = {1}").format(cls_boxes.shape, cls_scores[box_ind:box_ind + 1,
-            #                                   np.newaxis].shape, box_ind)
+        #keep = nms(dets, NMS_THRESH)
+        #dets = dets[keep, :]
+        vis_detections(im, cls, dets, ax, thresh=0.0)
 
-            dets = np.hstack((cls_boxes,
-                              cls_scores[:, np.newaxis])).astype(np.float32)
-            keep = nms(dets, NMS_THRESH)
-            dets = dets[keep, :]
-            vis_detections(im, cls, dets, ax)
-
-    # for cls_ind, cls in enumerate(CLASSES[1:]):
-    #     cls_ind += 1 # because we skipped background
-    #     cls_boxes = boxes[:, 4 * cls_ind : 4 * (cls_ind + 1)]
-    #     cls_scores = scores[:, cls_ind]
-    #     dets = np.hstack((cls_boxes,
-    #                       cls_scores[:, np.newaxis])).astype(np.float32)
-    #     keep = nms(dets, NMS_THRESH)
-    #     dets = dets[keep, :]
-    #     vis_detections(im, cls, dets, ax, thresh=conf_thresh)
     return 0
 
 def parse_args():
@@ -156,8 +175,9 @@ def parse_args():
 if __name__ == '__main__':
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
     cfg.TEST.RPN_MIN_SIZE = 4
-    cfg.TEST.RPN_POST_NMS_TOP_N = 4
-    cfg.TEST.NMS = 0.3
+    cfg.TEST.RPN_POST_NMS_TOP_N = 10
+    cfg.TEST.NMS = 0.6
+    cfg.TEST.RPN_NMS_THRESH = 0.6
 
     args = parse_args()
 
