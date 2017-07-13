@@ -85,7 +85,7 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
     #CONF_THRESH = 0.3
     NMS_THRESH = cfg.TEST.NMS #cfg.TEST.RPN_NMS_THRESH # 0.3
 
-    box_scores = [:, 1:] # get rid of background score
+    box_scores = scores[:, 1:] # get rid of background score
     if (np.where(box_scores >= conf_thresh)[0].shape[0] == 0):
         print('No box is greater than {0}'.format(conf_thresh))
         # get the box with a highest score
@@ -99,6 +99,7 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
         vis_detections(im, cls, dets, ax)
     else:
         # for each box, find a class with the highest score after filtering
+        # based on conf_thresh
         for box_ind in range(boxes.shape[0]):
             if (np.where(box_scores[box_ind] >= conf_thresh)[0].shape[0] == 0):
                 continue
