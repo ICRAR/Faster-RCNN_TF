@@ -73,6 +73,7 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
     timer = Timer()
     timer.tic()
     scores, boxes = im_detect(sess, net, im)
+    print("scores.shape = {0}, boxes.shape = {1}".format(scores.shape, boxes.shape))
     timer.toc()
     print ('Detection took {:.3f}s for '
            '{:d} object proposals').format(timer.total_time, boxes.shape[0])
@@ -92,10 +93,10 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
         box_ind, cls_ind = np.unravel_index(np.argmax(box_scores), box_scores.shape)
         cls_ind += 1# because we skipped background
         cls = CLASSES[cls_ind]
-        cls_boxes = boxes[box_ind, 4 * cls_ind : 4 * (cls_ind + 1)]
-        cls_scores = scores[box_ind, cls_ind]
+        cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
+        cls_scores = scores[box_ind:box_ind + 1, cls_ind]
         dets = np.hstack((cls_boxes,
-                          cls_scores[box_ind, np.newaxis])).astype(np.float32)
+                          cls_scores[box_ind:box_ind + 1, np.newaxis])).astype(np.float32)
         vis_detections(im, cls, dets, ax)
     else:
         # for each box, find a class with the highest score after filtering
@@ -105,10 +106,10 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
                 continue
             cls_ind = np.argmax(box_scores[box_ind]) + 1 # because we skipped background
             cls = CLASSES[cls_ind]
-            cls_boxes = boxes[box_ind, 4 * cls_ind : 4 * (cls_ind + 1)]
-            cls_scores = scores[box_ind, cls_ind]
+            cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
+            cls_scores = scores[box_ind:box_ind + 1, cls_ind]
             dets = np.hstack((cls_boxes,
-                              cls_scores[box_ind, np.newaxis])).astype(np.float32)
+                              cls_scores[box_ind:box_ind + 1, np.newaxis])).astype(np.float32)
             vis_detections(im, cls, dets, ax)
 
     # for cls_ind, cls in enumerate(CLASSES[1:]):
