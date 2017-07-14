@@ -32,11 +32,11 @@ def get_network(name):
         return networks.VGGnet_test(low_level_trainable=True,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
-    elif (nwnm in ['train14', 'train15']):
+    elif (nwnm in ['train14', 'train15', 'train16']):
         return networks.VGGnet_train(low_level_trainable=False,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
-    elif (nwnm in ['test14', 'test15']):
+    elif (nwnm in ['test14', 'test15', 'test16']):
         return networks.VGGnet_test(low_level_trainable=False,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
