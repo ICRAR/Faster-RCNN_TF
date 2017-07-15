@@ -292,3 +292,11 @@ Mean AP = 0.7279
 [16]
 The same as 14.1 but with a new channel from IR images!
 The data is produced by  prepare_data.mix_radio_ir_train16()
+
+[17]
+The same as [16], but with IR inserted as:
+0 Blue = radio [0], 1 Green = radio [1], 2 Red = IR[1]
+
+[18]
+The same as [16], but with IR inserted as:
+0 Blue = radio[0], 1 Green = radio [1], 2 Red = IR[1] + Radio [2]
