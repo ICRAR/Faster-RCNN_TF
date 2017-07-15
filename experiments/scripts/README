@@ -288,3 +288,7 @@ AP for 2_2 = 0.7011
 AP for 2_3 = 0.7337
 AP for 3_3 = 0.8968
 Mean AP = 0.7279
+
+[16]
+The same as 14.1 but with a new channel from IR images!
+The data is produced by  prepare_data.mix_radio_ir_train16()
