@@ -251,6 +251,24 @@ AP for 2_3 = 0.7165
 AP for 3_3 = 0.8921
 Mean AP = 0.7899
 
+after 80K iterations, TEST.RPN_POST_NMS_TOP_N = 5
+AP for 1_1 = 0.8185
+AP for 1_2 = 0.7179
+AP for 1_3 = 0.8901
+AP for 2_2 = 0.7439
+AP for 2_3 = 0.7162
+AP for 3_3 = 0.8881
+Mean AP = 0.7958
+
+after 85K iterations, TEST.RPN_POST_NMS_TOP_N = 5
+AP for 1_1 = 0.8081
+AP for 1_2 = 0.6836
+AP for 1_3 = 0.8928
+AP for 2_2 = 0.7279
+AP for 2_3 = 0.7473
+AP for 3_3 = 0.8816
+Mean AP = 0.7902
+
 after 105K, TEST.RPN_POST_NMS_TOP_N = 30
 AP for 1_1 = 0.7951
 AP for 1_2 = 0.6762
@@ -260,7 +278,7 @@ AP for 2_3 = 0.7395
 AP for 3_3 = 0.8844
 Mean AP = 0.7824
 
-140K iterations, TEST.RPN_POST_NMS_TOP_N = 5
+130K iterations, TEST.RPN_POST_NMS_TOP_N = 5
 AP for 1_1 = 0.8245
 AP for 1_2 = 0.6901
 AP for 1_3 = 0.8837
@@ -268,6 +286,9 @@ AP for 2_2 = 0.7461
 AP for 2_3 = 0.7349
 AP for 3_3 = 0.8794
 Mean AP = 0.7931
+Model is located at:
+/home/cwu/rgz-ml-ws/code/output/faster_rcnn_end2end/rgz_2017_train14/VGGnet_fast_rcnn-65000
+
 
 [15]
 The same as [14] but do not load pretrained weights for fc6 and fc7 (Skipping)
@@ -292,11 +313,36 @@ Mean AP = 0.7279
 [16]
 The same as 14.1 but with a new channel from IR images!
 The data is produced by  prepare_data.mix_radio_ir_train16()
+After 140k iterations
+AP for 1_1 = 0.8123
+AP for 1_2 = 0.6847
+AP for 1_3 = 0.8542
+AP for 2_2 = 0.7087
+AP for 2_3 = 0.6995
+AP for 3_3 = 0.8455
+Mean AP = 0.7675
 
 [17]
 The same as [16], but with IR inserted as:
+The data is produced by  prepare_data.mix_radio_ir()
 0 Blue = radio [0], 1 Green = radio [1], 2 Red = IR[1]
+After 130K iterations
+AP for 1_1 = 0.8122
+AP for 1_2 = 0.6846
+AP for 1_3 = 0.8495
+AP for 2_2 = 0.7121
+AP for 2_3 = 0.7100
+AP for 3_3 = 0.8522
+Mean AP = 0.7701
 
 [18]
 The same as [16], but with IR inserted as:
+The data is produced by  prepare_data.mix_radio_ir()
 0 Blue = radio[0], 1 Green = radio [1], 2 Red = IR[1] + Radio [2]
+AP for 1_1 = 0.8242
+AP for 1_2 = 0.6843
+AP for 1_3 = 0.8561
+AP for 2_2 = 0.7231
+AP for 2_3 = 0.6989
+AP for 3_3 = 0.8561
+Mean AP = 0.7738
