@@ -32,11 +32,11 @@ def get_network(name):
         return networks.VGGnet_test(low_level_trainable=True,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
-    elif (nwnm in ['train14', 'train15', 'train16', 'train17', 'train18', 'train19']):
+    elif (nwnm in ['train14', 'train15', 'train16', 'train17', 'train18', 'train19', 'train08']):
         return networks.VGGnet_train(low_level_trainable=False,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
-    elif (nwnm in ['test14', 'test15', 'test16', 'test17', 'test18', 'test19']):
+    elif (nwnm in ['test14', 'test15', 'test16', 'test17', 'test18', 'test19', 'test08']):
         return networks.VGGnet_test(low_level_trainable=False,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
@@ -46,10 +46,10 @@ def get_network(name):
     elif (nwnm in ['test07', 'test09', 'test11']):
         # we have to re-train low-level ConvNet from scratch
         return networks.VGGnet_test(low_level_trainable=True)
-    elif (nwnm in ['train08', 'train10']):
+    elif (nwnm in ['train10']):
         return networks.VGGnet_train(low_level_trainable=True,
                                      anchor_scales=[2, 4, 8])
-    elif (nwnm in ['test08', 'test10']):
+    elif (nwnm in ['test10']):
         return networks.VGGnet_test(low_level_trainable=True,
                                      anchor_scales=[2, 4, 8])
     elif nwnm.find('test') > -1:
