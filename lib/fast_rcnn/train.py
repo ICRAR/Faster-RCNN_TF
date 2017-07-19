@@ -110,7 +110,7 @@ class SolverWrapper(object):
 
         return outside_mul
 
-    def train_model(self, sess, max_iters):
+    def train_model(self, sess, max_iters, start_iter=0):
         """Network training loop."""
 
         data_layer = get_data_layer(self.roidb, self.imdb.num_classes)
@@ -179,7 +179,7 @@ class SolverWrapper(object):
 
         last_snapshot_iter = -1
         timer = Timer()
-        for iter in range(max_iters):
+        for iter in range(start_iter, start_iter + max_iters):
             # get one batch
             blobs = data_layer.forward()
 
@@ -286,7 +286,8 @@ def filter_roidb(roidb):
     return filtered_roidb
 
 
-def train_net(network, imdb, roidb, output_dir, pretrained_model=None, max_iters=40000):
+def train_net(network, imdb, roidb, output_dir, pretrained_model=None,
+              max_iters=40000, start_iter=0):
     """Train a Fast R-CNN network."""
     roidb = filter_roidb(roidb)
     saver = tf.train.Saver(max_to_keep=100)
@@ -307,5 +308,5 @@ def train_net(network, imdb, roidb, output_dir, pretrained_model=None, max_iters
         sw = SolverWrapper(sess, saver, network, imdb, roidb,
                            output_dir, pretrained_model=pretrained_model)
         print 'Solving...'
-        sw.train_model(sess, max_iters)
+        sw.train_model(sess, max_iters, start_iter=start_iter)
         print 'done solving'

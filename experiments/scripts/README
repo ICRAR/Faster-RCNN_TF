@@ -346,3 +346,12 @@ AP for 2_2 = 0.7231
 AP for 2_3 = 0.6989
 AP for 3_3 = 0.8561
 Mean AP = 0.7738
+
+[19]
+Use a new kind of IR mix
+t[:, :, 0] = im_radio[:, :, 2]  # BLUE
+t[:, :, 1] = im_radio[:, :, 2]  # GREEN
+t[:, :, 2] = im_ir[0:w, 0:h, 0]  # cut out from IR image as RED
+
+[08]
+the same as 14.1 but this time uses z-scale again

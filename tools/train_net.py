@@ -56,6 +56,9 @@ def parse_args():
     parser.add_argument('--lr', dest='learning_rate',
                         help='learning rate',
                         default=0.0, type=float)
+    parser.add_argument('--start', dest='start_iter',
+                        help='the starting iteration number',
+                        default=0, type=int)
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -99,4 +102,4 @@ if __name__ == '__main__':
 
     train_net(network, imdb, roidb, output_dir,
               pretrained_model=args.pretrained_model,
-              max_iters=args.max_iters)
+              max_iters=args.max_iters, start_iter=args.start_iter)
