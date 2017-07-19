@@ -259,6 +259,7 @@ AP for 2_2 = 0.7439
 AP for 2_3 = 0.7162
 AP for 3_3 = 0.8881
 Mean AP = 0.7958
+/home/cwu/rgz-ml-ws/code/output/faster_rcnn_end2end/rgz_2017_train14/VGGnet_fast_rcnn-15000
 
 after 85K iterations, TEST.RPN_POST_NMS_TOP_N = 5
 AP for 1_1 = 0.8081
@@ -352,6 +353,15 @@ Use a new kind of IR mix
 t[:, :, 0] = im_radio[:, :, 2]  # BLUE
 t[:, :, 1] = im_radio[:, :, 2]  # GREEN
 t[:, :, 2] = im_ir[0:w, 0:h, 0]  # cut out from IR image as RED
+DOES NOT WORK
 
 [08]
 the same as 14.1 but this time uses z-scale again
+After 135,000 iterations (with 0.01, 0.003 and 0.0003 as learning rates)
+AP for 1_1 = 0.8087
+AP for 1_2 = 0.6376
+AP for 1_3 = 0.8250
+AP for 2_2 = 0.7474
+AP for 2_3 = 0.7708
+AP for 3_3 = 0.9230
+Mean AP = 0.7854
