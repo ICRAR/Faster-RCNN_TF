@@ -336,6 +336,7 @@ AP for 2_3 = 0.7100
 AP for 3_3 = 0.8522
 Mean AP = 0.7701
 
+
 [18]
 The same as [16], but with IR inserted as:
 The data is produced by  prepare_data.mix_radio_ir()
@@ -350,10 +351,11 @@ Mean AP = 0.7738
 
 [19]
 Use a new kind of IR mix
-t[:, :, 0] = im_radio[:, :, 2]  # BLUE
-t[:, :, 1] = im_radio[:, :, 2]  # GREEN
-t[:, :, 2] = im_ir[0:w, 0:h, 0]  # cut out from IR image as RED
-DOES NOT WORK
+t[:, :, 0] = im_radio[:, :, 0]  # BLUE
+t[:, :, 1] = im_radio[:, :, 1]  # GREEN
+t[:, :, 2] = mask_ir[0:w, 0:h, 1]  # cut out from IR image as RED
+
+
 
 [08]
 the same as 14.1 but this time uses z-scale again
