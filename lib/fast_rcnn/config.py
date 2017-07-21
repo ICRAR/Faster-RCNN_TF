@@ -212,7 +212,7 @@ __C.DEDUP_BOXES = 1./16.
 #__C.PIXEL_MEANS = np.array([[[235, 128, 24]]])
 
 # for log_minmax_ir scale
-#__C.PIXEL_MEANS = np.array([[[128, 24, 43]]])
+__C.PIXEL_MEANS = np.array([[[235, 128, 26]]])
 
 # for log_minmax_ir17 scale
 #__C.PIXEL_MEANS = np.array([[[235, 128, 43]]])
@@ -221,7 +221,7 @@ __C.DEDUP_BOXES = 1./16.
 #__C.PIXEL_MEANS = np.array([[[235, 128, 67]]])
 
 # for log_minmax_ir19 scale
-__C.PIXEL_MEANS = np.array([[[237, 128, 2]]])
+#__C.PIXEL_MEANS = np.array([[[237, 128, 2]]])
 
 # for zscale
 #__C.PIXEL_MEANS = np.array([[[31, 2, 2]]])

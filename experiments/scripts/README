@@ -323,6 +323,9 @@ AP for 2_3 = 0.6995
 AP for 3_3 = 0.8455
 Mean AP = 0.7675
 
+now redo it with convexHull
+
+
 [17]
 The same as [16], but with IR inserted as:
 The data is produced by  prepare_data.mix_radio_ir()
@@ -355,6 +358,14 @@ t[:, :, 0] = im_radio[:, :, 0]  # BLUE
 t[:, :, 1] = im_radio[:, :, 1]  # GREEN
 t[:, :, 2] = mask_ir[0:w, 0:h, 1]  # cut out from IR image as RED
 
+After 65K iterations
+AP for 1_1 = 0.8613
+AP for 1_2 = 0.6788
+AP for 1_3 = 0.8601
+AP for 2_2 = 0.7389
+AP for 2_3 = 0.6799
+AP for 3_3 = 0.8242
+Mean AP = 0.7739
 
 
 [08]
