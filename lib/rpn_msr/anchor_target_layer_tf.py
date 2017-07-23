@@ -82,7 +82,7 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data,
     # cell K shifts (K, 1, 4) to get
     # shift anchors (K, A, 4)
     # reshape to (K*A, 4) shifted anchors
-    A = _num_anchors
+    A = _num_anchors   # this is THE "k" in the paper
     K = shifts.shape[0]
     all_anchors = (_anchors.reshape((1, A, 4)) +
                    shifts.reshape((1, K, 4)).transpose((1, 0, 2)))

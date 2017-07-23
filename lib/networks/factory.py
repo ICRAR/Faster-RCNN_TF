@@ -24,38 +24,44 @@ def get_network(name):
     #if not __sets.has_key(name):
     #    raise KeyError('Unknown dataset: {}'.format(name))
     #return __sets[name]
-    if (nwnm in ['train12', 'train13']):
-        return networks.VGGnet_train(low_level_trainable=True,
-                                     anchor_scales=[1, 2, 4, 8, 16, 32],
-                                     anchor_ratios=[1])
-    elif (nwnm in ['test12', 'test13']):
-        return networks.VGGnet_test(low_level_trainable=True,
-                                     anchor_scales=[1, 2, 4, 8, 16, 32],
-                                     anchor_ratios=[1])
-    elif (nwnm in ['train14', 'train15', 'train16', 'train17', 'train18', 'train19', 'train08']):
+    # if (nwnm in ['train12', 'train13']):
+    #     return networks.VGGnet_train(low_level_trainable=True,
+    #                                  anchor_scales=[1, 2, 4, 8, 16, 32],
+    #                                  anchor_ratios=[1])
+    # elif (nwnm in ['test12', 'test13']):
+    #     return networks.VGGnet_test(low_level_trainable=True,
+    #                                  anchor_scales=[1, 2, 4, 8, 16, 32],
+    #                                  anchor_ratios=[1])
+    # elif (nwnm in ['train14', 'train15', 'train16', 'train17', 'train18', 'train19', 'train08']):
+    #     return networks.VGGnet_train(low_level_trainable=False,
+    #                                  anchor_scales=[1, 2, 4, 8, 16, 32],
+    #                                  anchor_ratios=[1])
+    # elif (nwnm in ['test14', 'test15', 'test16', 'test17', 'test18', 'test19', 'test08']):
+    #     return networks.VGGnet_test(low_level_trainable=False,
+    #                                  anchor_scales=[1, 2, 4, 8, 16, 32],
+    #                                  anchor_ratios=[1])
+    # elif (nwnm in ['train07', 'train09', 'train11']):
+    #     # we have to re-train low-level ConvNet from scratch
+    #     return networks.VGGnet_train(low_level_trainable=True)
+    # elif (nwnm in ['test07', 'test09', 'test11']):
+    #     # we have to re-train low-level ConvNet from scratch
+    #     return networks.VGGnet_test(low_level_trainable=True)
+    # elif (nwnm in ['train10']):
+    #     return networks.VGGnet_train(low_level_trainable=True,
+    #                                  anchor_scales=[2, 4, 8])
+    # elif (nwnm in ['test10']):
+    #     return networks.VGGnet_test(low_level_trainable=True,
+    #                                  anchor_scales=[2, 4, 8])
+    if nwnm.find('train') > -1:
+        #return networks.VGGnet_test()
         return networks.VGGnet_train(low_level_trainable=False,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
-    elif (nwnm in ['test14', 'test15', 'test16', 'test17', 'test18', 'test19', 'test08']):
+    elif nwnm.find('test') > -1:
+        #return networks.VGGnet_train()
         return networks.VGGnet_test(low_level_trainable=False,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
                                      anchor_ratios=[1])
-    elif (nwnm in ['train07', 'train09', 'train11']):
-        # we have to re-train low-level ConvNet from scratch
-        return networks.VGGnet_train(low_level_trainable=True)
-    elif (nwnm in ['test07', 'test09', 'test11']):
-        # we have to re-train low-level ConvNet from scratch
-        return networks.VGGnet_test(low_level_trainable=True)
-    elif (nwnm in ['train10']):
-        return networks.VGGnet_train(low_level_trainable=True,
-                                     anchor_scales=[2, 4, 8])
-    elif (nwnm in ['test10']):
-        return networks.VGGnet_test(low_level_trainable=True,
-                                     anchor_scales=[2, 4, 8])
-    elif nwnm.find('test') > -1:
-        return networks.VGGnet_test()
-    elif nwnm.find('train') > -1:
-        return networks.VGGnet_train()
     else:
         raise KeyError('Unknown dataset: {}'.format(name))
 

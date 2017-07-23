@@ -4,3 +4,4 @@
 faster_rcnn_models
 data/rgz_index.tar
 experiments/scripts/train12_debug.log
+experiments/scripts/*.out

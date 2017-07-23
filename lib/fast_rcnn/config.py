@@ -209,10 +209,10 @@ __C.DEDUP_BOXES = 1./16.
 # they were trained with
 #__C.PIXEL_MEANS = np.array([[[102.9801, 115.9465, 122.7717]]])
 # for log_minmax scale
-#__C.PIXEL_MEANS = np.array([[[235, 128, 24]]])
+__C.PIXEL_MEANS = np.array([[[235, 128, 24]]])
 
 # for log_minmax_ir scale
-__C.PIXEL_MEANS = np.array([[[235, 128, 26]]])
+#__C.PIXEL_MEANS = np.array([[[235, 128, 26]]])
 
 # for log_minmax_ir17 scale
 #__C.PIXEL_MEANS = np.array([[[235, 128, 43]]])

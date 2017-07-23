@@ -259,7 +259,22 @@ AP for 2_2 = 0.7439
 AP for 2_3 = 0.7162
 AP for 3_3 = 0.8881
 Mean AP = 0.7958
-/home/cwu/rgz-ml-ws/code/output/faster_rcnn_end2end/rgz_2017_train14/VGGnet_fast_rcnn-15000
+/home/cwu/rgz-ml-ws/code/output/faster_rcnn_end2end/rgz_2017_train14_gold/VGGnet_fast_rcnn-15000
+
+
+after 160K iterations, in the last 80K, freeze other parameters,
+but only train box class/regressor,
+and freezes all other weights (including Cvnet)
+
+AP for 1_1 = 0.8297
+AP for 1_2 = 0.7102
+AP for 1_3 = 0.8880
+AP for 2_2 = 0.7467
+AP for 2_3 = 0.7357
+AP for 3_3 = 0.8902
+Mean AP = 0.8001
+/group/pawsey0129/cwu/rgz-faster-rcnn/output/faster_rcnn_end2end/rgz_2017_train14/VGGnet_fast_rcnn-95000
+
 
 after 85K iterations, TEST.RPN_POST_NMS_TOP_N = 5
 AP for 1_1 = 0.8081
@@ -288,7 +303,7 @@ AP for 2_3 = 0.7349
 AP for 3_3 = 0.8794
 Mean AP = 0.7931
 Model is located at:
-/home/cwu/rgz-ml-ws/code/output/faster_rcnn_end2end/rgz_2017_train14/VGGnet_fast_rcnn-65000
+/home/cwu/rgz-ml-ws/code/output/faster_rcnn_end2end/rgz_2017_train14_gold/VGGnet_fast_rcnn-65000
 
 
 [15]
@@ -313,7 +328,7 @@ Mean AP = 0.7279
 
 [16]
 The same as 14.1 but with a new channel from IR images!
-The data is produced by  prepare_data.mix_radio_ir_train16()
+The data is produced by  prepare_data.mix_radio_ir_train16_old()
 After 140k iterations
 AP for 1_1 = 0.8123
 AP for 1_2 = 0.6847
@@ -323,7 +338,26 @@ AP for 2_3 = 0.6995
 AP for 3_3 = 0.8455
 Mean AP = 0.7675
 
-now redo it with convexHull
+now redo it with convexHull by mix_radio_ir_train16()
+80k iterations
+AP for 1_1 = 0.8542
+AP for 1_2 = 0.6833
+AP for 1_3 = 0.8706
+AP for 2_2 = 0.7454
+AP for 2_3 = 0.6700
+AP for 3_3 = 0.8578
+Mean AP = 0.7802
+
+now continue train it, but only train box class/regressor,
+and freezes all otherwise weights (including Cvnet)
+starting from 80001 iterations til 160000 iterations
+AP for 1_1 = 0.8666
+AP for 1_2 = 0.6818
+AP for 1_3 = 0.8585
+AP for 2_2 = 0.7417
+AP for 2_3 = 0.6562
+AP for 3_3 = 0.8502
+Mean AP = 0.7758
 
 
 [17]
@@ -367,6 +401,15 @@ AP for 2_3 = 0.6799
 AP for 3_3 = 0.8242
 Mean AP = 0.7739
 
+Now running iterations at 125K iterations
+/group/pawsey0129/cwu/rgz-faster-rcnn/output/faster_rcnn_end2end/rgz_2017_train19/VGGnet_fast_rcnn-125000
+AP for 1_1 = 0.8680
+AP for 1_2 = 0.6857
+AP for 1_3 = 0.8557
+AP for 2_2 = 0.7250
+AP for 2_3 = 0.6578
+AP for 3_3 = 0.8172
+Mean AP = 0.7682
 
 [08]
 the same as 14.1 but this time uses z-scale again

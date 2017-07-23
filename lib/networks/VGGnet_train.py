@@ -54,7 +54,7 @@ class VGGnet_train(Network):
         #========= RPN ============
         (self.feed('conv5_3')
              .conv(3, 3, 512, 1, 1, name='rpn_conv/3x3')
-             .conv(1,1,len(self._anchor_scales) * self.anchor_ratio_size * 2, 1,
+             .conv(1, 1, len(self._anchor_scales) * self.anchor_ratio_size * 2, 1,
                    1, padding='VALID', relu=False, name='rpn_cls_score'))
 
         (self.feed('rpn_cls_score','gt_boxes','im_info','data')

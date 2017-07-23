@@ -102,14 +102,18 @@ def voc_eval(detpath,
         lines = f.readlines()
     imagenames = [x.strip() for x in lines]
 
-    if not os.path.isfile(cachefile):
-        # load annots
+    def compute_recs():
         recs = {}
         for i, imagename in enumerate(imagenames):
             recs[imagename] = parse_rec(annopath.format(imagename))
             if i % 100 == 0:
                 print 'Reading annotation for {:d}/{:d}'.format(
                     i + 1, len(imagenames))
+        return recs
+
+    if not os.path.isfile(cachefile):
+        # load annots
+        recs = compute_recs()
         # save
         print 'Saving cached annotations to {:s}'.format(cachefile)
         with open(cachefile, 'w') as f:
@@ -118,6 +122,12 @@ def voc_eval(detpath,
         # load
         with open(cachefile, 'r') as f:
             recs = cPickle.load(f)
+        try:
+            recs[imagenames[0]]
+            recs[imagenames[10]]
+        except KeyError as ke:
+            print(str(ke))
+            recs = compute_recs()
 
     # extract gt objects for this class
     class_recs = {}

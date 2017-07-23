@@ -97,8 +97,15 @@ class Network(object):
 
     @layer
     def conv(self, input, k_h, k_w, c_o, s_h, s_w, name, relu=True, padding=DEFAULT_PADDING, group=1, trainable=True):
+        """
+        k_h:    kernel height
+        k_w:    kernel wideth
+        c_o:    channel output
+        s_h:    strides height
+        s_w:    stirdes width
+        """
         self.validate_padding(padding)
-        c_i = input.get_shape()[-1]
+        c_i = input.get_shape()[-1]  #channel input
         assert c_i%group==0
         assert c_o%group==0
         convolve = lambda i, k: tf.nn.conv2d(i, k, [1, s_h, s_w, 1], padding=padding)
