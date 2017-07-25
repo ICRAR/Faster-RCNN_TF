@@ -421,3 +421,14 @@ AP for 2_2 = 0.7474
 AP for 2_3 = 0.7708
 AP for 3_3 = 0.9230
 Mean AP = 0.7854
+
+[20]
+The same as 14.1, but adding another 1901 training examples (1_2, and 2_2)
+After 135K iterations
+AP for 1_1 = 0.8016
+AP for 1_2 = 0.7298
+AP for 1_3 = 0.8677
+AP for 2_2 = 0.7404
+AP for 2_3 = 0.7323
+AP for 3_3 = 0.8859
+Mean AP = 0.7929
