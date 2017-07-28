@@ -8,6 +8,13 @@
 import numpy as np
 
 def bbox_transform(ex_rois, gt_rois):
+    """
+    ex_rois:    either anchor_rois for anchor_target_layer
+                or     rpn_rois for proposal_target_layer
+                       so RPN is treated as anchor in the 2nd case
+
+    gt_rois:    ground-truth_roi
+    """
     ex_widths = ex_rois[:, 2] - ex_rois[:, 0] + 1.0
     ex_heights = ex_rois[:, 3] - ex_rois[:, 1] + 1.0
     ex_ctr_x = ex_rois[:, 0] + 0.5 * ex_widths

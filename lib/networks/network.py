@@ -5,7 +5,7 @@ import roi_pooling_layer.roi_pooling_op_grad
 from rpn_msr.proposal_layer_tf import proposal_layer as proposal_layer_py
 from rpn_msr.anchor_target_layer_tf import anchor_target_layer as anchor_target_layer_py
 from rpn_msr.proposal_target_layer_tf import proposal_target_layer as proposal_target_layer_py
-
+from spatial_transformer import transformer
 
 
 DEFAULT_PADDING = 'SAME'
@@ -271,6 +271,43 @@ class Network(object):
             op = tf.nn.relu_layer if relu else tf.nn.xw_plus_b
             fc = op(feed_in, weights, biases, name=scope.name)
             return fc
+
+    @layer
+    def spatial_transform(self, input, name, do_transform=False, num_hidden=20, keep_prob=0.7):
+        """
+        Based on https://github.com/daviddao/spatial-transformer-tensorflow/\
+        blob/master/cluttered_mnist.py
+        """
+        if (not do_transform):
+            return input
+        with tf.variable_scope(name) as scope:
+            if isinstance(input, tuple):
+                input = input[0]
+            input_shape = input.get_shape() # used for output shape
+            w_shape_1 = [input_shape[1] * input_shape[2] * input_shape[3],
+                         num_hidden]
+            out_size = (input_shape[1], input_shape[2]) #remain the same size
+            x = tf.reshape(input, [None, w_shape_1[0]])
+            W_fc_loc1 = self.make_var('loc_weights_1', w_shape_1,
+                                      tf.constant_initializer(0.0))
+            b_fc_loc1 = self.make_var('loc_biases_1', [num_hidden],
+                                      tf.constant_initializer(0.0))
+            W_fc_loc2 = self.make_var('loc_weights_2', [num_hidden, 6],
+                                      tf.constant_initializer(0.0))
+            initial = np.array([[1, 0, 0], [0, 1, 0]]).astype('float32').flatten()
+            b_fc_loc2 = self.make_var('loc_biases_2', initial.shape,
+                                      tf.constant_initializer(initial))
+
+            # Define the two layer localisation network
+            h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1, name=scope.name)
+            keep_prob = 0.7
+            h_fc_loc1_drop = tf.nn.dropout(h_fc_loc1, keep_prob=keep_prob)
+
+            # %% Second layer
+            h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
+                                         b_fc_loc2, name=scope.name)
+            h_trans = transformer(input, h_fc_loc2, out_size)
+            return h_trans
 
     @layer
     def softmax(self, input, name):

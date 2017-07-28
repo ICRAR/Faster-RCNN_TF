@@ -432,3 +432,12 @@ AP for 2_2 = 0.7404
 AP for 2_3 = 0.7323
 AP for 3_3 = 0.8859
 Mean AP = 0.7929
+
+After 270K iteratios
+AP for 1_1 = 0.8213
+AP for 1_2 = 0.7023
+AP for 1_3 = 0.8484
+AP for 2_2 = 0.7373
+AP for 2_3 = 0.7068
+AP for 3_3 = 0.8584
+Mean AP = 0.7791

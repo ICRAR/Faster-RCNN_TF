@@ -6,7 +6,7 @@ n_classes = 7
 class VGGnet_train(Network):
     def __init__(self, trainable=True, anchor_scales=[8, 16, 32],
                 feat_stride=[16,], low_level_trainable=False,
-                anchor_ratios=[0.5, 1, 2]):
+                anchor_ratios=[0.5, 1, 2], transform_img=False):
         self.inputs = []
         self._anchor_scales = anchor_scales
         self._feat_stride = feat_stride
@@ -34,6 +34,7 @@ class VGGnet_train(Network):
 
     def setup(self):
         (self.feed('data')
+             .spatial_transform(name='spt_trans', do_transform=transform_img)
              .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=self.low_level_trainable)
              .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool1')
@@ -62,6 +63,10 @@ class VGGnet_train(Network):
 
         # Loss of rpn_cls & rpn_boxes
 
+        # directly predict the "delta shift", thus t_x, t_y, t_w, t_h in the Eq(2)
+        # of the original Faster-RCNN paper
+        # it DOES NOT directly predict the four raw coordinates of bbox corresponding
+        # to each anchor
         (self.feed('rpn_conv/3x3')
              .conv(1,1,len(self._anchor_scales) * self.anchor_ratio_size * 4, 1,
                    1, padding='VALID', relu=False, name='rpn_bbox_pred'))
