@@ -11,6 +11,7 @@ import numpy.random as npr
 from fast_rcnn.config import cfg
 from fast_rcnn.bbox_transform import bbox_transform
 from utils.cython_bbox import bbox_overlaps
+from utils.project_bbox import project_bbox
 import pdb
 
 DEBUG = False
@@ -26,6 +27,11 @@ def proposal_target_layer(rpn_rois, gt_boxes, theta, _num_classes):
     all_rois = rpn_rois
     # TODO(rbg): it's annoying that sometimes I have extra info before
     # and other times after box coordinates -- normalize to one format
+
+    gt_boxes = project_bbox(gt_boxes, theta)
+
+    if DEBUG:
+        print('After spatial_transformer proposal_target: gt_boxes', gt_boxes)
 
     # Include ground-truth boxes in the set of candidate rois
     zeros = np.zeros((gt_boxes.shape[0], 1), dtype=gt_boxes.dtype)

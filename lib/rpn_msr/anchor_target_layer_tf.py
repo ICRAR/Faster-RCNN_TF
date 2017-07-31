@@ -13,6 +13,7 @@ import numpy.random as npr
 from generate_anchors import generate_anchors
 from utils.cython_bbox import bbox_overlaps
 from fast_rcnn.bbox_transform import bbox_transform
+from utils.project_bbox import project_bbox
 import pdb
 
 DEBUG = False
@@ -74,7 +75,11 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, theta,
         print 'rpn: gt_boxes.shape', gt_boxes.shape
         print 'rpn: gt_boxes', gt_boxes
 
-    
+    gt_boxes = project_bbox(gt_boxes, theta)
+
+    if DEBUG:
+        print('After spatial_transformer rpn: gt_boxes', gt_boxes)
+
 
     # 1. Generate proposals from bbox deltas and shifted anchors
     shift_x = np.arange(0, width) * _feat_stride
