@@ -10,7 +10,7 @@ from spatial_transformer import transformer
 
 DEFAULT_PADDING = 'SAME'
 identity = np.array([[1., 0., 0.],
-                     [0., 1., 0.]])
+                     [0., 1., 0.]], dtype=np.float32)
 identity = identity.flatten()
 identity_theta = tf.Variable(initial_value=identity)
 
@@ -108,7 +108,7 @@ class Network(object):
         s_h:    strides height
         s_w:    stirdes width
         """
-        if (isinstance(input, list)):
+        if (isinstance(input, tuple)):
             input = input[0] # spatial transformer output, only consider data
 
         self.validate_padding(padding)

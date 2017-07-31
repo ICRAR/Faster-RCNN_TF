@@ -23,7 +23,7 @@ def project_bbox(gt_boxes, theta):
     boxes = np.transpose(gt_boxes)[0:-1]
     boxes = np.hstack((boxes[0:2, :], boxes[2:4, :])) # shape = (2, num_gtb * 2)
     assert(boxes.shape[1] == num_gtb * 2)
-    new_boxes = np.vstack((boxes,  np.ones((1, num_gtb * 2))))
+    new_boxes = np.vstack((boxes,  np.ones((1, num_gtb * 2), dtype=np.float32)))
     new_coord = np.dot(theta, new_boxes)
     new_cc = np.transpose(np.vstack((new_coord[:, 0:num_gtb], new_coord[:, num_gtb:num_gtb * 2])))
     return np.hstack((new_cc, cls_lbl))

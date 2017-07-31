@@ -28,10 +28,16 @@ def proposal_target_layer(rpn_rois, gt_boxes, theta, _num_classes):
     # TODO(rbg): it's annoying that sometimes I have extra info before
     # and other times after box coordinates -- normalize to one format
 
+    if DEBUG:
+        print('Before spatial_transformer proposal_target: gt_boxes', gt_boxes, gt_boxes.dtype)
+
     gt_boxes = project_bbox(gt_boxes, theta)
 
     if DEBUG:
-        print('After spatial_transformer proposal_target: gt_boxes', gt_boxes)
+	_count = 0
+	_fg_num = 0
+        _bg_num = 0
+        print('After spatial_transformer proposal_target: gt_boxes', gt_boxes, gt_boxes.dtype)
 
     # Include ground-truth boxes in the set of candidate rois
     zeros = np.zeros((gt_boxes.shape[0], 1), dtype=gt_boxes.dtype)
