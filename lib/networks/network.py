@@ -295,7 +295,6 @@ class Network(object):
             if isinstance(input, tuple):
                 input = input[0]
             input_shape = input.get_shape().as_list() # used for output shape
-	    #input_shape = [1, 600, 600, 3]
             w_shape_1 = [input_shape[1] * input_shape[2] * input_shape[3],
                          num_hidden]
             out_size = (input_shape[1], input_shape[2]) #remain the same size
@@ -318,8 +317,7 @@ class Network(object):
             h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
                                          b_fc_loc2, name=scope.name + '_theta')
             h_trans = transformer(input, h_fc_loc2, out_size)
-	    print("transformed shape", h_trans.get_shape())
-
+            #print("transformed shape", h_trans.get_shape().as_list())
             return h_trans, h_fc_loc2
 
     @layer
