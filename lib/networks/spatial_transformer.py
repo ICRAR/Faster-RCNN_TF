@@ -142,10 +142,12 @@ def transformer(U, theta, out_size, name='SpatialTransformer', **kwargs):
 
     def _transform(theta, input_dim, out_size):
         with tf.variable_scope('_transform'):
-            num_batch = tf.shape(input_dim)[0]
-            height = tf.shape(input_dim)[1]
-            width = tf.shape(input_dim)[2]
-            num_channels = tf.shape(input_dim)[3]
+	    input_shape = input_dim.get_shape().as_list()
+            num_batch = input_shape[0] #tf.shape(input_dim)[0]
+            height = input_shape[1] #tf.shape(input_dim)[1]
+            width = input_shape[2] #tf.shape(input_dim)[2]
+            num_channels = input_shape[3] #tf.shape(input_dim)[3]
+	    print("_transform input dimension = ", input_dim.get_shape().as_list())
             theta = tf.reshape(theta, (-1, 2, 3))
             theta = tf.cast(theta, 'float32')
 
@@ -170,10 +172,12 @@ def transformer(U, theta, out_size, name='SpatialTransformer', **kwargs):
             input_transformed = _interpolate(
                 input_dim, x_s_flat, y_s_flat,
                 out_size)
+	    print("input_transformed", input_transformed.get_shape().as_list())
 
             output = tf.reshape(
                 input_transformed, tf.stack([num_batch, out_height, out_width, num_channels]))
-            return output
+            print("_transform output", output.get_shape().as_list())
+	    return output
 
     with tf.variable_scope(name):
         output = _transform(theta, U, out_size)

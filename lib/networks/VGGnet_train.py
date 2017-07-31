@@ -10,7 +10,8 @@ class VGGnet_train(Network):
         self.inputs = []
         self._anchor_scales = anchor_scales
         self._feat_stride = feat_stride
-        self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
+        #self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
+        self.data = tf.placeholder(tf.float32, shape=[1, 600, 600, 3])
         self.im_info = tf.placeholder(tf.float32, shape=[None, 3])
         self.gt_boxes = tf.placeholder(tf.float32, shape=[None, 5])
         self.keep_prob = tf.placeholder(tf.float32)

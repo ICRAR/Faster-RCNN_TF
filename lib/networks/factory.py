@@ -56,7 +56,7 @@ def get_network(name):
         #return networks.VGGnet_test()
         return networks.VGGnet_train(low_level_trainable=False,
                                      anchor_scales=[1, 2, 4, 8, 16, 32],
-                                     anchor_ratios=[1])
+                                     anchor_ratios=[1], transform_img=True)
     elif nwnm.find('test') > -1:
         #return networks.VGGnet_train()
         return networks.VGGnet_test(low_level_trainable=False,

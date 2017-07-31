@@ -74,9 +74,9 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, theta,
         print 'height, width: ({}, {})'.format(height, width)
         print 'rpn: gt_boxes.shape', gt_boxes.shape
         print 'rpn: gt_boxes', gt_boxes
+    	print("theta = {0}".format(theta.flatten()))
 
     gt_boxes = project_bbox(gt_boxes, theta)
-
     if DEBUG:
         print('After spatial_transformer rpn: gt_boxes', gt_boxes)
 

@@ -112,6 +112,7 @@ class Network(object):
             input = input[0] # spatial transformer output, only consider data
 
         self.validate_padding(padding)
+	print("got input shape", input.get_shape())
         c_i = input.get_shape()[-1]  #channel input
         assert c_i%group==0
         assert c_o%group==0
@@ -293,11 +294,12 @@ class Network(object):
         with tf.variable_scope(name) as scope:
             if isinstance(input, tuple):
                 input = input[0]
-            input_shape = input.get_shape() # used for output shape
+            input_shape = input.get_shape().as_list() # used for output shape
+	    #input_shape = [1, 600, 600, 3]
             w_shape_1 = [input_shape[1] * input_shape[2] * input_shape[3],
                          num_hidden]
             out_size = (input_shape[1], input_shape[2]) #remain the same size
-            x = tf.reshape(input, [None, w_shape_1[0]])
+            x = tf.reshape(input, [-1, w_shape_1[0]])
             W_fc_loc1 = self.make_var('loc_weights_1', w_shape_1,
                                       tf.constant_initializer(0.0))
             b_fc_loc1 = self.make_var('loc_biases_1', [num_hidden],
@@ -316,6 +318,8 @@ class Network(object):
             h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
                                          b_fc_loc2, name=scope.name + '_theta')
             h_trans = transformer(input, h_fc_loc2, out_size)
+	    print("transformed shape", h_trans.get_shape())
+
             return h_trans, h_fc_loc2
 
     @layer
