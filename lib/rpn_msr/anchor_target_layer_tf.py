@@ -17,12 +17,14 @@ import pdb
 
 DEBUG = False
 
-def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data,
+def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, theta,
                        _feat_stride = [16,], anchor_scales=[4, 8, 16, 32],
                        anchor_ratios=[0.5, 1, 2]):
     """
     Assign anchors to ground-truth targets. Produces anchor classification
     labels and bounding-box regression targets.
+
+    Theta - spatial transformer matrix
     """
     _anchors = generate_anchors(ratios=anchor_ratios, scales=np.array(anchor_scales))
     _num_anchors = _anchors.shape[0]
@@ -71,6 +73,8 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data,
         print 'height, width: ({}, {})'.format(height, width)
         print 'rpn: gt_boxes.shape', gt_boxes.shape
         print 'rpn: gt_boxes', gt_boxes
+
+    
 
     # 1. Generate proposals from bbox deltas and shifted anchors
     shift_x = np.arange(0, width) * _feat_stride

@@ -9,6 +9,10 @@ from spatial_transformer import transformer
 
 
 DEFAULT_PADDING = 'SAME'
+identity = np.array([[1., 0., 0.],
+                     [0., 1., 0.]])
+identity = identity.flatten()
+identity_theta = tf.Variable(initial_value=identity)
 
 def layer(op):
     def layer_decorated(self, *args, **kwargs):
@@ -104,6 +108,9 @@ class Network(object):
         s_h:    strides height
         s_w:    stirdes width
         """
+        if (isinstance(input, list)):
+            input = input[0] # spatial transformer output, only consider data
+
         self.validate_padding(padding)
         c_i = input.get_shape()[-1]  #channel input
         assert c_i%group==0
@@ -181,7 +188,7 @@ class Network(object):
         with tf.variable_scope(name) as scope:
 
             rpn_labels,rpn_bbox_targets,rpn_bbox_inside_weights,rpn_bbox_outside_weights =\
-             tf.py_func(anchor_target_layer_py,[input[0],input[1],input[2],input[3],
+             tf.py_func(anchor_target_layer_py,[input[0],input[1],input[2],input[3], input[4][1],
              _feat_stride, anchor_scales, anchor_ratios],[tf.float32,tf.float32,tf.float32,tf.float32])
 
             rpn_labels = tf.convert_to_tensor(tf.cast(rpn_labels,tf.int32), name = 'rpn_labels')
@@ -199,7 +206,10 @@ class Network(object):
             input[0] = input[0][0]
         with tf.variable_scope(name) as scope:
 
-            rois,labels,bbox_targets,bbox_inside_weights,bbox_outside_weights = tf.py_func(proposal_target_layer_py,[input[0],input[1],classes],[tf.float32,tf.float32,tf.float32,tf.float32,tf.float32])
+            rois,labels,bbox_targets,bbox_inside_weights,bbox_outside_weights =\
+             tf.py_func(proposal_target_layer_py,
+                        [input[0], input[1], input[2][1], classes],
+                        [tf.float32,tf.float32,tf.float32,tf.float32,tf.float32])
 
             rois = tf.reshape(rois,[-1,5] , name = 'rois')
             labels = tf.convert_to_tensor(tf.cast(labels,tf.int32), name = 'labels')
@@ -279,7 +289,7 @@ class Network(object):
         blob/master/cluttered_mnist.py
         """
         if (not do_transform):
-            return input
+            return input, identity_theta
         with tf.variable_scope(name) as scope:
             if isinstance(input, tuple):
                 input = input[0]
@@ -299,15 +309,14 @@ class Network(object):
                                       tf.constant_initializer(initial))
 
             # Define the two layer localisation network
-            h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1, name=scope.name)
-            keep_prob = 0.7
+            h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1, name=scope.name + '_loc1')
             h_fc_loc1_drop = tf.nn.dropout(h_fc_loc1, keep_prob=keep_prob)
 
             # %% Second layer
             h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
-                                         b_fc_loc2, name=scope.name)
+                                         b_fc_loc2, name=scope.name + '_theta')
             h_trans = transformer(input, h_fc_loc2, out_size)
-            return h_trans
+            return h_trans, h_fc_loc2
 
     @layer
     def softmax(self, input, name):
