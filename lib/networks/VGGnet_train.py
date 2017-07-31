@@ -19,6 +19,7 @@ class VGGnet_train(Network):
         self.low_level_trainable = low_level_trainable
         self.anchor_ratio_size = len(anchor_ratios)
         self.anchor_ratios = anchor_ratios
+        self.transform_img = transform_img
         self.setup()
 
         # create ops and placeholders for bbox normalization process
@@ -34,7 +35,7 @@ class VGGnet_train(Network):
 
     def setup(self):
         (self.feed('data')
-             .spatial_transform(name='spt_trans', do_transform=transform_img)
+             .spatial_transform(name='spt_trans', do_transform=self.transform_img)
              .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=self.low_level_trainable)
              .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool1')
