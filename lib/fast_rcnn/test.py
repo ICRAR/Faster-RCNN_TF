@@ -175,12 +175,13 @@ def im_detect(sess, net, im, boxes=None):
         run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
         run_metadata = tf.RunMetadata()
 
-    cls_score, cls_prob, bbox_pred, rois, transform_out = sess.run([net.get_output('cls_score'),
-    net.get_output('cls_prob'), net.get_output('bbox_pred'), net.get_output('rois'), net.get_output('spt_trans')],
+    theta_tensor = tf.get_default_graph().get_tensor_by_name('spt_trans_theta')
+    cls_score, cls_prob, bbox_pred, rois, theta = sess.run([net.get_output('cls_score'),
+    net.get_output('cls_prob'), net.get_output('bbox_pred'), net.get_output('rois'), theta_tensor],
                                                     feed_dict=feed_dict,
                                                     options=run_options,
                                                     run_metadata=run_metadata)
-    theta = transform_out[1]
+    #theta = transform_out[1]
 
     if cfg.TEST.HAS_RPN:
         assert len(im_scales) == 1, "Only single-image batch implemented"
