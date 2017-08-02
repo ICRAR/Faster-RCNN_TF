@@ -6,11 +6,12 @@ n_classes = 7
 class VGGnet_test(Network):
     def __init__(self, trainable=True, anchor_scales=[8, 16, 32],
                 feat_stride=[16,], low_level_trainable=False,
-                anchor_ratios=[0.5, 1, 2]):
+                anchor_ratios=[0.5, 1, 2], transform_img=False):
         self.inputs = []
         self._anchor_scales = anchor_scales
         self._feat_stride = feat_stride
-        self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
+        #self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
+        self.data = tf.placeholder(tf.float32, shape=[1, 600, 600, 3])
         self.im_info = tf.placeholder(tf.float32, shape=[None, 3])
         self.keep_prob = tf.placeholder(tf.float32)
         self.layers = dict({'data':self.data, 'im_info':self.im_info})
@@ -18,10 +19,12 @@ class VGGnet_test(Network):
         self.low_level_trainable = low_level_trainable
         self.anchor_ratio_size = len(anchor_ratios)
         self.anchor_ratios = anchor_ratios
+        self.transform_img = transform_img
         self.setup()
 
     def setup(self):
         (self.feed('data')
+             .spatial_transform(name='spt_trans', do_transform=self.transform_img)
              .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=self.low_level_trainable)
              .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool1')

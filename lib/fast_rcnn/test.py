@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 from utils.cython_nms import nms, nms_new
 from utils.boxes_grid import get_boxes_grid
+from utils.project_bbox import project_bbox_inv
 import cPickle
 import heapq
 from utils.blob import im_list_to_blob
@@ -140,6 +141,7 @@ def im_detect(sess, net, im, boxes=None):
         scores (ndarray): R x K array of object class scores (K includes
             background as object category 0)
         boxes (ndarray): R x (4*K) array of predicted bounding boxes
+        theta:  spatial transform parameter
     """
 
     blobs, im_scales = _get_blobs(im, boxes)
@@ -173,10 +175,12 @@ def im_detect(sess, net, im, boxes=None):
         run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
         run_metadata = tf.RunMetadata()
 
-    cls_score, cls_prob, bbox_pred, rois = sess.run([net.get_output('cls_score'), net.get_output('cls_prob'), net.get_output('bbox_pred'),net.get_output('rois')],
+    cls_score, cls_prob, bbox_pred, rois, transform_out = sess.run([net.get_output('cls_score'),
+    net.get_output('cls_prob'), net.get_output('bbox_pred'), net.get_output('rois'), net.get_output('spt_trans')],
                                                     feed_dict=feed_dict,
                                                     options=run_options,
                                                     run_metadata=run_metadata)
+    theta = transform_out[1]
 
     if cfg.TEST.HAS_RPN:
         assert len(im_scales) == 1, "Only single-image batch implemented"
@@ -195,6 +199,7 @@ def im_detect(sess, net, im, boxes=None):
         # Apply bounding-box regression deltas
         box_deltas = bbox_pred
         pred_boxes = bbox_transform_inv(boxes, box_deltas)
+        project_bbox_inv(pred_boxes, theta) # project spatially transformed box back
         pred_boxes = _clip_boxes(pred_boxes, im.shape)
     else:
         # Simply repeat the boxes, once for each class
@@ -211,7 +216,7 @@ def im_detect(sess, net, im, boxes=None):
         trace_file.write(trace.generate_chrome_trace_format(show_memory=False))
         trace_file.close()
 
-    return scores, pred_boxes
+    return scores, pred_boxes, theta
 
 
 def vis_detections(im, class_name, dets, thresh=0.8):
@@ -304,7 +309,7 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
 
             im = cv2.imread(imdb.image_path_at(i))
             _t['im_detect'].tic()
-            scores, boxes = im_detect(sess, net, im, box_proposals)
+            scores, boxes, theta = im_detect(sess, net, im, box_proposals)
             _t['im_detect'].toc()
 
             _t['misc'].tic()
@@ -340,9 +345,9 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
                         all_boxes[j][i] = all_boxes[j][i][keep, :]
             _t['misc'].toc()
 
-            print 'im_detect: {:d}/{:d} {:d} detection {:.3f}s {:.3f}s' \
+            print 'im_detect: {:d}/{:d} {:d} detection {:.3f}s, theta = {}' \
                   .format(i + 1, num_images, ttt, _t['im_detect'].average_time,
-                          _t['misc'].average_time)
+                          theta.flatten())
 
         with open(det_file, 'wb') as f:
             cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
