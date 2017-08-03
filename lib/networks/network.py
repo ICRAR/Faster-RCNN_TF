@@ -297,13 +297,14 @@ class Network(object):
             w_shape_1 = [input_shape[1] * input_shape[2] * input_shape[3],
                          num_hidden]
             out_size = (input_shape[1], input_shape[2]) #remain the same size
+            init_weights = tf.truncated_normal_initializer(0.0, stddev=0.001)
             x = tf.reshape(input, [-1, w_shape_1[0]])
             W_fc_loc1 = self.make_var('loc_weights_1', w_shape_1,
-                                      tf.constant_initializer(0.0))
+                                      init_weights)#tf.constant_initializer(0.0))
             b_fc_loc1 = self.make_var('loc_biases_1', [num_hidden],
                                       tf.constant_initializer(0.0))
             W_fc_loc2 = self.make_var('loc_weights_2', [num_hidden, 6],
-                                      tf.constant_initializer(0.0))
+                                      init_weights)#tf.constant_initializer(0.0))
             initial = np.array([[1, 0, 0], [0, 1, 0]]).astype('float32').flatten()
             b_fc_loc2 = self.make_var('loc_biases_2', initial.shape,
                                       tf.constant_initializer(initial))
