@@ -310,15 +310,19 @@ class Network(object):
                                       tf.constant_initializer(initial))
 
             # Define the two layer localisation network
-            h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1, name=scope.name + '_loc1')
+            # h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1, name=scope.name + '_loc1')
+            h_fc_loc1 = tf.nn.tanh(tf.matmul(x, W_fc_loc1) + b_fc_loc1, name=scope.name + '_loc1')
             if (keep_prob < 1):
                 h_fc_loc1_drop = tf.nn.dropout(h_fc_loc1, keep_prob=keep_prob)
             else:
                 h_fc_loc1_drop = h_fc_loc1
 
             # %% Second layer
-            h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
+            #h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
+            #                             b_fc_loc2, name=scope.name + '_theta')
+            h_fc_loc2 = tf.nn.tanh(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
                                          b_fc_loc2, name=scope.name + '_theta')
+
             h_trans = transformer(input, h_fc_loc2, out_size)
             #print("transformed shape", h_trans.get_shape().as_list())
             return h_trans, h_fc_loc2
