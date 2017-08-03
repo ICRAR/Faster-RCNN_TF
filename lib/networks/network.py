@@ -303,11 +303,12 @@ class Network(object):
                                       init_weights)#tf.constant_initializer(0.0))
             b_fc_loc1 = self.make_var('loc_biases_1', [num_hidden],
                                       tf.constant_initializer(0.0))
-            W_fc_loc2 = self.make_var('loc_weights_2', [num_hidden, 6],
+            W_fc_loc2 = self.make_var('loc_weights_2', [num_hidden, 1],
                                       init_weights)#tf.constant_initializer(0.0))
-            initial = np.array([[1, 0, 0], [0, 1, 0]]).astype('float32').flatten()
-            b_fc_loc2 = self.make_var('loc_biases_2', initial.shape,
-                                      tf.constant_initializer(initial))
+            #initial = np.array([[1, 0, 0], [0, 1, 0]]).astype('float32').flatten()
+            #initial = np.array([[0.0]]).astype('float32').flatten()
+            b_fc_loc2 = self.make_var('loc_biases_2', [1]
+                                      tf.constant_initializer(0.0))
 
             # Define the two layer localisation network
             h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1, name=scope.name + '_loc1')
@@ -321,11 +322,22 @@ class Network(object):
             #h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
             #                             b_fc_loc2, name=scope.name + '_theta')
             h_fc_loc2 = tf.nn.tanh(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
-                                         b_fc_loc2, name=scope.name + '_theta')
+                                         b_fc_loc2, name=scope.name + '_loc2')
 
-            h_trans = transformer(input, h_fc_loc2, out_size)
+            alpha = tf.multiply(tf.reshape(h_fc_loc2, []), # convert to scalar
+                                tf.convert_to_tensor(np.pi / 2, dtype=tf.float32))
+            sin_alpha = tf.sin(alpha)
+            cos_alpha = tf.cos(alpha)
+            n_sin_alpha = tf.multiply(sin_alpha,
+                                      tf.convert_to_tensor(-1.0, dtype=tf.float32))
+            zero_tensor = tf.convert_to_tensor(0.0, dtype=tf.float32)
+            row1 = tf.concat([cos_alpha, n_sin_alpha, zero_tensor])
+            row2 = tf.concat([sin_alpha, cos_alpha, zero_tensor])
+            theta = tf.stack([row1, row2], axis=0)
+
+            h_trans = transformer(input, theta, out_size)
             #print("transformed shape", h_trans.get_shape().as_list())
-            return h_trans, h_fc_loc2
+            return h_trans, theta
 
     @layer
     def softmax(self, input, name):
