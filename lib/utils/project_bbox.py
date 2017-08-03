@@ -19,6 +19,7 @@ identity = np.array([[1., 0., 0.],
 def project_bbox(gt_boxes, theta):
     """
     """
+    print("*** theta = {0}".format(theta))
     theta = np.reshape(theta, (-1, 3)) # in case it is unflattened
     if (np.sum(theta == identity) == 6):
         return gt_boxes
