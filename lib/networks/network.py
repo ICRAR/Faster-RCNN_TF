@@ -112,7 +112,6 @@ class Network(object):
             input = input[0] # spatial transformer output, only consider data
 
         self.validate_padding(padding)
-	print("got input shape", input.get_shape())
         c_i = input.get_shape()[-1]  #channel input
         assert c_i%group==0
         assert c_o%group==0
@@ -311,7 +310,10 @@ class Network(object):
 
             # Define the two layer localisation network
             h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1, name=scope.name + '_loc1')
-            h_fc_loc1_drop = tf.nn.dropout(h_fc_loc1, keep_prob=keep_prob)
+            if (keep_prob < 1):
+                h_fc_loc1_drop = tf.nn.dropout(h_fc_loc1, keep_prob=keep_prob)
+            else:
+                h_fc_loc1_drop = h_fc_loc1
 
             # %% Second layer
             h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
