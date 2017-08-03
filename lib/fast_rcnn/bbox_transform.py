@@ -23,9 +23,11 @@ def bbox_transform(ex_rois, gt_rois):
     gt_widths = gt_rois[:, 2] - gt_rois[:, 0] + 1.0
     if (gt_widths < 0):
         gt_widths = gt_rois[:, 0] - gt_rois[:, 2] + 1.0
+    gt_widths = 1.0 if gt_widths <= 0
     gt_heights = gt_rois[:, 3] - gt_rois[:, 1] + 1.0
     if (gt_heights < 0):
         gt_heights = gt_rois[:, 1] - gt_rois[:, 3] + 1.0
+    gt_heights = 1.0 if gt_heights <= 0
     gt_ctr_x = gt_rois[:, 0] + 0.5 * gt_widths
     gt_ctr_y = gt_rois[:, 1] + 0.5 * gt_heights
 
