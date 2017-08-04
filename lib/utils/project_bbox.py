@@ -18,7 +18,10 @@ identity = np.array([[1., 0., 0.],
 
 def project_bbox(gt_boxes, theta):
     """
+    1. fill all four corners (since ration will result in new xmin/max, ymin/max)
+    2. for each box,
     """
+    return gt_boxes
     print("*** theta = {0}".format(theta))
     theta = np.reshape(theta, (-1, 3)) # in case it is unflattened
     if (np.sum(theta == identity) == 6):

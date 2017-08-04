@@ -283,7 +283,8 @@ class Network(object):
             return fc
 
     @layer
-    def spatial_transform(self, input, name, do_transform=False, num_hidden=20, keep_prob=0.7):
+    def spatial_transform(self, input, name, do_transform=False, num_hidden=200,
+                          rotation_dim=30, keep_prob=0.7):
         """
         Based on https://github.com/daviddao/spatial-transformer-tensorflow/\
         blob/master/cluttered_mnist.py
@@ -297,21 +298,23 @@ class Network(object):
             w_shape_1 = [input_shape[1] * input_shape[2] * input_shape[3],
                          num_hidden]
             out_size = (input_shape[1], input_shape[2]) #remain the same size
-            init_weights = tf.truncated_normal_initializer(0.0, stddev=0.001)
+            init_weights1 = tf.truncated_normal_initializer(0.0, stddev=0.001)
+            init_weights2 = tf.truncated_normal_initializer(0.0, stddev=0.001)
             x = tf.reshape(input, [-1, w_shape_1[0]])
             W_fc_loc1 = self.make_var('loc_weights_1', w_shape_1,
-                                      init_weights)#tf.constant_initializer(0.0))
+                                      init_weights1)#tf.constant_initializer(0.0))
             b_fc_loc1 = self.make_var('loc_biases_1', [num_hidden],
                                       tf.constant_initializer(0.0))
-            W_fc_loc2 = self.make_var('loc_weights_2', [num_hidden, 1],
-                                      init_weights)#tf.constant_initializer(0.0))
+            W_fc_loc2 = self.make_var('loc_weights_2', [num_hidden, rotation_dim],
+                                      init_weights2)#tf.constant_initializer(0.0))
             #initial = np.array([[1, 0, 0], [0, 1, 0]]).astype('float32').flatten()
             #initial = np.array([[0.0]]).astype('float32').flatten()
             b_fc_loc2 = self.make_var('loc_biases_2', [1],
                                       tf.constant_initializer(0.0))
 
             # Define the two layer localisation network
-            h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1, name=scope.name + '_loc1')
+            h_fc_loc1 = tf.nn.relu_layer(x, W_fc_loc1, b_fc_loc1,
+                                         name=scope.name + '_loc1')
             # h_fc_loc1 = tf.nn.tanh(tf.matmul(x, W_fc_loc1) + b_fc_loc1, name=scope.name + '_loc1')
             if (keep_prob < 1):
                 h_fc_loc1_drop = tf.nn.dropout(h_fc_loc1, keep_prob=keep_prob)
@@ -319,36 +322,38 @@ class Network(object):
                 h_fc_loc1_drop = h_fc_loc1
 
             # %% Second layer
-            #h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
-            #                             b_fc_loc2, name=scope.name + '_theta')
-            h_fc_loc2 = tf.nn.tanh(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
+            h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
                                          b_fc_loc2, name=scope.name + '_loc2')
-	    print("h_fc_loc2 shape = {0}".format(h_fc_loc2.get_shape().as_list()))
-	    h_fc_loc2 = tf.Print(h_fc_loc2, [h_fc_loc2, "h_fc_loc2 value"])
+            #h_fc_loc2 = tf.nn.tanh(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
+                                         b_fc_loc2, name=scope.name + '_loc2')
+    	    #print("h_fc_loc2 shape = {0}".format(h_fc_loc2.get_shape().as_list()))
+    	    h_fc_loc2 = tf.Print(h_fc_loc2, [h_fc_loc2, "h_fc_loc2 value"])
+            h_fc_loc2_max = tf.argmax(h_fc_loc2)
+            h_fc_loc2_max = tf.reshape(h_fc_loc2_max, [1, 1])
 
             #alpha = tf.multiply(tf.reshape(h_fc_loc2, []), # convert to scalar
-            alpha = tf.multiply(h_fc_loc2, # convert to scalar
-                                tf.convert_to_tensor(np.pi / 3, dtype=tf.float32))
+            alpha = tf.multiply(h_fc_loc2_max, # convert to scalar
+                                tf.convert_to_tensor(np.pi / rotation_dim, dtype=tf.float32))
             alpha = tf.Print(alpha, [alpha, "alpha value"])
-	    print("alpha shape = {0}".format(alpha.get_shape().as_list()))
+            #print("alpha shape = {0}".format(alpha.get_shape().as_list()))
             sin_alpha = tf.sin(alpha)
-	    sin_alpha = tf.Print(sin_alpha, [sin_alpha, "sin_alpha value"])
+            #sin_alpha = tf.Print(sin_alpha, [sin_alpha, "sin_alpha value"])
             cos_alpha = tf.cos(alpha)
-	    cos_alpha = tf.Print(cos_alpha, [cos_alpha, "cos_alpha value"])
+            #cos_alpha = tf.Print(cos_alpha, [cos_alpha, "cos_alpha value"])
             n_sin_alpha = tf.multiply(sin_alpha,
                                       tf.convert_to_tensor(-1.0, dtype=tf.float32))
-	    print("n_sin_alpha shape = {0}".format(n_sin_alpha.get_shape().as_list()))
+	        #print("n_sin_alpha shape = {0}".format(n_sin_alpha.get_shape().as_list()))
             zero_tensor = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
-	    print("zero_tensor shape = {0}".format(zero_tensor.get_shape().as_list()))
+            #print("zero_tensor shape = {0}".format(zero_tensor.get_shape().as_list()))
             row1 = tf.concat([cos_alpha, n_sin_alpha, zero_tensor], axis=1)
-	    row1 = tf.reshape(row1, [3])
-	    print("row1 shape = {0}".format(row1.get_shape().as_list()))
+            row1 = tf.reshape(row1, [3])
+            #print("row1 shape = {0}".format(row1.get_shape().as_list()))
             row2 = tf.concat([sin_alpha, cos_alpha, zero_tensor], axis=1)
-	    row2 = tf.reshape(row2, [3])
-	    print("row2 shape = {0}".format(row2.get_shape().as_list()))
+            row2 = tf.reshape(row2, [3])
+            #print("row2 shape = {0}".format(row2.get_shape().as_list()))
             theta = tf.stack([row1, row2], axis=0)
-	    theta_shape = theta.get_shape().as_list()
-            print("theta shape = {0}".format(theta_shape))
+            theta_shape = theta.get_shape().as_list()
+            #print("theta shape = {0}".format(theta_shape))
             assert(theta_shape[0] == 2 and theta_shape[1] == 3)
             h_trans = transformer(input, theta, out_size)
             #print("transformed shape", h_trans.get_shape().as_list())
