@@ -16,13 +16,13 @@ array([[ 109.09091187,   81.8181839 ,  127.27272797,  104.54545593,    1.       
 identity = np.array([[1., 0., 0.],
                      [0., 1., 0.]], dtype=np.float32)
 
-def project_bbox(gt_boxes, theta):
+def project_bbox(gt_boxes, theta, im_size=(600, 600)):
     """
     1. fill all four corners (since ration will result in new xmin/max, ymin/max)
     2. for each box,
     """
-    return gt_boxes
-    print("*** theta = {0}".format(theta))
+    #return gt_boxes
+    #print("*** theta = {0}".format(theta))
     theta = np.reshape(theta, (-1, 3)) # in case it is unflattened
     if (np.sum(theta == identity) == 6):
         return gt_boxes
@@ -31,10 +31,25 @@ def project_bbox(gt_boxes, theta):
     cls_lbl = np.reshape(gt_boxes[:, -1], [num_gtb, 1])
 
     boxes = np.transpose(gt_boxes)[0:-1]
-    boxes = np.hstack((boxes[0:2, :], boxes[2:4, :])) # shape = (2, num_gtb * 2)
-    assert(boxes.shape[1] == num_gtb * 2)
-    new_boxes = np.vstack((boxes,  np.ones((1, num_gtb * 2), dtype=np.float32)))
-    new_coord = np.dot(theta, new_boxes)
+    #boxes = np.hstack((boxes[0:2, :], boxes[2:4, :])) # shape = (2, num_gtb * 2)
+
+    # shape = (2, num_gtb * 4)
+    boxes = np.hstack((boxes[0:2, :], boxes[2:4, :], boxes[(0,3), :], boxes[(2,1), :]))
+    # assert(boxes.shape[1] == num_gtb * 2)
+    assert(boxes.shape[1] == num_gtb * 4)
+
+    new_boxes = np.vstack((boxes,  np.ones((1, num_gtb * 4), dtype=np.float32)))
+    new_coord1 = np.dot(theta, new_boxes)
+    row, col = new_coord1.shape
+    x_row = new_coord1[0]
+    y_row = new_coord1[1]
+    new_coord = np.zeros([row, col / 2])
+    for i in range(num_gtb):
+        new_coord[0][i] = max(np.min(x_row[i::num_gtb]), 0)
+        new_coord[0][i + num_gtb] = min(np.max(x_row[i::num_gtb]), im_size[1] - 1)
+        new_coord[1][i] = max(np.min(y_row[i::num_gtb]), 0)
+        new_coord[1][i + num_gtb] = min(np.max(y_row[i::num_gtb]), im_size[0] - 1)
+
     new_cc = np.transpose(np.vstack((new_coord[:, 0:num_gtb], new_coord[:, num_gtb:num_gtb * 2])))
     return np.hstack((new_cc, cls_lbl))
 

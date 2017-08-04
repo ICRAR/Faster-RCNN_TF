@@ -298,8 +298,8 @@ class Network(object):
             w_shape_1 = [input_shape[1] * input_shape[2] * input_shape[3],
                          num_hidden]
             out_size = (input_shape[1], input_shape[2]) #remain the same size
-            init_weights1 = tf.truncated_normal_initializer(0.0, stddev=0.001)
-            init_weights2 = tf.truncated_normal_initializer(0.0, stddev=0.001)
+            init_weights1 = tf.truncated_normal_initializer(0.0, stddev=0.01)
+            init_weights2 = tf.truncated_normal_initializer(0.0, stddev=0.01)
             x = tf.reshape(input, [-1, w_shape_1[0]])
             W_fc_loc1 = self.make_var('loc_weights_1', w_shape_1,
                                       init_weights1)#tf.constant_initializer(0.0))
@@ -327,16 +327,16 @@ class Network(object):
             #h_fc_loc2 = tf.nn.tanh(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
                                          #b_fc_loc2, name=scope.name + '_loc2')
     	    #print("h_fc_loc2 shape = {0}".format(h_fc_loc2.get_shape().as_list()))
-    	    h_fc_loc2 = tf.Print(h_fc_loc2, [h_fc_loc2, "h_fc_loc2 value"])
+    	    #h_fc_loc2 = tf.Print(h_fc_loc2, [h_fc_loc2, "h_fc_loc2 value"])
             h_fc_loc2_max = tf.argmax(h_fc_loc2, 1)
-	    print("h_fc_loc2_max.shape = {0}".format(h_fc_loc2_max.get_shape().as_list()))
+	        print("h_fc_loc2_max.shape = {0}".format(h_fc_loc2_max.get_shape().as_list()))
             h_fc_loc2_max = tf.reshape(h_fc_loc2_max, [1, 1])
-	    h_fc_loc2_max = tf.to_float(h_fc_loc2_max)
+            h_fc_loc2_max = tf.to_float(h_fc_loc2_max)
 
             #alpha = tf.multiply(tf.reshape(h_fc_loc2, []), # convert to scalar
             alpha = tf.multiply(h_fc_loc2_max, # convert to scalar
-                                tf.convert_to_tensor(np.pi / rotation_dim, dtype=tf.float32))
-            alpha = tf.Print(alpha, [alpha, "alpha value"])
+                                tf.convert_to_tensor(2 * np.pi / rotation_dim, dtype=tf.float32))
+            #alpha = tf.Print(alpha, [alpha, "alpha value"])
             #print("alpha shape = {0}".format(alpha.get_shape().as_list()))
             sin_alpha = tf.sin(alpha)
             #sin_alpha = tf.Print(sin_alpha, [sin_alpha, "sin_alpha value"])
