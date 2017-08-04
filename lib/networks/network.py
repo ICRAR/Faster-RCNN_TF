@@ -329,7 +329,7 @@ class Network(object):
     	    #print("h_fc_loc2 shape = {0}".format(h_fc_loc2.get_shape().as_list()))
     	    #h_fc_loc2 = tf.Print(h_fc_loc2, [h_fc_loc2, "h_fc_loc2 value"])
             h_fc_loc2_max = tf.argmax(h_fc_loc2, 1)
-	        print("h_fc_loc2_max.shape = {0}".format(h_fc_loc2_max.get_shape().as_list()))
+            print("h_fc_loc2_max.shape = {0}".format(h_fc_loc2_max.get_shape().as_list()))
             h_fc_loc2_max = tf.reshape(h_fc_loc2_max, [1, 1])
             h_fc_loc2_max = tf.to_float(h_fc_loc2_max)
 
