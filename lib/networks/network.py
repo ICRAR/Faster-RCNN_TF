@@ -347,7 +347,7 @@ class Network(object):
 	        #print("n_sin_alpha shape = {0}".format(n_sin_alpha.get_shape().as_list()))
             scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
             scale_tensor = tf.divide(scale_tensor,
-                                     tf.add(tf.abs(sin_alpha) + tf.abs(cos_alpha)))
+                                     tf.add(tf.abs(sin_alpha), tf.abs(cos_alpha)))
             sin_alpha = tf.multiply(scale_tensor, sin_alpha)
             cos_alpha = tf.multiply(scale_tensor, cos_alpha)
             n_sin_alpha = tf.multiply(scale_tensor, n_sin_alpha)

@@ -36,7 +36,10 @@ def prep_im_for_blob(im, pixel_means, target_size, max_size):
     # Prevent the biggest axis from being more than MAX_SIZE
     if np.round(im_scale * im_size_max) > max_size:
         im_scale = float(max_size) / float(im_size_max)
-    im = cv2.resize(im, None, None, fx=im_scale, fy=im_scale,
-                    interpolation=cv2.INTER_LINEAR)
+    # im = cv2.resize(im, None, None, fx=im_scale, fy=im_scale,
+    #                 interpolation=cv2.INTER_LINEAR)
+    w = min(target_size, max_size)
+    h = w
+    im = cv2.resize(im, (h, w), interpolation=cv2.INTER_LINEAR)
 
     return im, im_scale
