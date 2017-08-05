@@ -61,14 +61,19 @@ def project_bbox(gt_boxes, theta, im_size=(600, 600)):
         new_coord[0][i + num_gtb] = min(np.max(x_row[i::num_gtb]), 1.0)
         #assert(new_coord[0][i + num_gtb] > new_coord[0][i])
         if (new_coord[0][i + num_gtb] <= new_coord[0][i]):
-            print("{0} <= {1}".format(new_coord[0][i + num_gtb], new_coord[0][i]))
+            print("x: {0} <= {1}".format(new_coord[0][i + num_gtb], new_coord[0][i]))
             count_error += 1
         new_coord[1][i] = max(np.min(y_row[i::num_gtb]), -1.0)
         new_coord[1][i + num_gtb] = min(np.max(y_row[i::num_gtb]), 1.0)
         #assert(new_coord[1][i + num_gtb] > new_coord[1][i])
         if (new_coord[1][i + num_gtb] <= new_coord[1][i]):
-            print("{0} <= {1}".format(new_coord[1][i + num_gtb], new_coord[1][i]))
+            print("y: {0} <= {1}".format(new_coord[1][i + num_gtb], new_coord[1][i]))
             count_error += 1
+
+    if (count_error > 0):
+        print("*** original boxes = {0}".format(boxes))
+        print("*** new_coord = {0}".format(new_coord))
+        raise Exception("Assertion Error")
 
     new_coord[0, :] *= im_size[1] / 2.0
     new_coord[0, :] += im_size[1] / 2.0
@@ -78,8 +83,7 @@ def project_bbox(gt_boxes, theta, im_size=(600, 600)):
     new_cc = np.transpose(np.vstack((new_coord[:, 0:num_gtb], new_coord[:, num_gtb:num_gtb * 2])))
     #print("xxxxx new gt_boxes = {0}".format(new_cc))
 
-    if (count_error > 0):
-        raise Exception("Assertion Error")
+
 
     return np.hstack((new_cc, cls_lbl))
 

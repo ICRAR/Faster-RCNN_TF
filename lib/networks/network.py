@@ -345,8 +345,15 @@ class Network(object):
             n_sin_alpha = tf.multiply(sin_alpha,
                                       tf.convert_to_tensor(-1.0, dtype=tf.float32))
 	        #print("n_sin_alpha shape = {0}".format(n_sin_alpha.get_shape().as_list()))
+            scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
+            scale_tensor = tf.divide(scale_tensor,
+                                     tf.add(tf.abs(sin_alpha) + tf.abs(cos_alpha)))
+            sin_alpha = tf.multiply(scale_tensor, sin_alpha)
+            cos_alpha = tf.multiply(scale_tensor, cos_alpha)
+            n_sin_alpha = tf.multiply(scale_tensor, n_sin_alpha)
+
             zero_tensor = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
-            #print("zero_tensor shape = {0}".format(zero_tensor.get_shape().as_list()))
+            #print("scale_tensor shape = {0}".format(scale_tensor.get_shape().as_list()))
             row1 = tf.concat([cos_alpha, n_sin_alpha, zero_tensor], axis=1)
             row1 = tf.reshape(row1, [3])
             #print("row1 shape = {0}".format(row1.get_shape().as_list()))

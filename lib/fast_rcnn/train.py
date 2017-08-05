@@ -219,7 +219,7 @@ class SolverWrapper(object):
                     (iter + 1, max_iters + start_iter, rpn_loss_cls_value + rpn_loss_box_value + loss_cls_value + loss_box_value,
                      rpn_loss_cls_value, rpn_loss_box_value, loss_cls_value, loss_box_value, lr.eval())
                 theta = transform_out[1]
-                print 'speed: {:.3f}s / iter. theta = {}'.format(timer.average_time, theta)
+                print 'speed: {:.3f}s / iter. theta = {}'.format(timer.average_time, theta.flatten())
 
             if (iter + 1) % cfg.TRAIN.SNAPSHOT_ITERS == 0:
                 last_snapshot_iter = iter
