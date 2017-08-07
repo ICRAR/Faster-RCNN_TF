@@ -284,7 +284,7 @@ class Network(object):
 
     @layer
     def spatial_transform(self, input, name, do_transform=False, num_hidden=20,
-                          rotation_dim=30, keep_prob=0.7):
+                          rotation_dim=1, keep_prob=0.7):
         """
         Based on https://github.com/daviddao/spatial-transformer-tensorflow/\
         blob/master/cluttered_mnist.py
@@ -322,20 +322,26 @@ class Network(object):
                 h_fc_loc1_drop = h_fc_loc1
 
             # %% Second layer
-            h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
-                                         b_fc_loc2, name=scope.name + '_loc2')
-            #h_fc_loc2 = tf.nn.tanh(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
+            #h_fc_loc2 = tf.nn.relu_layer(h_fc_loc1_drop, W_fc_loc2,
                                          #b_fc_loc2, name=scope.name + '_loc2')
+            # h_fc_loc2 = tf.nn.tanh(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
+            #                              b_fc_loc2, name=scope.name + '_loc2')
+            alpha = tf.nn.relu_layer(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
+                                         b_fc_loc2, name=scope.name + '_loc2')
     	    #print("h_fc_loc2 shape = {0}".format(h_fc_loc2.get_shape().as_list()))
     	    #h_fc_loc2 = tf.Print(h_fc_loc2, [h_fc_loc2, "h_fc_loc2 value"])
-            h_fc_loc2_max = tf.argmax(h_fc_loc2, 1)
+            #h_fc_loc2_max = tf.argmax(h_fc_loc2, 1)
+            #h_fc_loc2_max = tf.nn.softmax(h_fc_loc2)
+            # TODO but argmax is not differentiable! see
+            #https://www.reddit.com/r/MachineLearning/comments/4e2get/argmax_differentiable/
+
             print("h_fc_loc2_max.shape = {0}".format(h_fc_loc2_max.get_shape().as_list()))
-            h_fc_loc2_max = tf.reshape(h_fc_loc2_max, [1, 1])
-            h_fc_loc2_max = tf.to_float(h_fc_loc2_max)
+            #h_fc_loc2_max = tf.reshape(h_fc_loc2_max, [1, 1])
+            #h_fc_loc2_max = tf.to_float(h_fc_loc2_max)
 
             #alpha = tf.multiply(tf.reshape(h_fc_loc2, []), # convert to scalar
-            alpha = tf.multiply(h_fc_loc2_max, # convert to scalar
-                                tf.convert_to_tensor(2 * np.pi / rotation_dim, dtype=tf.float32))
+            #alpha = tf.multiply(h_fc_loc2_max, # convert to scalar
+                                #tf.convert_to_tensor(2 * np.pi / rotation_dim, dtype=tf.float32))
             #alpha = tf.Print(alpha, [alpha, "alpha value"])
             #print("alpha shape = {0}".format(alpha.get_shape().as_list()))
             sin_alpha = tf.sin(alpha)
