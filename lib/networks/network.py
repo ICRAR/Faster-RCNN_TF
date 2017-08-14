@@ -326,8 +326,11 @@ class Network(object):
                                          #b_fc_loc2, name=scope.name + '_loc2')
             # h_fc_loc2 = tf.nn.tanh(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
             #                              b_fc_loc2, name=scope.name + '_loc2')
-            alpha = tf.nn.relu_layer(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
-                                         b_fc_loc2, name=scope.name + '_loc2')
+            #alpha = tf.nn.relu_layer(tf.matmul(h_fc_loc1_drop, W_fc_loc2) +
+            #                             b_fc_loc2, name=scope.name + '_loc2')
+            alpha = tf.nn.xw_plus_b(h_fc_loc1_drop, W_fc_loc2, b_fc_loc2,
+                                    name=scope.name + '_loc2')
+
     	    #print("h_fc_loc2 shape = {0}".format(h_fc_loc2.get_shape().as_list()))
     	    #h_fc_loc2 = tf.Print(h_fc_loc2, [h_fc_loc2, "h_fc_loc2 value"])
             #h_fc_loc2_max = tf.argmax(h_fc_loc2, 1)
