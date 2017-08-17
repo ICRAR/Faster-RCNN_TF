@@ -18,7 +18,7 @@ import pdb
 
 DEBUG = False
 
-def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, theta,
+def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, #theta,
                        _feat_stride = [16,], anchor_scales=[4, 8, 16, 32],
                        anchor_ratios=[0.5, 1, 2]):
     """
@@ -74,9 +74,9 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, theta,
         print 'height, width: ({}, {})'.format(height, width)
         print 'rpn: gt_boxes.shape', gt_boxes.shape
         print 'rpn: gt_boxes', gt_boxes
-    	print("theta = {0}".format(theta.flatten()))
+    	#print("theta = {0}".format(theta.flatten()))
 
-    gt_boxes = project_bbox(gt_boxes, theta, (im_info[0], im_info[1]))
+    #gt_boxes = project_bbox(gt_boxes, theta, (im_info[0], im_info[1]))
     if DEBUG:
         print('After spatial_transformer rpn: gt_boxes', gt_boxes)
 

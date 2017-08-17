@@ -27,7 +27,7 @@ class VGGnet_test(Network):
 
     def setup(self):
         (self.feed('data')
-             .spatial_transform(name='spt_trans', do_transform=self.transform_img, keep_prob=1)
+             #.spatial_transform(name='spt_trans', do_transform=self.transform_img, keep_prob=1)
              .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=self.low_level_trainable)
              .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool1')

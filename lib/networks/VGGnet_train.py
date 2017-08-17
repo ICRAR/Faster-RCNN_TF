@@ -39,7 +39,7 @@ class VGGnet_train(Network):
 
     def setup(self):
         (self.feed('data')
-             .spatial_transform(name='spt_trans', do_transform=self.transform_img)
+             #.spatial_transform(name='spt_trans', do_transform=self.transform_img)
              .conv(3, 3, 64, 1, 1, name='conv1_1', trainable=self.low_level_trainable)
              .conv(3, 3, 64, 1, 1, name='conv1_2', trainable=self.low_level_trainable)
              .max_pool(2, 2, 2, 2, padding='VALID', name='pool1')
@@ -63,7 +63,7 @@ class VGGnet_train(Network):
              .conv(1, 1, len(self._anchor_scales) * self.anchor_ratio_size * 2, 1,
                    1, padding='VALID', relu=False, name='rpn_cls_score'))
 
-        (self.feed('rpn_cls_score','gt_boxes','im_info','data', 'spt_trans')
+        (self.feed('rpn_cls_score','gt_boxes','im_info','data')#, 'spt_trans')
              .anchor_target_layer(self._feat_stride, self._anchor_scales, self.anchor_ratios, name='rpn-data'))
 
         # Loss of rpn_cls & rpn_boxes
@@ -88,7 +88,7 @@ class VGGnet_train(Network):
         (self.feed('rpn_cls_prob_reshape','rpn_bbox_pred','im_info')
              .proposal_layer(self._feat_stride, self._anchor_scales, self.anchor_ratios, 'TRAIN', name='rpn_rois'))
 
-        (self.feed('rpn_rois','gt_boxes', 'spt_trans')
+        (self.feed('rpn_rois','gt_boxes')#, 'spt_trans')
              .proposal_target_layer(n_classes, name='roi-data'))
 
         #========= RCNN ============

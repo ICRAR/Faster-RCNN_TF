@@ -16,7 +16,8 @@ import pdb
 
 DEBUG = False
 
-def proposal_target_layer(rpn_rois, gt_boxes, theta, _num_classes):
+def proposal_target_layer(rpn_rois, gt_boxes, #theta,
+                          _num_classes):
     """
     Assign object detection proposals to ground-truth targets. Produces proposal
     classification labels and bounding-box regression targets.
@@ -31,7 +32,7 @@ def proposal_target_layer(rpn_rois, gt_boxes, theta, _num_classes):
     if DEBUG:
         print('Before spatial_transformer proposal_target: gt_boxes', gt_boxes, gt_boxes.dtype)
 
-    gt_boxes = project_bbox(gt_boxes, theta)
+    #gt_boxes = project_bbox(gt_boxes, theta)
 
     if DEBUG:
 	_count = 0

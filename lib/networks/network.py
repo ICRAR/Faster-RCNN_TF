@@ -188,7 +188,7 @@ class Network(object):
         with tf.variable_scope(name) as scope:
 
             rpn_labels,rpn_bbox_targets,rpn_bbox_inside_weights,rpn_bbox_outside_weights =\
-             tf.py_func(anchor_target_layer_py,[input[0],input[1],input[2],input[3], input[4][1],
+             tf.py_func(anchor_target_layer_py,[input[0],input[1],input[2],input[3], #input[4][1],
              _feat_stride, anchor_scales, anchor_ratios],[tf.float32,tf.float32,tf.float32,tf.float32])
 
             rpn_labels = tf.convert_to_tensor(tf.cast(rpn_labels,tf.int32), name = 'rpn_labels')
@@ -208,7 +208,7 @@ class Network(object):
 
             rois,labels,bbox_targets,bbox_inside_weights,bbox_outside_weights =\
              tf.py_func(proposal_target_layer_py,
-                        [input[0], input[1], input[2][1], classes],
+                        [input[0], input[1], classes],
                         [tf.float32,tf.float32,tf.float32,tf.float32,tf.float32])
 
             rois = tf.reshape(rois,[-1,5] , name = 'rois')
@@ -338,7 +338,7 @@ class Network(object):
             # TODO but argmax is not differentiable! see
             #https://www.reddit.com/r/MachineLearning/comments/4e2get/argmax_differentiable/
 
-            print("h_fc_loc2_max.shape = {0}".format(h_fc_loc2_max.get_shape().as_list()))
+            #print("h_fc_loc2_max.shape = {0}".format(h_fc_loc2_max.get_shape().as_list()))
             #h_fc_loc2_max = tf.reshape(h_fc_loc2_max, [1, 1])
             #h_fc_loc2_max = tf.to_float(h_fc_loc2_max)
 
