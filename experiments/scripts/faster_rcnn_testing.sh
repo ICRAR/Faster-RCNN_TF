@@ -144,8 +144,8 @@ case $DATASET in
     ITERS=80000
     ;;
   rgz20)
-    TRAIN_IMDB="rgz_2017_train20"
-    TEST_IMDB="rgz_2017_test20"
+    TRAIN_IMDB="rgz_2017_train21"
+    TEST_IMDB="rgz_2017_test21"
     PT_DIR="rgz"
     ITERS=80000
     ;;

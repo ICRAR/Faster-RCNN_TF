@@ -12,9 +12,9 @@ class VGGnet_test(Network):
         self.inputs = []
         self._anchor_scales = anchor_scales
         self._feat_stride = feat_stride
-        #self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
-        target_size = cfg.TEST.SCALES[0]
-        self.data = tf.placeholder(tf.float32, shape=[1, target_size, target_size, 3])
+        self.data = tf.placeholder(tf.float32, shape=[None, None, None, 3])
+        #target_size = cfg.TEST.SCALES[0]
+        #self.data = tf.placeholder(tf.float32, shape=[1, target_size, target_size, 3])
         self.im_info = tf.placeholder(tf.float32, shape=[None, 3])
         self.keep_prob = tf.placeholder(tf.float32)
         self.layers = dict({'data':self.data, 'im_info':self.im_info})
