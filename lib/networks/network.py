@@ -317,9 +317,9 @@ class Network(object):
         tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
         tensor_one = tf.convert_to_tensor(1.0, dtype=tf.float32)
         tensor_zero = tf.convert_to_tensor(0.0, dtype=tf.float32)
+        output_list = []
         for i in range(num_prop):
-            proposal = tf.slice(proposals, [i, 1], [1, 4])
-            proposal = tf.reshape(proposal, [4])
+            proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
             x1 = tf.slice(proposal, [0], [1])
             y1 = tf.slice(proposal, [1], [1])
             x2 = tf.slice(proposal, [2], [1])
@@ -328,25 +328,24 @@ class Network(object):
             yc = tf.divide(tf.add(y1, y2), tensor_two)
             w = tf.subtract(x2, x1)
             h = tf.subtract(y2, y1)
-            cos_alpha = tf.divide(h, H)
-            h_translate = tf.subtract(tf.subtract(f.multiply(tensor_two, yc), H), tensor_one)
-            h_translate = tf.divide(h_translate, tf.subtract(H, tensor_one))
-            row1 = tf.concat([cos_alpha, tensor_zero, h_translate], axis=1)
-            row1 = tf.reshape(row1, [3])
+            h_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, yc), H), tensor_one)
+            h_translate = tf.divide(h_translate_p, tf.subtract(H, tensor_one))
+            row1_p = tf.concat([tf.divide(h, H), tensor_zero, h_translate], axis=1)
+            row1 = tf.reshape(row1_p, [3])
 
-            cos_alpha = tf.divide(w, W) # this could be a bug
-            w_translate = tf.subtract(tf.subtract(f.multiply(tensor_two, xc), W), tensor_one)
-            w_translate = tf.divide(w_translate, tf.subtract(W, tensor_one))
-            row2 = tf.concat([tensor_zero, cos_alpha, w_translate], axis=1)
-            row2 = tf.reshape(row2, [3])
+            w_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, xc), W), tensor_one)
+            w_translate = tf.divide(w_translate_p, tf.subtract(W, tensor_one))
+            row2_p = tf.concat([tensor_zero, tf.divide(w, W), w_translate], axis=1)
+            row2 = tf.reshape(row2_p, [3])
             #print("row2 shape = {0}".format(row2.get_shape().as_list()))
             theta = tf.stack([row1, row2], axis=0)
             theta_shape = theta.get_shape().as_list()
             #print("theta shape = {0}".format(theta_shape))
             assert(theta_shape[0] == 2 and theta_shape[1] == 3)
             h_trans = transformer(conv5_3, theta, out_size)
-            #TODO concatenate / gather all h_trans
+            output_list.append(h_trans)
 
+        return tf.concat(output_list, axis=0)
 
     @layer
     def spatial_transform(self, input, name, do_transform=False, num_hidden=20,
