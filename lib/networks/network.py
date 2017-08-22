@@ -307,7 +307,9 @@ class Network(object):
         conv5_3 = input[0]  # shape = [1, 37, 37, 512]
         proposals = input[1]
         out_size = (pooled_width, pooled_height)
-        Wp, Hp = conv5_3.get_shape().as_list()[1:3] # image width and height
+        #Wp, Hp = conv5_3.get_shape().as_list()[1:3] # image width and height
+        Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
+        Hp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
         W = tf.convert_to_tensor(Wp, dtype=tf.float32)
         H = tf.convert_to_tensor(Hp, dtype=tf.float32)
 
