@@ -18,7 +18,7 @@ identity_theta = tf.Variable(initial_value=identity)
 
 
 
-DEBUG = True
+DEBUG = False
 
 def layer(op):
     def layer_decorated(self, *args, **kwargs):
