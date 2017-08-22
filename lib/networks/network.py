@@ -305,7 +305,9 @@ class Network(object):
 
         print input
 
-        proposals = input[1]
+        num_prop = cfg[phase].RPN_POST_NMS_TOP_N
+
+        proposals = tf.reshape(input[1], [num_prop, 5])
         out_size = (pooled_width, pooled_height)
         Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
         Hp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
@@ -316,7 +318,7 @@ class Network(object):
         conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
         print('conv5_3 = {0}'.format(conv5_3))
 
-        num_prop = cfg[phase].RPN_POST_NMS_TOP_N
+
 
         # shape = [2000, 5] --> [2000, 4], getting rid of the first col
         tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
@@ -326,10 +328,12 @@ class Network(object):
         output_list = []
         for i in range(num_prop):
             proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
+            print("A proposal's shape = {0}".format(proposal.get_shape().as_list()))
             x1 = tf.slice(proposal, [0], [1])
             y1 = tf.slice(proposal, [1], [1])
             x2 = tf.slice(proposal, [2], [1])
             y2 = tf.slice(proposal, [3], [1])
+            print(x1, y1, x2, y2)
             xc = tf.divide(tf.add(x1, x2), tensor_two)
             yc = tf.divide(tf.add(y1, y2), tensor_two)
             w = tf.subtract(x2, x1)
