@@ -93,7 +93,9 @@ class VGGnet_train(Network):
 
         #========= RCNN ============
         (self.feed('conv5_3', 'roi-data')
-             .roi_pool(7, 7, 1.0/16, name='pool_5')
+             #.roi_pool(7, 7, 1.0/16, name='pool_5')
+             .st_pool(7, 7, 1.0/16, name='pool_5', phase='TRAIN')
+             #FC6 input shape [RPN_POST_NMS_TOP_N, 7, 7, 512]
              .fc(4096, name='fc6')
              .dropout(0.5, name='drop6')
              .fc(4096, name='fc7')

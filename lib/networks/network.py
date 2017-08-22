@@ -7,12 +7,16 @@ from rpn_msr.anchor_target_layer_tf import anchor_target_layer as anchor_target_
 from rpn_msr.proposal_target_layer_tf import proposal_target_layer as proposal_target_layer_py
 from spatial_transformer import transformer
 
+from fast_rcnn.config import cfg
+
 
 DEFAULT_PADDING = 'SAME'
 identity = np.array([[1., 0., 0.],
                      [0., 1., 0.]], dtype=np.float32)
 identity = identity.flatten()
 identity_theta = tf.Variable(initial_value=identity)
+
+
 
 DEBUG = True
 
@@ -285,6 +289,64 @@ class Network(object):
             op = tf.nn.relu_layer if relu else tf.nn.xw_plus_b
             fc = op(feed_in, weights, biases, name=scope.name)
             return fc
+
+    @layer
+    def st_pool(self, input, pooled_height, pooled_width, spatial_scale, name, phase):
+        """
+        input shape:    blob shape: [2000, 5], proposal shape: [2000, 4]
+        output shape:   [RPN_POST_NMS_TOP_N, 7, 7, 512]
+        """
+        # only use the first input
+        if isinstance(input[0], tuple):
+            input[0] = input[0][0]
+
+        if isinstance(input[1], tuple):
+            input[1] = input[1][0]
+
+        print input
+        conv5_3 = input[0]  # shape = [1, 37, 37, 512]
+        proposals = input[1]
+        out_size = (pooled_width, pooled_height)
+        Wp, Hp = conv5_3.get_shape().as_list()[1:3] # image width and height
+        W = tf.convert_to_tensor(Wp, dtype=tf.float32)
+        H = tf.convert_to_tensor(Hp, dtype=tf.float32)
+
+        num_prop = cfg[phase].RPN_POST_NMS_TOP_N
+
+        # shape = [2000, 5] --> [2000, 4], getting rid of the first col
+        tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
+        tensor_one = tf.convert_to_tensor(1.0, dtype=tf.float32)
+        tensor_zero = tf.convert_to_tensor(0.0, dtype=tf.float32)
+        for i in range(num_prop):
+            proposal = tf.slice(proposals, [i, 1], [1, 4])
+            proposal = tf.reshape(proposal, [4])
+            x1 = tf.slice(proposal, [0], [1])
+            y1 = tf.slice(proposal, [1], [1])
+            x2 = tf.slice(proposal, [2], [1])
+            y2 = tf.slice(proposal, [3], [1])
+            xc = tf.divide(tf.add(x1, x2), tensor_two)
+            yc = tf.divide(tf.add(y1, y2), tensor_two)
+            w = tf.subtract(x2, x1)
+            h = tf.subtract(y2, y1)
+            cos_alpha = tf.divide(h, H)
+            h_translate = tf.subtract(tf.subtract(f.multiply(tensor_two, yc), H), tensor_one)
+            h_translate = tf.divide(h_translate, tf.subtract(H, tensor_one))
+            row1 = tf.concat([cos_alpha, tensor_zero, h_translate], axis=1)
+            row1 = tf.reshape(row1, [3])
+
+            cos_alpha = tf.divide(w, W) # this could be a bug
+            w_translate = tf.subtract(tf.subtract(f.multiply(tensor_two, xc), W), tensor_one)
+            w_translate = tf.divide(w_translate, tf.subtract(W, tensor_one))
+            row2 = tf.concat([tensor_zero, cos_alpha, w_translate], axis=1)
+            row2 = tf.reshape(row2, [3])
+            #print("row2 shape = {0}".format(row2.get_shape().as_list()))
+            theta = tf.stack([row1, row2], axis=0)
+            theta_shape = theta.get_shape().as_list()
+            #print("theta shape = {0}".format(theta_shape))
+            assert(theta_shape[0] == 2 and theta_shape[1] == 3)
+            h_trans = transformer(conv5_3, theta, out_size)
+            #TODO concatenate / gather all h_trans
+
 
     @layer
     def spatial_transform(self, input, name, do_transform=False, num_hidden=20,
