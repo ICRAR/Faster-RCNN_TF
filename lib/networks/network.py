@@ -313,7 +313,8 @@ class Network(object):
         H = tf.convert_to_tensor(Hp, dtype=tf.float32)
 
         old_shape = input[0].get_shape().as_list()
-        conv5_3 = tf.reshape(input[0], [-1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
+        conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
+        print('conv5_3 = {0}'.format(conv5_3))
 
         num_prop = cfg[phase].RPN_POST_NMS_TOP_N
 
