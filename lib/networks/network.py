@@ -14,6 +14,8 @@ identity = np.array([[1., 0., 0.],
 identity = identity.flatten()
 identity_theta = tf.Variable(initial_value=identity)
 
+DEBUG = True
+
 def layer(op):
     def layer_decorated(self, *args, **kwargs):
         # Automatically set a name if not provided.
@@ -254,6 +256,8 @@ class Network(object):
 
     @layer
     def fc(self, input, num_out, name, relu=True, trainable=True):
+        if (DEBUG and 'fc6' == name):
+            print('FC6 input shape {0}'.format(input.get_shape().as_list()))
         with tf.variable_scope(name) as scope:
             # only use the first input
             if isinstance(input, tuple):
