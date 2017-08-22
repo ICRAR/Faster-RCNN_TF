@@ -318,7 +318,8 @@ class Network(object):
         # shape = [2000, 5] --> [2000, 4], getting rid of the first col
         tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
         tensor_one = tf.convert_to_tensor(1.0, dtype=tf.float32)
-        tensor_zero = tf.convert_to_tensor(0.0, dtype=tf.float32)
+        tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
+        scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
         output_list = []
         for i in range(num_prop):
             proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
@@ -332,13 +333,18 @@ class Network(object):
             h = tf.subtract(y2, y1)
             h_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, yc), H), tensor_one)
             h_translate = tf.divide(h_translate_p, tf.subtract(H, tensor_one))
-            row1_p = tf.concat([tf.divide(h, H), tensor_zero, h_translate], axis=1)
+            row1_p = tf.concat([tf.multiply(scale_tensor, tf.divide(h, H)),
+                                tensor_zero,
+                                tf.multiply(scale_tensor, h_translate)], axis=1)
             row1 = tf.reshape(row1_p, [3])
 
             w_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, xc), W), tensor_one)
             w_translate = tf.divide(w_translate_p, tf.subtract(W, tensor_one))
-            row2_p = tf.concat([tensor_zero, tf.divide(w, W), w_translate], axis=1)
+            row2_p = tf.concat([tensor_zero,
+                                tf.multiply(scale_tensor, tf.divide(w, W)),
+                                tf.multiply(scale_tensor, w_translate)], axis=1)
             row2 = tf.reshape(row2_p, [3])
+
             #print("row2 shape = {0}".format(row2.get_shape().as_list()))
             theta = tf.stack([row1, row2], axis=0)
             theta_shape = theta.get_shape().as_list()
