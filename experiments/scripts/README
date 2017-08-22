@@ -496,3 +496,15 @@ AP for 2_2 = 0.7735
 AP for 2_3 = 0.8008
 AP for 3_3 = 0.9396
 Mean AP = 0.8105
+
+[22]
+Using the IR image with contours, also apply mask, but replace anything outside
+mask with mean value of the background
+60K Iterations
+AP for 1_1 = 0.8532
+AP for 1_2 = 0.6749
+AP for 1_3 = 0.8851
+AP for 2_2 = 0.7954
+AP for 2_3 = 0.7976
+AP for 3_3 = 0.9385
+Mean AP = 0.8241

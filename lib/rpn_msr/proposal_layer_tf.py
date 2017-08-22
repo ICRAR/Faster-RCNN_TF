@@ -14,7 +14,7 @@ from fast_rcnn.nms_wrapper import nms
 import pdb
 
 
-DEBUG = False
+DEBUG = True
 """
 Outputs object detection proposals by applying estimated bounding-box
 transformations to a set of regular boxes (called "anchors").
@@ -136,6 +136,9 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,
     # batch inds are 0
     batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False)))
+    if (DEBUG):
+        print('blob shape: {0}'.format(blob.shape))
+        print('proposal shape: {0}'.format(proposals.shape))
     return blob
     #top[0].reshape(*(blob.shape))
     #top[0].data[...] = blob
