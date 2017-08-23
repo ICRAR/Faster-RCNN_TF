@@ -293,8 +293,8 @@ class Network(object):
     @layer
     def st_pool(self, input, pooled_height, pooled_width, spatial_scale, name, phase):
         """
-        input shape:    blob shape: [2000, 5], proposal shape: [2000, 4]
-        output shape:   [RPN_POST_NMS_TOP_N, 7, 7, 512]
+        input shape:    blob shape: [cfg.TRAIN.BATCH_SIZE, 5], proposal shape: [cfg.TRAIN.BATCH_SIZE, 4]
+        output shape:   [cfg.TRAIN.BATCH_SIZE, 7, 7, 512]
         """
         # only use the first input
         if isinstance(input[0], tuple):
@@ -325,7 +325,6 @@ class Network(object):
         tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
         scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
         output_list = []
-
         """
         U : float
             The output of a convolutional net should have the
@@ -334,18 +333,13 @@ class Network(object):
             The output of the
             localisation network should be [num_batch, 6].
         """
-
-
-
         #TODO vectorise the following!
         for i in range(num_prop):
             proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
-            #print("A proposal's shape = {0}".format(proposal.get_shape().as_list()))
             x1 = tf.slice(proposal, [0], [1])
             y1 = tf.slice(proposal, [1], [1])
             x2 = tf.slice(proposal, [2], [1])
             y2 = tf.slice(proposal, [3], [1])
-            #print(x1, y1, x2, y2)
             xc = tf.divide(tf.add(x1, x2), tensor_two)
             yc = tf.divide(tf.add(y1, y2), tensor_two)
             w = tf.subtract(x2, x1)
@@ -364,11 +358,8 @@ class Network(object):
                                 tf.multiply(scale_tensor, w_translate)], axis=1)
             row2 = tf.reshape(row2_p, [3])
 
-            #print("row2 shape = {0}".format(row2.get_shape().as_list()))
             theta = tf.stack([row1, row2], axis=0)
             theta_shape = theta.get_shape().as_list()
-            #print("theta shape = {0}".format(theta_shape))
-            assert(theta_shape[0] == 2 and theta_shape[1] == 3)
             h_trans = transformer(conv5_3, tf.reshape(theta, [1, 6]), out_size)
             output_list.append(h_trans)
 
