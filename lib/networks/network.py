@@ -293,78 +293,80 @@ class Network(object):
     @layer
     def st_pool(self, input, pooled_height, pooled_width, spatial_scale, name, phase):
         """
+        Spatial Transformer-based RoI pooling
+
         input shape:    blob shape: [cfg.TRAIN.BATCH_SIZE, 5], proposal shape: [cfg.TRAIN.BATCH_SIZE, 4]
         output shape:   [cfg.TRAIN.BATCH_SIZE, 7, 7, 512]
         """
         # only use the first input
-        if isinstance(input[0], tuple):
-            input[0] = input[0][0]
+        with tf.variable_scope(name) as scope:
+            if isinstance(input[0], tuple):
+                input[0] = input[0][0]
 
-        if isinstance(input[1], tuple):
-            input[1] = input[1][0]
+            if isinstance(input[1], tuple):
+                input[1] = input[1][0]
 
-        print input
+            print input
 
-        num_prop = cfg.TRAIN.BATCH_SIZE
-        proposals = tf.reshape(input[1], [num_prop, 5])
-        out_size = (pooled_width, pooled_height)
-        Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
-        Hp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
-        W = tf.convert_to_tensor(Wp, dtype=tf.float32)
-        H = tf.convert_to_tensor(Hp, dtype=tf.float32)
+            num_prop = cfg.TRAIN.BATCH_SIZE
+            proposals = tf.reshape(input[1], [num_prop, 5])
+            out_size = (pooled_width, pooled_height)
+            Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
+            Hp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
+            W = tf.convert_to_tensor(Wp, dtype=tf.float32)
+            H = tf.convert_to_tensor(Hp, dtype=tf.float32)
 
-        old_shape = input[0].get_shape().as_list()
-        conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
-        #print('conv5_3 = {0}'.format(conv5_3))
+            old_shape = input[0].get_shape().as_list()
+            conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
+            #print('conv5_3 = {0}'.format(conv5_3))
 
-        # shape = [2000, 5] --> [2000, 4], getting rid of the first col
-        tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
-        tensor_one = tf.convert_to_tensor(1.0, dtype=tf.float32)
-        tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
-        scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
-        output_list = []
+            # shape = [2000, 5] --> [2000, 4], getting rid of the first col
+            tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
+            tensor_one = tf.convert_to_tensor(1.0, dtype=tf.float32)
+            tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
+            scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
+            output_list = []
 
-        #TODO vectorise the following!
-        # The reason not to vectorise it is becasue vecitorisation requires
-        # a huge matrix contains multiples of conv5_3 layer
-        # not sure how to do so without actualy tensor copying but only reference
-        # See the shape of U below, where num_batch is at least 128
-        """
-        U : float
-            The output of a convolutional net should have the
-            shape [num_batch, height, width, num_channels].
-        """
-        # maybe we can use map_fn, but the graph will end up being the same
-        for i in range(num_prop):
-            proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
-            x1 = tf.slice(proposal, [0], [1])
-            y1 = tf.slice(proposal, [1], [1])
-            x2 = tf.slice(proposal, [2], [1])
-            y2 = tf.slice(proposal, [3], [1])
-            xc = tf.divide(tf.add(x1, x2), tensor_two)
-            yc = tf.divide(tf.add(y1, y2), tensor_two)
-            w = tf.subtract(x2, x1)
-            h = tf.subtract(y2, y1)
-            h_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, yc), H), tensor_one)
-            h_translate = tf.divide(h_translate_p, tf.subtract(H, tensor_one))
-            row1_p = tf.concat([tf.multiply(scale_tensor, tf.divide(h, H)),
-                                tensor_zero,
-                                tf.multiply(scale_tensor, h_translate)], axis=1)
-            row1 = tf.reshape(row1_p, [3])
+            #TODO vectorise the following!
+            # The reason not to vectorise it is becasue vecitorisation requires
+            # a huge matrix contains multiples of conv5_3 layer
+            # not sure how to do so without actualy tensor copying but only reference
+            # See the shape of U below, where num_batch is at least 128
+            """
+            U : float
+                The output of a convolutional net should have the
+                shape [num_batch, height, width, num_channels].
+            """
+            # maybe we can use map_fn, but the graph will end up being the same
+            for i in range(num_prop):
+                proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
+                x1 = tf.slice(proposal, [0], [1])
+                y1 = tf.slice(proposal, [1], [1])
+                x2 = tf.slice(proposal, [2], [1])
+                y2 = tf.slice(proposal, [3], [1])
+                xc = tf.divide(tf.add(x1, x2), tensor_two)
+                yc = tf.divide(tf.add(y1, y2), tensor_two)
+                w = tf.subtract(x2, x1)
+                h = tf.subtract(y2, y1)
+                h_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, yc), H), tensor_one)
+                h_translate = tf.divide(h_translate_p, tf.subtract(H, tensor_one))
+                row1_p = tf.concat([tf.multiply(scale_tensor, tf.divide(h, H)),
+                                    tensor_zero,
+                                    tf.multiply(scale_tensor, h_translate)], axis=1)
+                row1 = tf.reshape(row1_p, [3])
 
-            w_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, xc), W), tensor_one)
-            w_translate = tf.divide(w_translate_p, tf.subtract(W, tensor_one))
-            row2_p = tf.concat([tensor_zero,
-                                tf.multiply(scale_tensor, tf.divide(w, W)),
-                                tf.multiply(scale_tensor, w_translate)], axis=1)
-            row2 = tf.reshape(row2_p, [3])
+                w_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, xc), W), tensor_one)
+                w_translate = tf.divide(w_translate_p, tf.subtract(W, tensor_one))
+                row2_p = tf.concat([tensor_zero,
+                                    tf.multiply(scale_tensor, tf.divide(w, W)),
+                                    tf.multiply(scale_tensor, w_translate)], axis=1)
+                row2 = tf.reshape(row2_p, [3])
 
-            theta = tf.stack([row1, row2], axis=0)
-            theta_shape = theta.get_shape().as_list()
-            h_trans = transformer(conv5_3, tf.reshape(theta, [1, 6]), out_size)
-            output_list.append(h_trans)
+                theta = tf.stack([row1, row2], axis=0)
+                h_trans = transformer(conv5_3, tf.reshape(theta, [1, 6]), out_size)
+                output_list.append(h_trans)
 
-        return tf.concat(output_list, axis=0)
+            return tf.concat(output_list, axis=0)
 
     @layer
     def spatial_transform(self, input, name, do_transform=False, num_hidden=20,
