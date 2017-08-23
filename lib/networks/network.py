@@ -319,10 +319,10 @@ class Network(object):
             old_shape = input[0].get_shape().as_list()
             conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
 
-            x1v = tf.slice(proposals, [0, 1], [num_prop, 1])
-            x2v = tf.slice(proposals, [0, 3], [num_prop, 1])
-            y1v = tf.slice(proposals, [0, 2], [num_prop, 1])
-            y2v = tf.slice(proposals, [0, 4], [num_prop, 1])
+            x1v = tf.divide(tf.slice(proposals, [0, 1], [num_prop, 1]), spatial_scale)
+            x2v = tf.divide(tf.slice(proposals, [0, 3], [num_prop, 1]), spatial_scale)
+            y1v = tf.divide(tf.slice(proposals, [0, 2], [num_prop, 1]), spatial_scale)
+            y2v = tf.divide(tf.slice(proposals, [0, 4], [num_prop, 1]), spatial_scale)
 
             xc = tf.divide(tf.add(x1v, x2v), 2.0)
             yc = tf.divide(tf.add(y1v, y2v), 2.0)
