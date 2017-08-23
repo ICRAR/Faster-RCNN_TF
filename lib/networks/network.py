@@ -5,7 +5,7 @@ import roi_pooling_layer.roi_pooling_op_grad
 from rpn_msr.proposal_layer_tf import proposal_layer as proposal_layer_py
 from rpn_msr.anchor_target_layer_tf import anchor_target_layer as anchor_target_layer_py
 from rpn_msr.proposal_target_layer_tf import proposal_target_layer as proposal_target_layer_py
-from spatial_transformer import transformer
+from spatial_transformer import transformer, batch_transformer
 
 from fast_rcnn.config import cfg
 
@@ -318,55 +318,29 @@ class Network(object):
 
             old_shape = input[0].get_shape().as_list()
             conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
-            #print('conv5_3 = {0}'.format(conv5_3))
 
-            # shape = [2000, 5] --> [2000, 4], getting rid of the first col
-            tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
-            tensor_one = tf.convert_to_tensor(1.0, dtype=tf.float32)
-            tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
-            scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
-            output_list = []
+            x1v = tf.slice(proposals, [0, 1], [num_prop, 1])
+            x2v = tf.slice(proposals, [0, 3], [num_prop, 1])
+            y1v = tf.slice(proposals, [0, 2], [num_prop, 1])
+            y2v = tf.slice(proposals, [0, 4], [num_prop, 1])
 
-            #TODO vectorise the following!
-            # The reason not to vectorise it is becasue vecitorisation requires
-            # a huge matrix contains multiples of conv5_3 layer
-            # not sure how to do so without actualy tensor copying but only reference
-            # See the shape of U below, where num_batch is at least 128
-            """
-            U : float
-                The output of a convolutional net should have the
-                shape [num_batch, height, width, num_channels].
-            """
-            # maybe we can use map_fn, but the graph will end up being the same
-            for i in range(num_prop):
-                proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
-                x1 = tf.slice(proposal, [0], [1])
-                y1 = tf.slice(proposal, [1], [1])
-                x2 = tf.slice(proposal, [2], [1])
-                y2 = tf.slice(proposal, [3], [1])
-                xc = tf.divide(tf.add(x1, x2), tensor_two)
-                yc = tf.divide(tf.add(y1, y2), tensor_two)
-                w = tf.subtract(x2, x1)
-                h = tf.subtract(y2, y1)
-                h_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, yc), H), tensor_one)
-                h_translate = tf.divide(h_translate_p, tf.subtract(H, tensor_one))
-                row1_p = tf.concat([tf.multiply(scale_tensor, tf.divide(h, H)),
-                                    tensor_zero,
-                                    tf.multiply(scale_tensor, h_translate)], axis=1)
-                row1 = tf.reshape(row1_p, [3])
+            xc = tf.divide(tf.add(x1v, x2v), 2.0)
+            yc = tf.divide(tf.add(y1v, y2v), 2.0)
+            w = tf.subtract(x2v, x1v)
+            h = tf.subtract(y2v, y1v)
 
-                w_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, xc), W), tensor_one)
-                w_translate = tf.divide(w_translate_p, tf.subtract(W, tensor_one))
-                row2_p = tf.concat([tensor_zero,
-                                    tf.multiply(scale_tensor, tf.divide(w, W)),
-                                    tf.multiply(scale_tensor, w_translate)], axis=1)
-                row2 = tf.reshape(row2_p, [3])
+            h_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, yc), H), 1.0)
+            h_translate = tf.divide(h_translate_p, tf.subtract(H, 1.0))
+            row1 = tf.concat([tf.divide(h, H), np.zeros([num_prop, 1]), h_translate], axis=1)
 
-                theta = tf.stack([row1, row2], axis=0)
-                h_trans = transformer(conv5_3, tf.reshape(theta, [1, 6]), out_size)
-                output_list.append(h_trans)
+            w_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, xc), W), 1.0)
+            w_translate = tf.divide(w_translate_p, tf.subtract(W, 1.0))
+            row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(w, W), w_translate], axis=1)
 
-            return tf.concat(output_list, axis=0)
+            thetas = tf.stack([row1, row2], axis=1)
+            thetas = tf.reshape(thetas, [1, num_prop, 6])
+
+            return batch_transformer(conv5_3, thetas, out_size)
 
     @layer
     def spatial_transform(self, input, name, do_transform=False, num_hidden=20,
