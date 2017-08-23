@@ -305,7 +305,8 @@ class Network(object):
 
         print input
 
-        num_prop = cfg[phase].RPN_POST_NMS_TOP_N
+        #num_prop = cfg[phase].RPN_POST_NMS_TOP_N
+        num_prop = cfg.TRAIN.BATCH_SIZE
 
         proposals = tf.reshape(input[1], [num_prop, 5])
         out_size = (pooled_width, pooled_height)
@@ -318,14 +319,13 @@ class Network(object):
         conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
         print('conv5_3 = {0}'.format(conv5_3))
 
-
-
         # shape = [2000, 5] --> [2000, 4], getting rid of the first col
         tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
         tensor_one = tf.convert_to_tensor(1.0, dtype=tf.float32)
         tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
         scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
         output_list = []
+        #TODO vectorise the following!
         for i in range(num_prop):
             proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
             print("A proposal's shape = {0}".format(proposal.get_shape().as_list()))
