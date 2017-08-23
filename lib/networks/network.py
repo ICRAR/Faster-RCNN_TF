@@ -309,7 +309,8 @@ class Network(object):
             print input
 
             num_prop = cfg.TRAIN.BATCH_SIZE
-            proposals = tf.reshape(input[1], [num_prop, 5])
+            scale_down = tf.multiply(input[1], spatial_scale)
+            proposals = tf.reshape(scale_down, [num_prop, 5])
             out_size = (pooled_width, pooled_height)
             Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
             Hp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
@@ -317,12 +318,13 @@ class Network(object):
             H = tf.convert_to_tensor(Hp, dtype=tf.float32)
 
             old_shape = input[0].get_shape().as_list()
+
             conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
 
-            x1v = tf.multiply(tf.slice(proposals, [0, 1], [num_prop, 1]), spatial_scale)
-            x2v = tf.multiply(tf.slice(proposals, [0, 3], [num_prop, 1]), spatial_scale)
-            y1v = tf.multiply(tf.slice(proposals, [0, 2], [num_prop, 1]), spatial_scale)
-            y2v = tf.multiply(tf.slice(proposals, [0, 4], [num_prop, 1]), spatial_scale)
+            x1v = tf.slice(proposals, [0, 1], [num_prop, 1])
+            x2v = tf.slice(proposals, [0, 3], [num_prop, 1])
+            y1v = tf.slice(proposals, [0, 2], [num_prop, 1])
+            y2v = tf.slice(proposals, [0, 4], [num_prop, 1])
 
             xc = tf.divide(tf.add(x1v, x2v), 2.0)
             yc = tf.divide(tf.add(y1v, y2v), 2.0)

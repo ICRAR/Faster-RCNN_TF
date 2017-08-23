@@ -65,10 +65,10 @@ with tf.variable_scope('spatial_transformer_0'):
     proposals = tf.convert_to_tensor(proposal_init, dtype=tf.float32)
     num_prop = 3
 
-    x1v = tf.slice(proposals, [0, 1], [num_prop, 1])
-    x2v = tf.slice(proposals, [0, 3], [num_prop, 1])
-    y1v = tf.slice(proposals, [0, 2], [num_prop, 1])
-    y2v = tf.slice(proposals, [0, 4], [num_prop, 1])
+    x1v = tf.multiply(tf.slice(proposals, [0, 1], [num_prop, 1]), 0.5)
+    x2v = tf.multiply(tf.slice(proposals, [0, 3], [num_prop, 1]), 0.5)
+    y1v = tf.multiply(tf.slice(proposals, [0, 2], [num_prop, 1]), 0.5)
+    y2v = tf.multiply(tf.slice(proposals, [0, 4], [num_prop, 1]), 0.5)
 
     xc = tf.divide(tf.add(x1v, x2v), 2.0)
     yc = tf.divide(tf.add(y1v, y2v), 2.0)
