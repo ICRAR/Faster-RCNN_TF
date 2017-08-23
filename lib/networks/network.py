@@ -310,16 +310,16 @@ class Network(object):
 
             num_prop = cfg.TRAIN.BATCH_SIZE
             proposals = tf.reshape(input[1], [num_prop, 5])
-            proposals = tf.to_int32(proposals * spatial_scale)
+            proposals = proposals * spatial_scale
             out_size = (pooled_width, pooled_height)
-            W = int(np.floor(cfg.TRAIN.SCALES[0] * spatial_scale))
-            H = int(np.floor(cfg.TRAIN.SCALES[0] * spatial_scale))
-            #W = tf.convert_to_tensor(Wp, dtype=tf.float32)
-            #H = tf.convert_to_tensor(Hp, dtype=tf.float32)
+            Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
+            Hp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
+            W = tf.convert_to_tensor(Wp, dtype=tf.float32)
+            H = tf.convert_to_tensor(Hp, dtype=tf.float32)
 
             old_shape = input[0].get_shape().as_list()
 
-            conv5_3 = tf.reshape(input[0], [1, W, H, old_shape[-1]])  # shape = [1, 37, 37, 512]
+            conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
 
             x1v = tf.slice(proposals, [0, 1], [num_prop, 1])
             #x1v = tf.Print(x1v, [x1v, "x1v value"])
@@ -328,17 +328,17 @@ class Network(object):
             y2v = tf.slice(proposals, [0, 4], [num_prop, 1])
             #y2v = tf.Print(y2v, [y2v, "y2v value"])
 
-            xc = tf.to_int32(tf.divide(tf.add(x1v, x2v), 2))
-            yc = tf.to_int32(tf.divide(tf.add(y1v, y2v), 2))
+            xc = tf.divide(tf.add(x1v, x2v), 2.0)
+            yc = tf.divide(tf.add(y1v, y2v), 2.0)
             w = tf.subtract(x2v, x1v)
             h = tf.subtract(y2v, y1v)
 
-            h_translate_p = tf.subtract(tf.subtract(tf.multiply(2, yc), H), 1)
-            h_translate = tf.divide(h_translate_p, H - 1)
+            h_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, yc), H), 1.0)
+            h_translate = tf.divide(h_translate_p, tf.subtract(H, 1.0))
             row1 = tf.concat([tf.divide(h, H), np.zeros([num_prop, 1]), h_translate], axis=1)
 
-            w_translate_p = tf.subtract(tf.subtract(tf.multiply(2, xc), W), 1)
-            w_translate = tf.divide(w_translate_p, W - 1)
+            w_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, xc), W), 1.0)
+            w_translate = tf.divide(w_translate_p, tf.subtract(W, 1.0))
             row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(w, W), w_translate], axis=1)
 
             thetas = tf.stack([row1, row2], axis=1)
