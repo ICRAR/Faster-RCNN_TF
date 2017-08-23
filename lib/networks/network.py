@@ -334,11 +334,11 @@ class Network(object):
             h = tf.subtract(y2v, y1v)
 
             h_translate_p = tf.subtract(tf.subtract(tf.multiply(2, yc), H), 1)
-            h_translate = tf.divide(h_translate_p, H - 1))
+            h_translate = tf.divide(h_translate_p, H - 1)
             row1 = tf.concat([tf.divide(h, H), np.zeros([num_prop, 1]), h_translate], axis=1)
 
             w_translate_p = tf.subtract(tf.subtract(tf.multiply(2, xc), W), 1)
-            w_translate = tf.divide(w_translate_p, W - 1))
+            w_translate = tf.divide(w_translate_p, W - 1)
             row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(w, W), w_translate], axis=1)
 
             thetas = tf.stack([row1, row2], axis=1)
