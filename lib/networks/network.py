@@ -328,12 +328,12 @@ class Network(object):
         output_list = []
         for i in range(num_prop):
             proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
-            print("A proposal's shape = {0}".format(proposal.get_shape().as_list()))
+            #print("A proposal's shape = {0}".format(proposal.get_shape().as_list()))
             x1 = tf.slice(proposal, [0], [1])
             y1 = tf.slice(proposal, [1], [1])
             x2 = tf.slice(proposal, [2], [1])
             y2 = tf.slice(proposal, [3], [1])
-            print(x1, y1, x2, y2)
+            #print(x1, y1, x2, y2)
             xc = tf.divide(tf.add(x1, x2), tensor_two)
             yc = tf.divide(tf.add(y1, y2), tensor_two)
             w = tf.subtract(x2, x1)
