@@ -325,6 +325,18 @@ class Network(object):
         tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
         scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
         output_list = []
+
+        """
+        U : float
+            The output of a convolutional net should have the
+            shape [num_batch, height, width, num_channels].
+        theta: float
+            The output of the
+            localisation network should be [num_batch, 6].
+        """
+
+
+
         #TODO vectorise the following!
         for i in range(num_prop):
             proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
@@ -357,7 +369,7 @@ class Network(object):
             theta_shape = theta.get_shape().as_list()
             #print("theta shape = {0}".format(theta_shape))
             assert(theta_shape[0] == 2 and theta_shape[1] == 3)
-            h_trans = transformer(conv5_3, theta, out_size)
+            h_trans = transformer(conv5_3, tf.reshape(theta, [1, 6]), out_size)
             output_list.append(h_trans)
 
         return tf.concat(output_list, axis=0)
