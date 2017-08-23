@@ -305,9 +305,7 @@ class Network(object):
 
         print input
 
-        #num_prop = cfg[phase].RPN_POST_NMS_TOP_N
         num_prop = cfg.TRAIN.BATCH_SIZE
-
         proposals = tf.reshape(input[1], [num_prop, 5])
         out_size = (pooled_width, pooled_height)
         Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
@@ -317,7 +315,7 @@ class Network(object):
 
         old_shape = input[0].get_shape().as_list()
         conv5_3 = tf.reshape(input[0], [1, int(Wp), int(Hp), old_shape[-1]])  # shape = [1, 37, 37, 512]
-        print('conv5_3 = {0}'.format(conv5_3))
+        #print('conv5_3 = {0}'.format(conv5_3))
 
         # shape = [2000, 5] --> [2000, 4], getting rid of the first col
         tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
@@ -325,15 +323,18 @@ class Network(object):
         tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
         scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
         output_list = []
+
+        #TODO vectorise the following!
+        # The reason not to vectorise it is becasue vecitorisation requires
+        # a huge matrix contains multiples of conv5_3 layer
+        # not sure how to do so without actualy tensor copying but only reference
+        # See the shape of U below, where num_batch is at least 128
         """
         U : float
             The output of a convolutional net should have the
             shape [num_batch, height, width, num_channels].
-        theta: float
-            The output of the
-            localisation network should be [num_batch, 6].
         """
-        #TODO vectorise the following!
+        # maybe we can use map_fn, but the graph will end up being the same
         for i in range(num_prop):
             proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
             x1 = tf.slice(proposal, [0], [1])
