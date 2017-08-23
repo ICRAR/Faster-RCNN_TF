@@ -309,7 +309,7 @@ class Network(object):
             print input
 
             num_prop = cfg.TRAIN.BATCH_SIZE
-            scale_down = tf.multiply(input[1], spatial_scale)
+            scale_down = tf.scalar_mul(spatial_scale, input[1])
             proposals = tf.reshape(scale_down, [num_prop, 5])
             out_size = (pooled_width, pooled_height)
             Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
