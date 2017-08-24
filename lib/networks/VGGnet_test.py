@@ -64,7 +64,8 @@ class VGGnet_test(Network):
              .proposal_layer(self._feat_stride, self._anchor_scales, self.anchor_ratios, 'TEST', name = 'rois'))
 
         (self.feed('conv5_3', 'rois')
-             .roi_pool(7, 7, 1.0/16, name='pool_5')
+             #.roi_pool(7, 7, 1.0/16, name='pool_5')
+             .st_pool(7, 7, 1.0/16, name='pool_5', phase='TEST')
              .fc(4096, name='fc6')
              .fc(4096, name='fc7')
              .fc(n_classes, relu=False, name='cls_score')

@@ -307,8 +307,12 @@ class Network(object):
                 input[1] = input[1][0]
 
             print input
-
-            num_prop = cfg.TRAIN.BATCH_SIZE
+            if ('TRAIN' == phase):
+                num_prop = cfg.TRAIN.BATCH_SIZE
+            elif ('TEST' == phase):
+                num_prop = cfg.TEST.RPN_POST_NMS_TOP_N
+            else:
+                raise Exception('unknown phase for st_pool')
             proposals = tf.reshape(input[1], [num_prop, 5])
             proposals = proposals * spatial_scale
             out_size = (pooled_width, pooled_height)
