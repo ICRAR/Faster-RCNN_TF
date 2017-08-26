@@ -508,3 +508,11 @@ AP for 2_2 = 0.7954
 AP for 2_3 = 0.7976
 AP for 3_3 = 0.9385
 Mean AP = 0.8241
+
+Currenlty running [22] again (jobid - 2212360) but with new st_pool (bug fixed)
+
+[14]
+Currently running [14] again (jobid - 2212363) but two differences:
+1. using st_pool
+2. no pre-trained weights at all
+3. freeze low-level weight at random!

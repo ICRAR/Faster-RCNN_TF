@@ -51,14 +51,20 @@ class Network(object):
     def setup(self):
         raise NotImplementedError('Must be subclassed.')
 
-    def load(self, data_path, session, saver, ignore_missing=False):
+    def load(self, data_path, session, saver, ignore_missing=False,
+             load_lowlevel_only=False):
         #if data_path.endswith('.ckpt'):
         if (not data_path.endswith('.npy')):
             saver.restore(session, data_path)
         else: # load pre-grained vgg-net convnet model (for feature extraction)
             data_dict = np.load(data_path).item()
+            skip_list = ['fc6', 'fc7']
+            if (load_lowlevel_only):
+                skip_list += ['conv3_1', 'conv3_2', 'conv3_3',
+                              'conv4_1', 'conv4_2', 'conv4_3',
+                              'conv5_1', 'conv5_2', 'conv5_3',]
             for key in data_dict:
-                if (key in ['fc6', 'fc7']):
+                if (key in skip_list):
                     print("Skipping %s" % key)
                     continue
                 with tf.variable_scope(key, reuse=True):

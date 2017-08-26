@@ -230,7 +230,7 @@ __C.PIXEL_MEANS = np.array([[[14, 45, 213]]])
 #__C.PIXEL_MEANS = np.array([[[31, 2, 2]]])
 
 # For reproducibility
-__C.RNG_SEED = 17 #3
+__C.RNG_SEED = 3
 
 # A small number that's used many times
 __C.EPS = 1e-14
