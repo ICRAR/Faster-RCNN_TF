@@ -1,3 +1,6 @@
+# Visual sanity tests to ensure the Spatial transformer pooling work
+# as expected. Code is absed on tensorflow ST contrlib by chen.wu@icrar.org
+# original copyright below
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +20,7 @@ import tensorflow as tf
 from spatial_transformer import transformer, batch_transformer
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 # %% Create a batch of three images (1600 x 1200)
 # %% Image retrieved from:
@@ -27,7 +31,7 @@ im = im.reshape(1, 1200, 1600, 3)
 im = im.astype('float32')
 
 # %% Let the output size of the transformer be half the image size.
-out_size = (95, 125)
+out_size = (95, 125) # (w, h)
 
 # %% Simulate batch
 #batch = np.append(im, im, axis=0)
@@ -65,10 +69,10 @@ with tf.variable_scope('spatial_transformer_0'):
     proposals = tf.convert_to_tensor(proposal_init, dtype=tf.float32)
     num_prop = 3
 
-    x1v = tf.multiply(tf.slice(proposals, [0, 1], [num_prop, 1]), 0.5)
-    x2v = tf.multiply(tf.slice(proposals, [0, 3], [num_prop, 1]), 0.5)
-    y1v = tf.multiply(tf.slice(proposals, [0, 2], [num_prop, 1]), 0.5)
-    y2v = tf.multiply(tf.slice(proposals, [0, 4], [num_prop, 1]), 0.5)
+    x1v = tf.slice(proposals, [0, 1], [num_prop, 1])
+    x2v = tf.slice(proposals, [0, 3], [num_prop, 1])
+    y1v = tf.slice(proposals, [0, 2], [num_prop, 1])
+    y2v = tf.slice(proposals, [0, 4], [num_prop, 1])
 
     xc = tf.divide(tf.add(x1v, x2v), 2.0)
     yc = tf.divide(tf.add(y1v, y2v), 2.0)
@@ -77,68 +81,33 @@ with tf.variable_scope('spatial_transformer_0'):
 
     h_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, yc), H), 1.0)
     h_translate = tf.divide(h_translate_p, tf.subtract(H, 1.0))
-    row1 = tf.concat([tf.divide(h, H), np.zeros([num_prop, 1]), h_translate], axis=1)
+    #row1 = tf.concat([tf.divide(h, H), np.zeros([num_prop, 1]), h_translate], axis=1)
+    row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(h, H), h_translate], axis=1)
 
     w_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, xc), W), 1.0)
     w_translate = tf.divide(w_translate_p, tf.subtract(W, 1.0))
-    row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(w, W), w_translate], axis=1)
+    #row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(w, W), w_translate], axis=1)
+    row1 = tf.concat([tf.divide(w, W), np.zeros([num_prop, 1]), w_translate], axis=1)
 
     thetas = tf.stack([row1, row2], axis=1)
     thetas = tf.reshape(thetas, [1, num_prop, 6])
 
-    final_output = batch_transformer(conv5_3, thetas, out_size)
-
-
-    # output_list = []
-    # tensor_two = tf.convert_to_tensor(2.0, dtype=tf.float32)
-    # tensor_one = tf.convert_to_tensor(1.0, dtype=tf.float32)
-    # tensor_zero = tf.convert_to_tensor([[0.0]], dtype=tf.float32)
-    # scale_tensor = tf.convert_to_tensor([[1.0]], dtype=tf.float32)
-    # for i in range(num_prop):
-    #     proposal = tf.reshape(tf.slice(proposals, [i, 1], [1, 4]), [4])
-    #     #print("A proposal's shape = {0}".format(proposal.get_shape().as_list()))
-    #     x1 = tf.slice(proposal, [0], [1])
-    #     y1 = tf.slice(proposal, [1], [1])
-    #     x2 = tf.slice(proposal, [2], [1])
-    #     y2 = tf.slice(proposal, [3], [1])
-    #     #print(x1, y1, x2, y2)
-    #     xc = tf.divide(tf.add(x1, x2), tensor_two)
-    #     yc = tf.divide(tf.add(y1, y2), tensor_two)
-    #     w = tf.subtract(x2, x1)
-    #     h = tf.subtract(y2, y1)
-    #     h_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, yc), H), tensor_one)
-    #     h_translate = tf.divide(h_translate_p, tf.subtract(H, tensor_one))
-    #     row1_p = tf.concat([tf.multiply(scale_tensor, tf.divide(h, H)),
-    #                         tensor_zero,
-    #                         tf.multiply(scale_tensor, h_translate)], axis=1)
-    #     row1 = tf.reshape(row1_p, [3])
-    #
-    #     w_translate_p = tf.subtract(tf.subtract(tf.multiply(tensor_two, xc), W), tensor_one)
-    #     w_translate = tf.divide(w_translate_p, tf.subtract(W, tensor_one))
-    #     row2_p = tf.concat([tensor_zero,
-    #                         tf.multiply(scale_tensor, tf.divide(w, W)),
-    #                         tf.multiply(scale_tensor, w_translate)], axis=1)
-    #     row2 = tf.reshape(row2_p, [3])
-    #
-    #     #print("row2 shape = {0}".format(row2.get_shape().as_list()))
-    #     theta = tf.stack([row1, row2], axis=0)
-    #     theta_shape = theta.get_shape().as_list()
-    #     #print("theta shape = {0}".format(theta_shape))
-    #     #assert(theta_shape[0] == 2 and theta_shape[1] == 3)
-    #
-    #     h_trans = transformer(conv5_3, tf.reshape(theta, [1, 6]), out_size)
-    #     #h_trans = transformer(conv5_3, theta, out_size)
-    #     output_list.append(h_trans)
-    #
-    # final_output = tf.concat(output_list, axis=0)
+    final_output = batch_transformer(conv5_3, thetas, (out_size[1], out_size[0]))
 
 # %% Run session
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 y, theta_val = sess.run([final_output, thetas], feed_dict={conv5_3: batch})
-print(y.shape, theta_val)
+#print(y.shape, theta_val)
+
+origin_im = cv2.imread('cat.jpg')
 
 for j in range(num_prop):
     plt.imshow(y[j])
-    plt.savefig('test%d.png' % j)
+    plt.savefig('test%d_pred.png' % j)
     plt.close()
+
+    x1, y1, x2, y2 = [int(x) for x in proposal_init[j, :][1:]]
+    cutout = origin_im[x1:x2, y1:y2, :]
+    to_dump = cv2.resize(cutout, out_size)
+    cv2.imwrite('test%d_truth.png' % j, to_dump)

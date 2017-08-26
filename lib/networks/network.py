@@ -315,7 +315,7 @@ class Network(object):
                 raise Exception('unknown phase for st_pool')
             proposals = tf.reshape(input[1], [num_prop, 5])
             proposals = proposals * spatial_scale
-            out_size = (pooled_width, pooled_height)
+            out_size = (pooled_height, pooled_width)
             Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
             Hp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
             W = tf.convert_to_tensor(Wp, dtype=tf.float32)
@@ -339,11 +339,11 @@ class Network(object):
 
             h_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, yc), H), 1.0)
             h_translate = tf.divide(h_translate_p, tf.subtract(H, 1.0))
-            row1 = tf.concat([tf.divide(h, H), np.zeros([num_prop, 1]), h_translate], axis=1)
+            row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(h, H), h_translate], axis=1)
 
             w_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, xc), W), 1.0)
             w_translate = tf.divide(w_translate_p, tf.subtract(W, 1.0))
-            row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(w, W), w_translate], axis=1)
+            row1 = tf.concat([tf.divide(w, W), np.zeros([num_prop, 1]), w_translate], axis=1)
 
             thetas = tf.stack([row1, row2], axis=1)
             thetas = tf.reshape(thetas, [1, num_prop, 6])
