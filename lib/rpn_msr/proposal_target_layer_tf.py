@@ -127,9 +127,10 @@ def _sample_rois(all_rois, gt_boxes, fg_rois_per_image, rois_per_image, num_clas
     overlaps = bbox_overlaps(
         np.ascontiguousarray(all_rois[:, 1:5], dtype=np.float),
         np.ascontiguousarray(gt_boxes[:, :4], dtype=np.float))
+    # assign to each RoI the groud-truth that has the largest overlap
     gt_assignment = overlaps.argmax(axis=1)
     max_overlaps = overlaps.max(axis=1)
-    labels = gt_boxes[gt_assignment, 4]
+    labels = gt_boxes[gt_assignment, 4] # get each RoI's class label
 
     # Select foreground RoIs as those with >= FG_THRESH overlap
     fg_inds = np.where(max_overlaps >= cfg.TRAIN.FG_THRESH)[0]
