@@ -575,6 +575,28 @@ AP for 2_3 = 0.7574
 AP for 3_3 = 0.9254
 Mean AP = 0.8162
 
+Currently set cfg.TRAIN.FG_THRESH to 0.7
+50K iterations
+AP for 1_1 = 0.8309
+AP for 1_2 = 0.5119
+AP for 1_3 = 0.8320
+AP for 2_2 = 0.6698
+AP for 2_3 = 0.6686
+AP for 3_3 = 0.8452
+Mean AP = 0.7264
+
+60K iterations
+AP for 1_1 = 0.8581
+AP for 1_2 = 0.5566
+AP for 1_3 = 0.8575
+AP for 2_2 = 0.7172
+AP for 2_3 = 0.6770
+AP for 3_3 = 0.8744
+Mean AP = 0.7568
+
+So it appears there is an over-fitting problem
+
+
 [14]
 Currently running [14] again (jobid - 2212370) but differences:
 1. using st_pool (bug fixed)
@@ -591,7 +613,7 @@ Currently running [14] again (jobid - 2212370) but differences:
    of the regional proposals' coordinates, that apparently did not work with the
    ImageNet pre-trained weights values.
 
-   Results:
+   Results after 120K iterations
    0.849
    0.675
    0.904

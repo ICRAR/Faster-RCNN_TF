@@ -15,7 +15,6 @@ from utils.cython_bbox import bbox_overlaps
 from fast_rcnn.bbox_transform import bbox_transform
 from utils.project_bbox import project_bbox
 import pdb
-import itertools
 
 DEBUG = False
 
@@ -134,14 +133,14 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, #theta,
 
     # anything greater than cfg.TRAIN.RPN_NEGATIVE_OVERLAP but less than
     # cfg.TRAIN.RPN_POSITIVE_OVERLAP is
-    # subject to embedding tests first (has the potential to become negative)
-    idx = (max_overlaps > cfg.TRAIN.RPN_NEGATIVE_OVERLAP) * (max_overlaps < cfg.TRAIN.RPN_POSITIVE_OVERLAP)
+    # subject to embedding tests since they have the potential to become negative)
+    idx = (max_overlaps >= cfg.TRAIN.RPN_NEGATIVE_OVERLAP) * (max_overlaps < cfg.TRAIN.RPN_POSITIVE_OVERLAP)
     anch_inds = np.where(idx)[0]
     priority_negative = 0
     for anch_idx in anch_inds:
         anch = anchors[anch_idx]
         gtb = gt_boxes[argmax_overlaps[anch_idx]]
-        if _contains(anch, gtb):
+        if _contains(gtb, anch): # archor is completely embedded inside gt_box
             labels[anch_idx] = 2 #special negative case to pick up later
             priority_negative += 1
 
@@ -263,20 +262,10 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, #theta,
 
     return rpn_labels,rpn_bbox_targets,rpn_bbox_inside_weights,rpn_bbox_outside_weights
 
-def _set_to_negatives(anchors, gt_boxes, overlaps, labels):
-    """
-    explicitly set certain anchors to negative for training
-    e.g. "embarrisingly" embedded anchors should be flagged as "negative"
-    """
-    hid, wid = np.where(overlaps > 0.0)
-    for hi, wi in itertools.product(hid, wid):
-        ac = anchors[hi]
-        gt = gt_boxes[wi]
-    #matrix = np.zeros
-
 def _contains(bx1, bx2, delta=4):
     """
-    does bx1 fully contains box2?
+    does bx1 fully contains bx2
+    delta is with respect with the scaled image (i.e. 600 x 600)
     """
     xmin_1 = bx1[0]
     ymin_1 = bx1[1]
@@ -288,16 +277,17 @@ def _contains(bx1, bx2, delta=4):
     xmax_2 = bx2[2]
     ymax_2 = bx2[3]
 
+    # does bx1 fully contains box2?
     if (xmin_2 - xmin_1 > delta):
         if (xmax_1 - xmax_2 > delta):
             if (ymin_2 - ymin_1 > delta):
                 if (ymax_1 - ymax_2 > delta):
                     return True
-    elif (xmin_1 - xmin_2 > delta):
-        if (xmax_2 - xmax_1 > delta):
-            if (ymin_1 - ymin_2 > delta):
-                if (ymax_2 - ymax_1 > delta):
-                    return True
+    # elif (xmin_1 - xmin_2 > delta): #does bx2 fully contains box1?
+    #     if (xmax_2 - xmax_1 > delta):
+    #         if (ymin_1 - ymin_2 > delta):
+    #             if (ymax_2 - ymax_1 > delta):
+    #                 return True
     return False
 
 def _unmap(data, count, inds, fill=0):
