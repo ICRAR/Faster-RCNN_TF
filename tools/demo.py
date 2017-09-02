@@ -73,7 +73,8 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8, save_vis_dir=None):
     # Detect all object classes and regress object bounds
     timer = Timer()
     timer.tic()
-    scores, boxes = im_detect(sess, net, im, save_vis_dir=save_vis_dir)
+    scores, boxes = im_detect(sess, net, im, save_vis_dir=save_vis_dir,
+                             img_name=os.path.splitext(image_name)[0])
     #print("scores.shape = {0}, boxes.shape = {1}".format(scores.shape, boxes.shape))
     timer.toc()
     print ('Detection took {:.3f}s for '
@@ -170,8 +171,9 @@ def parse_args():
                         default=0.8, type=float)
     parser.add_argument('--imgindex', dest='img_index', help='Image index path',
                         default='/home/cwu/rgz-ml-ws/data/RGZdevkit2017/RGZ2017/ImageSets/Main/test14.txt')
-    parser.add_argument('--visdir', dest='save_vis_dir', help='Directory to save tensors for visual (e.g. weights, features)',
-                        default=None)
+    # parser.add_argument('--visdir', dest='save_vis_dir', help='Directory to save tensors for visual (e.g. weights, features)',
+    #                     default=None)
+    parser.add_argument('--imgsuffix', dest='img_suffix', default='_radio.png')
 
     args = parser.parse_args()
 
@@ -220,13 +222,14 @@ if __name__ == '__main__':
         for line in fin:
             #print(line)
             fid = line.strip()
-            im_names.append(fid + '_radio.png')
+            #im_names.append(fid + '_radio.png')
+            im_names.append(fid + args.img_suffix)
 
     for i, im_name in enumerate(im_names):
         #print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         #print 'Demo for data/demo/{}'.format(im_name)
         ret = demo(sess, net, im_name, args.input_path,
-                    conf_thresh=args.conf_thresh, save_vis_dir=args.save_vis_dir)
+                    conf_thresh=args.conf_thresh, save_vis_dir=args.fig_path)
         if (-1 == ret):
             continue
         plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')))

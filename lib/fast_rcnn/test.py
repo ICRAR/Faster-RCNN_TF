@@ -131,7 +131,7 @@ def _rescale_boxes(boxes, inds, scales):
     return boxes
 
 
-def im_detect(sess, net, im, boxes=None, save_vis_dir=None):
+def im_detect(sess, net, im, boxes=None, save_vis_dir=None, img_name=''):
     """Detect object classes in an image given object proposals.
     Arguments:
         net (caffe.Net): Fast R-CNN network to use
@@ -191,9 +191,9 @@ def im_detect(sess, net, im, boxes=None, save_vis_dir=None):
                   feed_dict=feed_dict,
                   options=run_options,
                   run_metadata=run_metadata)
-        np.save(os.path.join(save_vis_dir, 'conv5_3_weights.npy'), conv5_3_weights_np)
-        np.save(os.path.join(save_vis_dir, 'conv5_3_features.npy'), conv5_3_features)
-        np.save(os.path.join(save_vis_dir, 'st_pool_features.npy'), st_pool_features)
+        np.save(os.path.join(save_vis_dir, '%s_conv5_3_w.npy' % img_name), conv5_3_weights_np)
+        np.save(os.path.join(save_vis_dir, '%s_conv5_3_f.npy' % img_name), conv5_3_features)
+        np.save(os.path.join(save_vis_dir, '%s_st_pool_f.npy' % img_name), st_pool_features)
 
 
     if cfg.TEST.HAS_RPN:
