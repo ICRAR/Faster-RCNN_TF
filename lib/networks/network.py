@@ -60,9 +60,7 @@ class Network(object):
             data_dict = np.load(data_path).item()
             skip_list = ['fc6', 'fc7']
             if (load_lowlevel_only):
-                skip_list += ['conv3_1', 'conv3_2', 'conv3_3',
-                              'conv4_1', 'conv4_2', 'conv4_3',
-                              'conv5_1', 'conv5_2', 'conv5_3',]
+                skip_list += ['conv5_1', 'conv5_2', 'conv5_3']
             for key in data_dict:
                 if (key in skip_list):
                     print("Skipping %s" % key)
