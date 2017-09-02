@@ -134,15 +134,15 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, #theta,
     # anything greater than cfg.TRAIN.RPN_NEGATIVE_OVERLAP but less than
     # cfg.TRAIN.RPN_POSITIVE_OVERLAP is
     # subject to embedding tests since they have the potential to become negative)
-    idx = (max_overlaps >= cfg.TRAIN.RPN_NEGATIVE_OVERLAP) * (max_overlaps < cfg.TRAIN.RPN_POSITIVE_OVERLAP)
-    anch_inds = np.where(idx)[0]
-    priority_negative = 0
-    for anch_idx in anch_inds:
-        anch = anchors[anch_idx]
-        gtb = gt_boxes[argmax_overlaps[anch_idx]]
-        if _contains(gtb, anch): # archor is completely embedded inside gt_box
-            labels[anch_idx] = 2 #special negative case to pick up later
-            priority_negative += 1
+    # idx = (max_overlaps >= cfg.TRAIN.RPN_NEGATIVE_OVERLAP) * (max_overlaps < cfg.TRAIN.RPN_POSITIVE_OVERLAP)
+    # anch_inds = np.where(idx)[0]
+    # priority_negative = 0
+    # for anch_idx in anch_inds:
+    #     anch = anchors[anch_idx]
+    #     gtb = gt_boxes[argmax_overlaps[anch_idx]]
+    #     if _contains(gtb, anch): # archor is completely embedded inside gt_box
+    #         labels[anch_idx] = 2 #special negative case to pick up later
+    #         priority_negative += 1
 
     if not cfg.TRAIN.RPN_CLOBBER_POSITIVES:
         # assign bg labels first so that positive labels can clobber them
@@ -167,13 +167,13 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, #theta,
         labels[disable_inds] = -1
 
     # subsample negative labels if we have too many
-    num_bg = cfg.TRAIN.RPN_BATCHSIZE - np.sum(labels >= 1)
-    if (num_bg < 0):
-        too_many_priority_negative = True
-        labels[np.where(labels == 2)] = 0
-        num_bg = cfg.TRAIN.RPN_BATCHSIZE - np.sum(labels == 1)
-    else:
-        too_many_priority_negative = False
+    num_bg = cfg.TRAIN.RPN_BATCHSIZE - np.sum(labels == 1)
+    # if (num_bg < 0):
+    #     too_many_priority_negative = True
+    #     labels[np.where(labels == 2)] = 0
+    #     num_bg = cfg.TRAIN.RPN_BATCHSIZE - np.sum(labels == 1)
+    # else:
+    #     too_many_priority_negative = False
     bg_inds = np.where(labels == 0)[0]
     if len(bg_inds) > num_bg:
         disable_inds = npr.choice(
@@ -181,8 +181,8 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, im_info, data, #theta,
         labels[disable_inds] = -1
         #print "was %s inds, disabling %s, now %s inds" % (
             #len(bg_inds), len(disable_inds), np.sum(labels == 0))
-    if (priority_negative > 1 and (not too_many_priority_negative)):
-        labels[np.where(labels == 2)] = 0
+    # if (priority_negative > 0 and (not too_many_priority_negative)):
+    #     labels[np.where(labels == 2)] = 0
 
     bbox_targets = np.zeros((len(inds_inside), 4), dtype=np.float32)
     bbox_targets = _compute_targets(anchors, gt_boxes[argmax_overlaps, :])
