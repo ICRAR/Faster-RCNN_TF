@@ -512,6 +512,7 @@ Mean AP = 0.8241
 
 Currently (26 Aug 2017) running [22] again (jobid - 2212360)
 but with new st_pool (bug fixed)
+
 100K Iterations
 AP for 1_1 = 0.8773
 AP for 1_2 = 0.6988
@@ -596,6 +597,27 @@ Mean AP = 0.7568
 
 So it appears there is an over-fitting problem
 
+[with "priority negative mode"]
+60K iterations
+AP for 1_1 = 0.8674
+AP for 1_2 = 0.6601
+AP for 1_3 = 0.8782
+AP for 2_2 = 0.7936
+AP for 2_3 = 0.7740
+AP for 3_3 = 0.9264
+Mean AP = 0.8166
+
+
+80K iterations
+AP for 1_1 = 0.8801
+AP for 1_2 = 0.6500
+AP for 1_3 = 0.8734
+AP for 2_2 = 0.8017
+AP for 2_3 = 0.7554
+AP for 3_3 = 0.9243
+Mean AP = 0.8142
+
+
 
 [14]
 Currently running [14] again (jobid - 2212370) but differences:
@@ -621,3 +643,6 @@ Currently running [14] again (jobid - 2212370) but differences:
    0.719
    0.876
    0.793
+
+   But the mean values of the images are all wrong, so now running with the correct
+   mean, see what happens, but with priority_negative = True

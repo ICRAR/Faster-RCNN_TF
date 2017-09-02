@@ -131,7 +131,7 @@ def _rescale_boxes(boxes, inds, scales):
     return boxes
 
 
-def im_detect(sess, net, im, boxes=None):
+def im_detect(sess, net, im, boxes=None, save_vis_dir=None):
     """Detect object classes in an image given object proposals.
     Arguments:
         net (caffe.Net): Fast R-CNN network to use
@@ -180,6 +180,21 @@ def im_detect(sess, net, im, boxes=None):
                                                     feed_dict=feed_dict,
                                                     options=run_options,
                                                     run_metadata=run_metadata)
+
+    if (save_vis_dir is not None and os.path.exists(save_vis_dir)):
+        # first get the weights out
+        with tf.variable_scope('conv5_3') as scope:
+            conv5_3_weights = tf.get_variable("weights")
+
+        conv5_3_weights_np, conv5_3_features, st_pool_features =\
+        sess.run([conv5_3_weights, net.get_output('conv5_3'), net.get_output('pool_5')],
+                  feed_dict=feed_dict,
+                  options=run_options,
+                  run_metadata=run_metadata)
+        np.save(os.path.join(save_vis_dir, 'conv5_3_weights.npy'), conv5_3_weights_np)
+        np.save(os.path.join(save_vis_dir, 'conv5_3_features.npy'), conv5_3_features)
+        np.save(os.path.join(save_vis_dir, 'st_pool_features.npy'), st_pool_features)
+
 
     if cfg.TEST.HAS_RPN:
         assert len(im_scales) == 1, "Only single-image batch implemented"

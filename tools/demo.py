@@ -58,7 +58,7 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     return len(inds)
 
 
-def demo(sess, net, image_name, input_path, conf_thresh=0.8):
+def demo(sess, net, image_name, input_path, conf_thresh=0.8, save_vis_dir=None):
     """Detect object classes in an image using pre-computed object proposals."""
 
     # Load the demo image
@@ -73,7 +73,7 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8):
     # Detect all object classes and regress object bounds
     timer = Timer()
     timer.tic()
-    scores, boxes = im_detect(sess, net, im)
+    scores, boxes = im_detect(sess, net, im, save_vis_dir=save_vis_dir)
     #print("scores.shape = {0}, boxes.shape = {1}".format(scores.shape, boxes.shape))
     timer.toc()
     print ('Detection took {:.3f}s for '
@@ -170,6 +170,8 @@ def parse_args():
                         default=0.8, type=float)
     parser.add_argument('--imgindex', dest='img_index', help='Image index path',
                         default='/home/cwu/rgz-ml-ws/data/RGZdevkit2017/RGZ2017/ImageSets/Main/test14.txt')
+    parser.add_argument('--visdir', dest='save_vis_dir', help='Directory to save tensors for visual (e.g. weights, features)',
+                        default=None)
 
     args = parser.parse_args()
 
@@ -177,7 +179,7 @@ def parse_args():
 if __name__ == '__main__':
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
     cfg.TEST.RPN_MIN_SIZE = 4
-    cfg.TEST.RPN_POST_NMS_TOP_N = 10
+    cfg.TEST.RPN_POST_NMS_TOP_N =5
     cfg.TEST.NMS = 0.3
     cfg.TEST.RPN_NMS_THRESH = 0.5
 
@@ -223,7 +225,8 @@ if __name__ == '__main__':
     for i, im_name in enumerate(im_names):
         #print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         #print 'Demo for data/demo/{}'.format(im_name)
-        ret = demo(sess, net, im_name, args.input_path, conf_thresh=args.conf_thresh)
+        ret = demo(sess, net, im_name, args.input_path,
+                    conf_thresh=args.conf_thresh, save_vis_dir=args.save_vis_dir)
         if (-1 == ret):
             continue
         plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')))
