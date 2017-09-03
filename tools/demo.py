@@ -81,8 +81,18 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8, save_vis_dir=None):
            '{:d} object proposals').format(timer.total_time, boxes.shape[0])
 
     # Visualize detections for each class
+
+    my_dpi = 100
+    fig = plt.figure()
+    fig.set_size_inches(600/my_dpi, 600/my_dpi)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
+    #ax.set_xlim([0, 600])
+    #ax.set_ylim([600, 0])
+    #ax.set_aspect('equal')
     im = im[:, :, (2, 1, 0)]
-    fig, ax = plt.subplots(figsize=(6, 6))
+    #fig, ax = plt.subplots(figsize=(6, 6))
     ax.imshow(im, aspect='equal')
 
     #CONF_THRESH = 0.3
@@ -232,7 +242,7 @@ if __name__ == '__main__':
                     conf_thresh=args.conf_thresh, save_vis_dir=args.fig_path)
         if (-1 == ret):
             continue
-        plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')))
+        plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')), dpi=100)
         try:
             plt.close()
         except:
