@@ -17,7 +17,7 @@ from itertools import cycle
 CLASSES =  ('__background__', # always index 0
                             '1_1', '1_2', '1_3', '2_2', '2_3', '3_3')
 
-colors_ = cycle(['red', 'cyan', 'magenta', 'yellow', 'white'])
+colors_ = cycle(['red', 'cyan', 'magenta', 'yellow'])
 
 def vis_detections(im, class_name, dets,ax, thresh=0.5):
     """Draw detected bounding boxes."""
@@ -58,7 +58,8 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
     return len(inds)
 
 
-def demo(sess, net, image_name, input_path, conf_thresh=0.8, save_vis_dir=None):
+def demo(sess, net, image_name, input_path, conf_thresh=0.8,
+         save_vis_dir=None):
     """Detect object classes in an image using pre-computed object proposals."""
 
     # Load the demo image
@@ -81,6 +82,10 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8, save_vis_dir=None):
            '{:d} object proposals').format(timer.total_time, boxes.shape[0])
 
     # Visualize detections for each class
+    box_image_name = image_name.split('_')[0] + '_logminmax_radio.png'
+    im_box_file = os.path.join(input_path, box_image_name)
+    if (os.path.exists(im_box_file)):
+        im = cv2.imread(im_box_file)
 
     my_dpi = 100
     fig = plt.figure()
@@ -88,8 +93,8 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8, save_vis_dir=None):
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
-    #ax.set_xlim([0, 600])
-    #ax.set_ylim([600, 0])
+    ax.set_xlim([0, 600])
+    ax.set_ylim([600, 0])
     #ax.set_aspect('equal')
     im = im[:, :, (2, 1, 0)]
     #fig, ax = plt.subplots(figsize=(6, 6))
@@ -176,7 +181,7 @@ def parse_args():
     parser.add_argument('--input', dest='input_path', help='Input PNG path',
                         default='/home/cwu/rgz-faster-rcnn/data/RGZdevkit2017/RGZ2017/PNGImages')
     parser.add_argument('--figure', dest='fig_path', help='Figure path',
-                        default='/group/pawsey0129/cwu/output')
+                        default='/group/pawsey0129/cwu/output/22_result')
     parser.add_argument('--threshold', dest='conf_thresh', help='confidence threshold',
                         default=0.8, type=float)
     parser.add_argument('--imgindex', dest='img_index', help='Image index path',
@@ -239,7 +244,8 @@ if __name__ == '__main__':
         #print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         #print 'Demo for data/demo/{}'.format(im_name)
         ret = demo(sess, net, im_name, args.input_path,
-                    conf_thresh=args.conf_thresh, save_vis_dir=args.fig_path)
+                    conf_thresh=args.conf_thresh, save_vis_dir=None)
+                    #conf_thresh=args.conf_thresh, save_vis_dir=args.fig_path)
         if (-1 == ret):
             continue
         plt.savefig(os.path.join(args.fig_path, im_name.replace('.png', '_pred.png')), dpi=100)

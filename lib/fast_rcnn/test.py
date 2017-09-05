@@ -183,7 +183,7 @@ def im_detect(sess, net, im, boxes=None, save_vis_dir=None, img_name=''):
 
     if (save_vis_dir is not None and os.path.exists(save_vis_dir)):
         # first get the weights out
-        with tf.variable_scope('conv5_3') as scope:
+        with tf.variable_scope('conv5_3', reuse=True) as scope:
             conv5_3_weights = tf.get_variable("weights")
 
         conv5_3_weights_np, conv5_3_features, st_pool_features =\
