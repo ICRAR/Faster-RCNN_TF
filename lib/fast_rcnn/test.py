@@ -232,7 +232,8 @@ def im_detect(sess, net, im, boxes=None, save_vis_dir=None,
         trace_file.close()
 
     if (include_rpn_score):
-        scores *= rois[:, 0] # score is a joint prob instead of conditional prob
+        # score is a joint prob instead of conditional prob
+        scores *= np.reshape(rois[:, 0], [-1, 1])
     return scores, pred_boxes
 
 
