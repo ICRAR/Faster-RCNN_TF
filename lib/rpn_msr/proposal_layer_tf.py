@@ -134,7 +134,9 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,
     # Output rois blob
     # Our RPN implementation only supports a single input image, so all
     # batch inds are 0
-    batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
+    # batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
+    # here we abuse batch inds, and use it for carrying over the score
+    batch_inds = np.reshape(scores, [proposals.shape[0], 1])
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False)))
     if (DEBUG):
         print('blob shape: {0}'.format(blob.shape))

@@ -131,7 +131,8 @@ def _rescale_boxes(boxes, inds, scales):
     return boxes
 
 
-def im_detect(sess, net, im, boxes=None, save_vis_dir=None, img_name=''):
+def im_detect(sess, net, im, boxes=None, save_vis_dir=None,
+              img_name='', include_rpn_score=True):
     """Detect object classes in an image given object proposals.
     Arguments:
         net (caffe.Net): Fast R-CNN network to use
@@ -230,6 +231,8 @@ def im_detect(sess, net, im, boxes=None, save_vis_dir=None, img_name=''):
         trace_file.write(trace.generate_chrome_trace_format(show_memory=False))
         trace_file.close()
 
+    if (include_rpn_score):
+        scores *= rois[:, 0] # score is a joint prob instead of conditional prob
     return scores, pred_boxes
 
 
