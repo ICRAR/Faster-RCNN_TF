@@ -9,7 +9,7 @@ import numpy as np
 import yaml
 from fast_rcnn.config import cfg
 from generate_anchors import generate_anchors
-from fast_rcnn.bbox_transform import bbox_transform_inv, clip_boxes
+from fast_rcnn.bbox_transform import bbox_transform_inv, clip_boxes, bbox_contains
 from fast_rcnn.nms_wrapper import nms
 import pdb
 
@@ -131,11 +131,43 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,
         keep = keep[:post_nms_topN]
     proposals = proposals[keep, :]
     scores = scores[keep]
+
+    remove_option = 1
+    if ('TEST' == cfg_key and remove_option in [1, 2]):
+        # get rid of boxes that are completely inside other boxes
+        # with options as to which one to get rid of
+        # 1. always the one with lower scores, 2. always the one inside
+        new_proposals = []
+        removed_indices = set()
+        num_props = proposals.shape[0]
+        for i in range(num_props):
+            if (i in removed_indices):
+                continue
+            bxA = proposals[i, :]
+            for j in range(num_props):
+                if ((j == i) or (j in removed_indices)):
+                    continue
+                bxB = proposals[j, :]
+                if (bbox_contains(bxA, bxB)):
+                    if ((1 == remove_option) and (scores[i] != scores[j])):
+                        if (scores[i] > scores[j]):
+                            removed_indices.add(j)
+                        else:
+                            removed_indices.add(i)
+                    else: # remove_option == 2 or scores[i] == scores[j]
+                        removed_indices.add(j)
+        for i in range(num_props):
+            if (not i in removed_indices):
+                new_proposals.append(i)
+
+        proposals = proposals[new_proposals, :]
+        scores = scores[new_proposals]
+
     # Output rois blob
     # Our RPN implementation only supports a single input image, so all
     # batch inds are 0
     # batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
-    # here we abuse batch inds, and use it for carrying over the score
+    # BUT we NOW (18-Sep-2017) abuse batch inds, and use it for carrying scores
     batch_inds = np.reshape(scores, [proposals.shape[0], 1])
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False)))
     if (DEBUG):

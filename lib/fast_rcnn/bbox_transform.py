@@ -82,3 +82,32 @@ def clip_boxes(boxes, im_shape):
     # y2 < im_shape[0]
     boxes[:, 3::4] = np.maximum(np.minimum(boxes[:, 3::4], im_shape[0] - 1), 0)
     return boxes
+
+def bbox_contains(bx1, bx2, delta=4):
+    """
+    bx1 and bx2 are 1D array
+    does bx1 fully contains bx2
+    delta is with respect with the scaled image (i.e. 600 x 600)
+    """
+    xmin_1 = bx1[0]
+    ymin_1 = bx1[1]
+    xmax_1 = bx1[2]
+    ymax_1 = bx1[3]
+
+    xmin_2 = bx2[0]
+    ymin_2 = bx2[1]
+    xmax_2 = bx2[2]
+    ymax_2 = bx2[3]
+
+    # does bx1 fully contains box2?
+    if (xmin_2 - xmin_1 > delta):
+        if (xmax_1 - xmax_2 > delta):
+            if (ymin_2 - ymin_1 > delta):
+                if (ymax_1 - ymax_2 > delta):
+                    return True
+    # elif (xmin_1 - xmin_2 > delta): #does bx2 fully contains box1?
+    #     if (xmax_2 - xmax_1 > delta):
+    #         if (ymin_1 - ymin_2 > delta):
+    #             if (ymax_2 - ymax_1 > delta):
+    #                 return True
+    return False
