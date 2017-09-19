@@ -132,38 +132,38 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,
     proposals = proposals[keep, :]
     scores = scores[keep]
 
-    remove_option = 1
-    if ('TEST' == cfg_key and remove_option in [1, 2]):
-        # get rid of boxes that are completely inside other boxes
-        # with options as to which one to get rid of
-        # 1. always the one with lower scores, 2. always the one inside
-        new_proposals = []
-        removed_indices = set()
-        num_props = proposals.shape[0]
-        for i in range(num_props):
-            if (i in removed_indices):
-                continue
-            bxA = proposals[i, :]
-            for j in range(num_props):
-                if ((j == i) or (j in removed_indices)):
-                    continue
-                bxB = proposals[j, :]
-                if (bbox_contains(bxA, bxB)):
-                    if ((1 == remove_option) and (scores[i] != scores[j])):
-                        if (scores[i] > scores[j]):
-                            removed_indices.add(j)
-                        else:
-                            removed_indices.add(i)
-                    else: # remove_option == 2 or scores[i] == scores[j]
-                        removed_indices.add(j)
-        nr = len(removed_indices)
-        if (nr > 0):
-            new_proposals = sorted(set(range(num_props)) - removed_indices)
-            proposals = proposals[new_proposals, :]
-            scores = scores[new_proposals]
-            # padding to make the total number of proposals == post_nms_topN
-            proposals = np.vstack((proposals, [proposals[-1, :]] * nr))
-            scores = np.vstack((scores, [scores[-1]] * nr))
+    # remove_option = 1
+    # if ('TEST' == cfg_key and remove_option in [1, 2]):
+    #     # get rid of boxes that are completely inside other boxes
+    #     # with options as to which one to get rid of
+    #     # 1. always the one with lower scores, 2. always the one inside
+    #     new_proposals = []
+    #     removed_indices = set()
+    #     num_props = proposals.shape[0]
+    #     for i in range(num_props):
+    #         if (i in removed_indices):
+    #             continue
+    #         bxA = proposals[i, :]
+    #         for j in range(num_props):
+    #             if ((j == i) or (j in removed_indices)):
+    #                 continue
+    #             bxB = proposals[j, :]
+    #             if (bbox_contains(bxA, bxB)):
+    #                 if ((1 == remove_option) and (scores[i] != scores[j])):
+    #                     if (scores[i] > scores[j]):
+    #                         removed_indices.add(j)
+    #                     else:
+    #                         removed_indices.add(i)
+    #                 else: # remove_option == 2 or scores[i] == scores[j]
+    #                     removed_indices.add(j)
+    #     nr = len(removed_indices)
+    #     if (nr > 0):
+    #         new_proposals = sorted(set(range(num_props)) - removed_indices)
+    #         proposals = proposals[new_proposals, :]
+    #         scores = scores[new_proposals]
+    #         # padding to make the total number of proposals == post_nms_topN
+    #         proposals = np.vstack((proposals, [proposals[-1, :]] * nr))
+    #         scores = np.vstack((scores, [scores[-1]] * nr))
 
         # for idx in removed_indices:
         #     proposals = np.vstack((proposals, proposals[-1, :]))
