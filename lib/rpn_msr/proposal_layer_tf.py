@@ -156,12 +156,18 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,
                             removed_indices.add(i)
                     else: # remove_option == 2 or scores[i] == scores[j]
                         removed_indices.add(j)
-        for i in range(num_props):
-            if (not i in removed_indices):
-                new_proposals.append(i)
-
+        new_proposals = sorted(set(range(num_props)) - removed_indices)
         proposals = proposals[new_proposals, :]
         scores = scores[new_proposals]
+
+        # padding to make the total number of proposals == post_nms_topN
+        nr = len(removed_indices)
+        proposals = np.vstack((proposals, [proposals[-1, :]] * nr))
+        scores = np.vstack((scores, [scores[-1]] * nr))
+
+        # for idx in removed_indices:
+        #     proposals = np.vstack((proposals, proposals[-1, :]))
+        #     scores = np.vstack((scores, scores[-1]))
 
     # Output rois blob
     # Our RPN implementation only supports a single input image, so all
