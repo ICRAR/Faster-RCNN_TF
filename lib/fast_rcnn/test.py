@@ -387,12 +387,13 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
                 all_boxes[j][i] = cls_dets
                 #cls_dets.shape == [nb_detections_for_cls_j, 5]
                 # we need to get all bboxes in a image regardless of classes
-                bbox_img.append(cls_dets[:, 0:-1])
-                bscore_img.append(cls_dets[:, -1])
-                # remember the mapping
-                for bc in range(cls_dets.shape[0]):
-                    index_map[bbc] = (j, bc)
-                    bbc += 1
+                if (cls_dets.shape[0] > 0):
+                    bbox_img.append(cls_dets[:, 0:-1])
+                    bscore_img.append(np.reshape(cls_dets[:, -1], [-1, 1]))
+                    # remember the mapping
+                    for bc in range(cls_dets.shape[0]):
+                        index_map[bbc] = (j, bc)
+                        bbc += 1
 
             boxes = np.vstack(bbox_img)
             scores = np.vstack(bscore_img)
@@ -404,7 +405,8 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
                 cls_keep[j].append(bc)
 
             for j in xrange(1, imdb.num_classes):
-                all_boxes[j][i] = all_boxes[j][i][cls_keep[j], :]
+                if (j in cls_keep):
+                    all_boxes[j][i] = all_boxes[j][i][cls_keep[j], :]
 
             if vis:
                plt.show()
