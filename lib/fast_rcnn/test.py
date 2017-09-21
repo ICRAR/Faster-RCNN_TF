@@ -399,7 +399,7 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
                 boxes = np.vstack(bbox_img)
                 scores = np.vstack(bscore_img)
                 keep_indices = remove_embedded(boxes, scores, remove_option=1)
-                removed = len(bbox_img) - len(keep_indices)
+                removed = bbc - len(keep_indices)
                 # need to find out which j, and which k correspond to which index
                 cls_keep = defaultdict(list)
                 for ki in keep_indices:
