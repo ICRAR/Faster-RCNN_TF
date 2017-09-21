@@ -394,11 +394,12 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
                     for bc in range(cls_dets.shape[0]):
                         index_map[bbc] = (j, bc)
                         bbc += 1
-
+            removed = 0
             if (len(bbox_img) > 0):
                 boxes = np.vstack(bbox_img)
                 scores = np.vstack(bscore_img)
                 keep_indices = remove_embedded(boxes, scores, remove_option=1)
+                removed = len(bbox_img) - len(keep_indices)
                 # need to find out which j, and which k correspond to which index
                 cls_keep = defaultdict(list)
                 for ki in keep_indices:
@@ -422,8 +423,8 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
                         all_boxes[j][i] = all_boxes[j][i][keep, :]
             _t['misc'].toc()
 
-            print 'im_detect: {:d}/{:d} {:d} detection {:.3f}s' \
-                  .format(i + 1, num_images, ttt, _t['im_detect'].average_time)
+            print 'im_detect: {:d}/{:d} {:d} detection {:d} removed {:.3f}s' \
+                  .format(i + 1, num_images, ttt, removed, _t['im_detect'].average_time)
 
         with open(det_file, 'wb') as f:
             cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
