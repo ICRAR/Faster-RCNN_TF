@@ -165,10 +165,6 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,
     #         proposals = np.vstack((proposals, [proposals[-1, :]] * nr))
     #         scores = np.vstack((scores, [scores[-1]] * nr))
 
-        # for idx in removed_indices:
-        #     proposals = np.vstack((proposals, proposals[-1, :]))
-        #     scores = np.vstack((scores, scores[-1]))
-
     # Output rois blob
     # Our RPN implementation only supports a single input image, so all
     # batch inds are 0

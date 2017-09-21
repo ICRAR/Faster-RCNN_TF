@@ -13,10 +13,11 @@ import os
 import math
 from rpn_msr.generate import imdb_proposals_det
 import tensorflow as tf
-from fast_rcnn.bbox_transform import clip_boxes, bbox_transform_inv
+from fast_rcnn.bbox_transform import clip_boxes, bbox_transform_inv, bbox_contains
 import matplotlib.pyplot as plt
 from tensorflow.python.client import timeline
 import time
+from collections import defaultdict
 
 def _get_image_blob(im):
     """Converts an image into a network input.
@@ -291,6 +292,36 @@ def apply_nms(all_boxes, thresh):
             nms_boxes[cls_ind][im_ind] = dets[keep, :].copy()
     return nms_boxes
 
+def remove_embedded(boxes, scores, remove_option=1):
+    """
+    Return indices of those that should be KEPT
+    """
+    removed_indices = set()
+    num_props = boxes.shape[0]
+    for i in range(num_props):
+        if (i in removed_indices):
+            continue
+        bxA = boxes[i, :]
+        for j in range(num_props):
+            if ((j == i) or (j in removed_indices)):
+                continue
+            bxB = boxes[j, :]
+            if (bbox_contains(bxA, bxB, delta=0)):
+                if ((1 == remove_option) and (scores[i] != scores[j])):
+                    if (scores[i] > scores[j]):
+                        removed_indices.add(j)
+                    else:
+                        removed_indices.add(i)
+                else: # remove_option == 2 or scores[i] == scores[j]
+                    removed_indices.add(j)
+    return sorted(set(range(num_props)) - removed_indices)
+    # nr = len(removed_indices)
+    # if (nr > 0):
+    #     new_boxes = sorted(set(range(num_props)) - removed_indices)
+    #     boxes = boxes[new_boxes, :]
+    #     scores = scores[new_boxes]
+    #
+    # return boxes, scores
 
 def test_net(sess, net, imdb, weights_filename , max_per_image=300,
              thresh=0.05, vis=False, force=False):
@@ -338,6 +369,10 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
 
             # skip j = 0, because it's the background class
             ttt = 0
+            bbox_img = []
+            bscore_img = []
+            bbc = 0 #bbox count
+            index_map = dict()
             for j in xrange(1, imdb.num_classes):
                 inds = np.where(scores[:, j] > thresh)[0]
                 ttt += len(inds)
@@ -350,6 +385,27 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
                 if vis:
                     vis_detections(image, imdb.classes[j], cls_dets)
                 all_boxes[j][i] = cls_dets
+                #cls_dets.shape == [nb_detections_for_cls_j, 5]
+                # we need to get all bboxes in a image regardless of classes
+                bbox_img.append(cls_dets[:, 0:-1])
+                bscore_img.append(cls_dets[:, -1])
+                # remember the mapping
+                for bc in range(cls_dets.shape[0]):
+                    index_map[bbc] = (j, bc)
+                    bbc += 1
+
+            boxes = np.vstack(bbox_img)
+            scores = np.vstack(bscore_img)
+            keep_indices = remove_embedded(boxes, scores, remove_option=1)
+            # need to find out which j, and which k correspond to which index
+            cls_keep = defaultdict(list)
+            for ki in keep_indices:
+                j, bc = index_map[ki]
+                cls_keep[j].append(bc)
+
+            for j in xrange(1, imdb.num_classes):
+                all_boxes[j][i] = all_boxes[j][i][cls_keep[j], :]
+
             if vis:
                plt.show()
             # Limit to max_per_image detections *over all classes*
