@@ -395,18 +395,19 @@ def test_net(sess, net, imdb, weights_filename , max_per_image=300,
                         index_map[bbc] = (j, bc)
                         bbc += 1
 
-            boxes = np.vstack(bbox_img)
-            scores = np.vstack(bscore_img)
-            keep_indices = remove_embedded(boxes, scores, remove_option=1)
-            # need to find out which j, and which k correspond to which index
-            cls_keep = defaultdict(list)
-            for ki in keep_indices:
-                j, bc = index_map[ki]
-                cls_keep[j].append(bc)
+            if (len(bbox_img) > 0):
+                boxes = np.vstack(bbox_img)
+                scores = np.vstack(bscore_img)
+                keep_indices = remove_embedded(boxes, scores, remove_option=1)
+                # need to find out which j, and which k correspond to which index
+                cls_keep = defaultdict(list)
+                for ki in keep_indices:
+                    j, bc = index_map[ki]
+                    cls_keep[j].append(bc)
 
-            for j in xrange(1, imdb.num_classes):
-                if (j in cls_keep):
-                    all_boxes[j][i] = all_boxes[j][i][cls_keep[j], :]
+                for j in xrange(1, imdb.num_classes):
+                    if (j in cls_keep):
+                        all_boxes[j][i] = all_boxes[j][i][cls_keep[j], :]
 
             if vis:
                plt.show()
