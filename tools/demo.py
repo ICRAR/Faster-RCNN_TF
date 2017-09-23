@@ -5,7 +5,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from fast_rcnn.config import cfg
-from fast_rcnn.test import im_detect
+from fast_rcnn.test import im_detect, remove_embedded
 from fast_rcnn.nms_wrapper import nms
 from utils.timer import Timer
 import numpy as np
@@ -21,19 +21,16 @@ colors_ = cycle(['red', 'cyan', 'magenta', 'yellow'])
 
 def vis_detections(im, class_name, dets,ax, thresh=0.5):
     """Draw detected bounding boxes."""
-    inds = np.where(dets[:, -1] >= thresh)[0]
+    inds = np.where(dets[:, -2] >= thresh)[0]
     if len(inds) == 0:
-        # get a box with a highest score
-        # try:
-        #     max_score = np.max(dets[:, -1])
-        #     inds = np.where(dets[:, -1] == max_score)[0][0:1]
-        # except Exception as exp:
-        #     print('inds == 0, but %s' % str(exp))
-        return len(inds)
-    #inds = range(dets.shape[0])
+        thresh = np.max(dets[:, -2])
+        inds = np.where(dets[:, -2] >= thresh)[0]
+
     for i in inds:
         bbox = dets[i, :4]
-        score = dets[i, -1]
+        score = dets[i, -2]
+        if (class_name is None):
+            class_name = CLASSES[int(dets[i, -1])]
 
         ax.add_patch(
             plt.Rectangle((bbox[0], bbox[1]),
@@ -59,12 +56,13 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
 
 
 def demo(sess, net, image_name, input_path, conf_thresh=0.8,
-         save_vis_dir=None):
+         save_vis_dir=None, remove_embedded_opt=0):
     """Detect object classes in an image using pre-computed object proposals."""
 
     # Load the demo image
     # im_file = os.path.join(cfg.DATA_DIR, 'demo', image_name)
     im_file = os.path.join(input_path, image_name)
+    show_img_size = cfg.TEST.SCALES[0]
     if (not os.path.exists(im_file)):
         print('%s cannot be found' % (im_file))
         return -1
@@ -76,6 +74,7 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8,
     timer.tic()
     scores, boxes = im_detect(sess, net, im, save_vis_dir=save_vis_dir,
                              img_name=os.path.splitext(image_name)[0])
+    boxes *= float(show_img_size) / float(im.shape[0])
     #print("scores.shape = {0}, boxes.shape = {1}".format(scores.shape, boxes.shape))
     timer.toc()
     print ('Detection took {:.3f}s for '
@@ -89,13 +88,14 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8,
 
     my_dpi = 100
     fig = plt.figure()
-    fig.set_size_inches(600/my_dpi, 600/my_dpi)
+    fig.set_size_inches(show_img_size / my_dpi, show_img_size / my_dpi)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
-    ax.set_xlim([0, 600])
-    ax.set_ylim([600, 0])
+    ax.set_xlim([0, show_img_size])
+    ax.set_ylim([show_img_size, 0])
     #ax.set_aspect('equal')
+    im = cv2.resize(im, (show_img_size, show_img_size))
     im = im[:, :, (2, 1, 0)]
     #fig, ax = plt.subplots(figsize=(6, 6))
     ax.imshow(im, aspect='equal')
@@ -141,6 +141,8 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8,
     #     vis_detections(im, cls, dets, ax)
 
     tt_vis = 0
+    bbox_img = []
+    bscore_img = []
     for cls_ind, cls in enumerate(CLASSES[1:]):
         cls_ind += 1 # because we skipped background
         cls_boxes = boxes[:, 4 * cls_ind : 4 * (cls_ind + 1)]
@@ -149,20 +151,32 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8,
                           cls_scores[:, np.newaxis])).astype(np.float32)
         keep = nms(dets, NMS_THRESH)
         dets = dets[keep, :]
-        tt_vis += vis_detections(im, cls, dets, ax, thresh=conf_thresh)
+        dets = np.hstack((dets, np.ones([dets.shape[0], 1]) * cls_ind))
+        if (dets.shape[0] > 0):
+            bbox_img.append(dets)
+            bscore_img.append(np.reshape(dets[:, -2], [-1, 1]))
 
-    if (tt_vis == 0):
-        box_scores = scores[:, 1:]
-        box_ind, cls_ind = np.unravel_index(np.argmax(box_scores), box_scores.shape)
-        cls_ind += 1# because we skipped background
-        cls = CLASSES[cls_ind]
-        cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
-        cls_scores = scores[box_ind:box_ind + 1, cls_ind]
-        dets = np.hstack((cls_boxes,
-                          cls_scores[:, np.newaxis])).astype(np.float32)
-        #keep = nms(dets, NMS_THRESH)
-        #dets = dets[keep, :]
-        vis_detections(im, cls, dets, ax, thresh=0.0)
+    boxes_im = np.vstack(bbox_img)
+    scores_im = np.vstack(bscore_img)
+    if (remove_embedded_opt in [1, 2]):
+        keep_indices = remove_embedded(boxes_im, scores_im, remove_option=remove_embedded_opt)
+        print("removed %d boxes with option %d" % ((boxes_im.shape[0] - len(keep_indices)), remove_embedded_opt))
+    else:
+        keep_indices = range(boxes_im.shape[0])
+    vis_detections(im, None, boxes_im[keep_indices, :], ax, thresh=conf_thresh)
+
+    # if (tt_vis == 0):
+    #     box_scores = scores[:, 1:]
+    #     box_ind, cls_ind = np.unravel_index(np.argmax(box_scores), box_scores.shape)
+    #     cls_ind += 1# because we skipped background
+    #     cls = CLASSES[cls_ind]
+    #     cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
+    #     cls_scores = scores[box_ind:box_ind + 1, cls_ind]
+    #     dets = np.hstack((cls_boxes,
+    #                       cls_scores[:, np.newaxis])).astype(np.float32)
+    #     #keep = nms(dets, NMS_THRESH)
+    #     #dets = dets[keep, :]
+    #     vis_detections(im, cls, dets, ax, thresh=0.0)
 
     return 0
 
@@ -190,13 +204,16 @@ def parse_args():
     #                     default=None)
     parser.add_argument('--imgsuffix', dest='img_suffix', default='_radio.png')
 
+    parser.add_argument('--rmembedded', dest='remove_embedded_opt', help='Otion how to remove embedded cases',
+                        default=0, type=int)
+
     args = parser.parse_args()
 
     return args
 if __name__ == '__main__':
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
     cfg.TEST.RPN_MIN_SIZE = 4
-    cfg.TEST.RPN_POST_NMS_TOP_N =5
+    cfg.TEST.RPN_POST_NMS_TOP_N = 5
     cfg.TEST.NMS = 0.3
     cfg.TEST.RPN_NMS_THRESH = 0.5
 
@@ -244,7 +261,8 @@ if __name__ == '__main__':
         #print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         #print 'Demo for data/demo/{}'.format(im_name)
         ret = demo(sess, net, im_name, args.input_path,
-                    conf_thresh=args.conf_thresh, save_vis_dir=None)
+                    conf_thresh=args.conf_thresh, save_vis_dir=None,
+                    remove_embedded_opt=args.remove_embedded_opt)
                     #conf_thresh=args.conf_thresh, save_vis_dir=args.fig_path)
         if (-1 == ret):
             continue
