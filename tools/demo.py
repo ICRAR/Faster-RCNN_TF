@@ -56,8 +56,13 @@ def vis_detections(im, class_name, dets,ax, thresh=0.5):
 
 
 def demo(sess, net, image_name, input_path, conf_thresh=0.8,
-         save_vis_dir=None, remove_embedded_opt=0):
-    """Detect object classes in an image using pre-computed object proposals."""
+         save_vis_dir=None, remove_embedded_opt=0, eval_class=False):
+    """
+    Detect object classes in an image using pre-computed object proposals.
+    eval_class: True - use traditional per class-based evaluation style
+                False - use per RoI-based evaluation
+
+    """
 
     # Load the demo image
     # im_file = os.path.join(cfg.DATA_DIR, 'demo', image_name)
@@ -103,61 +108,43 @@ def demo(sess, net, image_name, input_path, conf_thresh=0.8,
     #CONF_THRESH = 0.3
     NMS_THRESH = cfg.TEST.NMS #cfg.TEST.RPN_NMS_THRESH # 0.3
 
-    # box_scores = scores[:, 1:] # get rid of background score
-    #
-    # if (np.where(box_scores >= conf_thresh)[0].shape[0] == 0):
-    #     print('No box is greater than {0}'.format(conf_thresh))
-    #     # get the box with a highest score
-    #     box_ind, cls_ind = np.unravel_index(np.argmax(box_scores), box_scores.shape)
-    #     cls_ind += 1# because we skipped background
-    #     cls = CLASSES[cls_ind]
-    #     cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
-    #     cls_scores = scores[box_ind:box_ind + 1, cls_ind]
-    #     dets = np.hstack((cls_boxes,
-    #                       cls_scores[:, np.newaxis])).astype(np.float32)
-    #     keep = nms(dets, NMS_THRESH)
-    #     dets = dets[keep, :]
-    #     vis_detections(im, cls, dets, ax)
-    # else:
-    #     # for each box, find a class with the highest score after filtering
-    #     # based on conf_thresh
-    #     dets_list = []
-    #     for box_ind in range(boxes.shape[0]):
-    #         if (np.where(box_scores[box_ind] >= conf_thresh)[0].shape[0] == 0):
-    #             continue
-    #         cls_ind = np.argmax(box_scores[box_ind]) + 1 # because we skipped background
-    #         cls = CLASSES[cls_ind]
-    #         cls_boxes = boxes[box_ind:box_ind + 1, 4 * cls_ind : 4 * (cls_ind + 1)]
-    #         cls_scores = scores[box_ind:box_ind + 1, cls_ind]
-    #         #print("box_ind = {2}, cls_boxes.shape = {0}, cls_scores[box_ind:box_ind + 1,"\
-    #         #" np.newaxis].shape = {1}").format(cls_boxes.shape, cls_scores[box_ind:box_ind + 1,
-    #         #                                   np.newaxis].shape, box_ind)
-    #
-    #         dets = np.hstack((cls_boxes,
-    #                           cls_scores[:, np.newaxis])).astype(np.float32)
-    #
-    #     keep = nms(dets, NMS_THRESH)
-    #     dets = dets[keep, :]
-    #     vis_detections(im, cls, dets, ax)
-
     tt_vis = 0
     bbox_img = []
     bscore_img = []
-    for cls_ind, cls in enumerate(CLASSES[1:]):
-        cls_ind += 1 # because we skipped background
-        cls_boxes = boxes[:, 4 * cls_ind : 4 * (cls_ind + 1)]
-        cls_scores = scores[:, cls_ind]
-        dets = np.hstack((cls_boxes,
-                          cls_scores[:, np.newaxis])).astype(np.float32)
-        keep = nms(dets, NMS_THRESH)
-        dets = dets[keep, :]
-        dets = np.hstack((dets, np.ones([dets.shape[0], 1]) * cls_ind))
-        if (dets.shape[0] > 0):
+    if (eval_class):
+        for cls_ind, cls in enumerate(CLASSES[1:]):
+            cls_ind += 1 # because we skipped background
+            cls_boxes = boxes[:, 4 * cls_ind : 4 * (cls_ind + 1)]
+            cls_scores = scores[:, cls_ind]
+            dets = np.hstack((cls_boxes,
+                              cls_scores[:, np.newaxis]))#.astype(np.float32)
+            keep = nms(dets, NMS_THRESH)
+            #dets = dets[keep, :]
+            dets = np.hstack((dets, np.ones([dets.shape[0], 1]) * cls_ind))
+            if (dets.shape[0] > 0):
+                bbox_img.append(dets)
+                bscore_img.append(np.reshape(dets[:, -2], [-1, 1]))
+    else:
+        for eoi_ind, eoi in enumerate(boxes):
+            eoi_scores = scores[eoi_ind, 1:] # skip background
+            cls_ind = np.argmax(eoi_scores) + 1 # add the background index back
+            cls_boxes = boxes[eoi_ind, 4 * cls_ind : 4 * (cls_ind + 1)]
+            cls_scores = scores[eoi_ind, cls_ind]
+            dets = np.hstack((np.reshape(cls_boxes, [1, -1]),
+                              np.reshape(cls_scores, [-1, 1])))#.astype(np.float32)
+            dets = np.hstack((dets, np.ones([dets.shape[0], 1]) * cls_ind))
             bbox_img.append(dets)
             bscore_img.append(np.reshape(dets[:, -2], [-1, 1]))
 
     boxes_im = np.vstack(bbox_img)
     scores_im = np.vstack(bscore_img)
+
+    #if (not eval_class):
+    # a numpy float is a C double, so need to use float32
+    keep = nms(boxes_im[:, :-1].astype(np.float32), NMS_THRESH)
+    boxes_im = boxes_im[keep, :]
+    scores_im = scores_im[keep, :]
+
     if (remove_embedded_opt in [1, 2]):
         keep_indices = remove_embedded(boxes_im, scores_im, remove_option=remove_embedded_opt)
         print("removed %d boxes with option %d" % ((boxes_im.shape[0] - len(keep_indices)), remove_embedded_opt))
@@ -206,6 +193,10 @@ def parse_args():
 
     parser.add_argument('--rmembedded', dest='remove_embedded_opt', help='Otion how to remove embedded cases',
                         default=0, type=int)
+
+    parser.add_argument('--evaleoi', dest='eval_eoi',
+                        help='evaluation based on EoI',
+                        action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -262,7 +253,8 @@ if __name__ == '__main__':
         #print 'Demo for data/demo/{}'.format(im_name)
         ret = demo(sess, net, im_name, args.input_path,
                     conf_thresh=args.conf_thresh, save_vis_dir=None,
-                    remove_embedded_opt=args.remove_embedded_opt)
+                    remove_embedded_opt=args.remove_embedded_opt,
+                    eval_class=(not args.eval_eoi))
                     #conf_thresh=args.conf_thresh, save_vis_dir=args.fig_path)
         if (-1 == ret):
             continue
