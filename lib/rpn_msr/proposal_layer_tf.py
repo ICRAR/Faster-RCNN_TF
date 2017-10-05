@@ -170,7 +170,11 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,
     # batch inds are 0
     # batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
     # BUT we NOW (18-Sep-2017) abuse batch inds, and use it for carrying scores
-    batch_inds = np.reshape(scores, [proposals.shape[0], 1])
+    if ('TEST' == cfg_key):
+        batch_inds = np.reshape(scores, [proposals.shape[0], 1])
+    else:
+        batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
+
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False)))
     if (DEBUG):
         print('blob shape: {0}'.format(blob.shape))
