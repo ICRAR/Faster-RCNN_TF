@@ -31,7 +31,7 @@ im = im.reshape(1, 1200, 1600, 3)
 im = im.astype('float32')
 
 # %% Let the output size of the transformer be half the image size.
-out_size = (95, 125) # (w, h)
+out_size = (90, 90) # (w, h)
 
 # %% Simulate batch
 #batch = np.append(im, im, axis=0)
@@ -62,6 +62,10 @@ with tf.variable_scope('spatial_transformer_0'):
     # initial = initial.astype('float32')
     # initial = initial.flatten()
 
+    angle = np.pi * 0
+    s_ang = np.sin(angle)
+    c_ang = np.cos(angle)
+
     proposal_init = np.zeros([3,5])
     proposal_init[0, :] = [0, x1, y1, x2, y2]
     proposal_init[1, :] = [0, x1 + 100, y1 + 100, x2 + 100, y2 + 100]
@@ -83,11 +87,13 @@ with tf.variable_scope('spatial_transformer_0'):
     h_translate = tf.divide(h_translate_p, tf.subtract(H, 1.0))
     #row1 = tf.concat([tf.divide(h, H), np.zeros([num_prop, 1]), h_translate], axis=1)
     row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(h, H), h_translate], axis=1)
+    row2 = tf.concat([s_ang * tf.divide(w, W), tf.divide(h, H) * c_ang, h_translate], axis=1)
 
     w_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, xc), W), 1.0)
     w_translate = tf.divide(w_translate_p, tf.subtract(W, 1.0))
     #row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(w, W), w_translate], axis=1)
-    row1 = tf.concat([tf.divide(w, W), np.zeros([num_prop, 1]), w_translate], axis=1)
+    #row1 = tf.concat([tf.divide(w, W), np.zeros([num_prop, 1]), w_translate], axis=1)
+    row1 = tf.concat([tf.divide(w, W) * c_ang, -1 * s_ang * tf.divide(w, W), w_translate], axis=1)
 
     thetas = tf.stack([row1, row2], axis=1)
     thetas = tf.reshape(thetas, [1, num_prop, 6])
