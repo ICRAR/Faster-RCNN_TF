@@ -313,15 +313,17 @@ class Network(object):
             print input
             if ('TRAIN' == phase):
                 num_prop = cfg.TRAIN.BATCH_SIZE
+                img_size = cfg.TRAIN.SCALES[0]
             elif ('TEST' == phase):
                 num_prop = cfg.TEST.RPN_POST_NMS_TOP_N
+                img_size = cfg.TEST.SCALES[0]
             else:
                 raise Exception('unknown phase for st_pool')
             proposals = tf.reshape(input[1], [num_prop, 5])
             proposals = proposals * spatial_scale
             out_size = (pooled_height, pooled_width)
-            Wp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
-            Hp = np.floor(cfg.TRAIN.SCALES[0] * spatial_scale)
+            Wp = np.floor(img_size * spatial_scale)
+            Hp = np.floor(img_size * spatial_scale)
             W = tf.convert_to_tensor(Wp, dtype=tf.float32)
             H = tf.convert_to_tensor(Hp, dtype=tf.float32)
 
