@@ -208,11 +208,14 @@ __C.DEDUP_BOXES = 1./16.
 # We use the same pixel mean for all networks even though it's not exactly what
 # they were trained with
 #__C.PIXEL_MEANS = np.array([[[102.9801, 115.9465, 122.7717]]])
+# some say should be this value
+__C.PIXEL_MEANS = np.array([[[103.939, 116.779, 123.68]]])
+# [103.939, 116.779, 123.68]
 # for log_minmax scale
 #__C.PIXEL_MEANS = np.array([[[235, 128, 24]]])
 
 # for ir contour scale (red background)
-__C.PIXEL_MEANS = np.array([[[14, 45, 213]]])
+# __C.PIXEL_MEANS = np.array([[[14, 45, 213]]])
 
 # for log_minmax_ir scale
 #__C.PIXEL_MEANS = np.array([[[235, 128, 26]]])
