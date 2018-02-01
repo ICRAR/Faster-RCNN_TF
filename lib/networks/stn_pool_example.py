@@ -62,9 +62,9 @@ with tf.variable_scope('spatial_transformer_0'):
     # initial = initial.astype('float32')
     # initial = initial.flatten()
 
-    angle = np.pi * 0
-    s_ang = np.sin(angle)
-    c_ang = np.cos(angle)
+    angle = tf.random_uniform([], maxval=np.pi)
+    s_ang = tf.sin(angle)
+    c_ang = tf.cos(angle)
 
     proposal_init = np.zeros([3,5])
     proposal_init[0, :] = [0, x1, y1, x2, y2]
@@ -86,7 +86,7 @@ with tf.variable_scope('spatial_transformer_0'):
     h_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, yc), H), 1.0)
     h_translate = tf.divide(h_translate_p, tf.subtract(H, 1.0))
     #row1 = tf.concat([tf.divide(h, H), np.zeros([num_prop, 1]), h_translate], axis=1)
-    row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(h, H), h_translate], axis=1)
+    #row2 = tf.concat([np.zeros([num_prop, 1]), tf.divide(h, H), h_translate], axis=1)
     row2 = tf.concat([s_ang * tf.divide(w, W), tf.divide(h, H) * c_ang, h_translate], axis=1)
 
     w_translate_p = tf.subtract(tf.subtract(tf.multiply(2.0, xc), W), 1.0)
@@ -103,7 +103,8 @@ with tf.variable_scope('spatial_transformer_0'):
 # %% Run session
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
-y, theta_val = sess.run([final_output, thetas], feed_dict={conv5_3: batch})
+y, theta_val, ag = sess.run([final_output, thetas, angle], feed_dict={conv5_3: batch})
+print("random angle = {0}".format(ag))
 #print(y.shape, theta_val)
 
 origin_im = cv2.imread('cat.jpg')
