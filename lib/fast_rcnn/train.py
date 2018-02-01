@@ -49,7 +49,8 @@ class SolverWrapper(object):
         """
         net = self.net
 
-        if cfg.TRAIN.BBOX_REG and net.layers.has_key('bbox_pred'):
+        if cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED and \
+                        cfg.TRAIN.BBOX_REG and net.layers.has_key('bbox_pred'):
             # save original values
             with tf.variable_scope('bbox_pred', reuse=True):
                 weights = tf.get_variable("weights")
@@ -79,7 +80,7 @@ class SolverWrapper(object):
                                         global_step=iter_num + 1)
         print 'Wrote snapshot to: {:s}'.format(snapshot_file)
 
-        if cfg.TRAIN.BBOX_REG and net.layers.has_key('bbox_pred'):
+        if cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED and cfg.TRAIN.BBOX_REG and net.layers.has_key('bbox_pred'):
             with tf.variable_scope('bbox_pred', reuse=True):
                 # restore net to original state
                 sess.run(net.bbox_weights_assign, feed_dict={
@@ -154,8 +155,12 @@ class SolverWrapper(object):
         bbox_inside_weights = self.net.get_output('roi-data')[3]
         bbox_outside_weights = self.net.get_output('roi-data')[4]
 
+        if (cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED):
+            hl_sigma = 1.0
+        else:
+            hl_sigma = 3.0
         smooth_l1 = self._modified_smooth_l1(
-            1.0, bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights)
+            hl_sigma, bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights)
         loss_box = tf.reduce_mean(tf.reduce_sum(
             smooth_l1, reduction_indices=[1]))
 
