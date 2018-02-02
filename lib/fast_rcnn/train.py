@@ -184,6 +184,7 @@ class SolverWrapper(object):
 
         last_snapshot_iter = -1
         timer = Timer()
+        check_thres = max_iters * 0.8
         for iter in range(start_iter, start_iter + max_iters):
             # get one batch
             blobs = data_layer.forward()
@@ -203,8 +204,8 @@ class SolverWrapper(object):
 
             timer.tic()
 
-            rpn_loss_cls_value, rpn_loss_box_value, loss_cls_value, loss_box_value, _\
-             = sess.run([rpn_cross_entropy, rpn_loss_box, cross_entropy, loss_box, train_op],
+            rpn_loss_cls_value, rpn_loss_box_value, loss_cls_value, loss_box_value, lrate, _\
+             = sess.run([rpn_cross_entropy, rpn_loss_box, cross_entropy, loss_box, lr, train_op],
                         feed_dict=feed_dict,
                         options=run_options,
                         run_metadata=run_metadata)
@@ -219,11 +220,19 @@ class SolverWrapper(object):
                     trace.generate_chrome_trace_format(show_memory=False))
                 trace_file.close()
 
+            total_loss = rpn_loss_cls_value + rpn_loss_box_value + loss_cls_value + loss_box_value
             if (iter + 1) % (cfg.TRAIN.DISPLAY) == 0:
                 print 'iter: %d / %d, total loss: %.4f, rpn_loss_cls: %.4f, rpn_loss_box: %.4f, loss_cls: %.4f, loss_box: %.4f, lr: %f' %\
-                    (iter + 1, max_iters + start_iter, rpn_loss_cls_value + rpn_loss_box_value + loss_cls_value + loss_box_value,
-                     rpn_loss_cls_value, rpn_loss_box_value, loss_cls_value, loss_box_value, lr.eval())
+                    (iter + 1, max_iters + start_iter, total_loss,
+                     rpn_loss_cls_value, rpn_loss_box_value, loss_cls_value, loss_box_value, lrate)
                 print 'speed: {:.3f}s / iter.'.format(timer.average_time)
+
+            # find out who is the culprit...
+            if (total_loss > 0.2 and ((iter - start_iter) > check_thres)):
+                # save them in a list, which can be used as a test set to
+                # show what the model predicts and then compare that with gt
+                # visually
+                print("Culprit found %s, %.4f" % (blobs['img_id'], total_loss))
 
             if (iter + 1) % cfg.TRAIN.SNAPSHOT_ITERS == 0:
                 last_snapshot_iter = iter
