@@ -522,7 +522,7 @@ AP for 2_3 = 0.7610
 AP for 3_3 = 0.9253
 Mean AP = 0.8224
 
-80K Iterations
+80K Iterations (Gold model stored)
 AP for 1_1 = 0.8854
 AP for 1_2 = 0.6957
 AP for 1_3 = 0.8718
@@ -617,7 +617,41 @@ AP for 2_3 = 0.7554
 AP for 3_3 = 0.9243
 Mean AP = 0.8142
 
+[22.1]
+The same as [22], but do not use the actual pixel mean, but use the default
+VGGNet ImageNet mean: 103.939,  116.779,  123.68
 
+80K iterations
+AP for 1_1 = 0.8902
+AP for 1_2 = 0.6588
+AP for 1_3 = 0.8906
+AP for 2_2 = 0.8216
+AP for 2_3 = 0.7879
+AP for 3_3 = 0.9321
+Mean AP = 0.8302
+
+[22.2]
+Continue from [22.1] but freeze all weights in ConvNet, and set initial lr to
+0.0001
+80K iterations
+AP for 1_1 = 0.8857
+AP for 1_2 = 0.6779
+AP for 1_3 = 0.8792
+AP for 2_2 = 0.8318
+AP for 2_3 = 0.7769
+AP for 3_3 = 0.9273
+Mean AP = 0.8298
+
+[22.3]
+The same as 22.2 except that lr still starts from 0.001
+80K iterations
+AP for 1_1 = 0.8848
+AP for 1_2 = 0.6907
+AP for 1_3 = 0.8697
+AP for 2_2 = 0.8252
+AP for 2_3 = 0.7747
+AP for 3_3 = 0.9291
+Mean AP = 0.8290
 
 [14]
 Currently running [14] again (jobid - 2212370) but differences:
