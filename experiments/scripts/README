@@ -653,6 +653,26 @@ AP for 2_3 = 0.7747
 AP for 3_3 = 0.9291
 Mean AP = 0.8290
 
+[22.4]
+The same as 22.2, but use random rotation in forming the RoI
+AP for 1_1 = 0.8897
+AP for 1_2 = 0.6856
+AP for 1_3 = 0.8757
+AP for 2_2 = 0.8163
+AP for 2_3 = 0.7699
+AP for 3_3 = 0.9265
+Mean AP = 0.8273
+
+[22.5]
+The same as 22.2, but freeze weights in the final FC layers (reg / class)
+AP for 1_1 = 0.8755
+AP for 1_2 = 0.6807
+AP for 1_3 = 0.8583
+AP for 2_2 = 0.8150
+AP for 2_3 = 0.7528
+AP for 3_3 = 0.9174
+Mean AP = 0.8166
+
 [14]
 Currently running [14] again (jobid - 2212370) but differences:
 1. using st_pool (bug fixed)
