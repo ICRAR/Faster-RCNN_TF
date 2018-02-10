@@ -673,6 +673,47 @@ AP for 2_3 = 0.7528
 AP for 3_3 = 0.9174
 Mean AP = 0.8166
 
+[22.6]
+The same as 22.1, but free the weights in the low level convnet
+AP for 1_1 = 0.8804
+AP for 1_2 = 0.6683
+AP for 1_3 = 0.8608
+AP for 2_2 = 0.7133
+AP for 2_3 = 0.7014
+AP for 3_3 = 0.8321
+Mean AP = 0.7760
+
+[22.7]
+The same as 22.1, but fix the "1-row-down" contour bug, and used
+"blue" as the color
+AP for 1_1 = 0.8806
+AP for 1_2 = 0.6830
+AP for 1_3 = 0.8864
+AP for 2_2 = 0.8218
+AP for 2_3 = 0.7964
+AP for 3_3 = 0.9434
+Mean AP = 0.8353
+
+[22.8]
+The same as 22.7, but add two additional 512 FC layers
+80K
+AP for 1_1 = 0.8768
+AP for 1_2 = 0.7090
+AP for 1_3 = 0.8671
+AP for 2_2 = 0.8333
+AP for 2_3 = 0.7569
+AP for 3_3 = 0.9327
+Mean AP = 0.8293
+
+160K
+AP for 1_1 = 0.8822
+AP for 1_2 = 0.6765
+AP for 1_3 = 0.8708
+AP for 2_2 = 0.8255
+AP for 2_3 = 0.7614
+AP for 3_3 = 0.9345
+Mean AP = 0.8251
+
 [14]
 Currently running [14] again (jobid - 2212370) but differences:
 1. using st_pool (bug fixed)
