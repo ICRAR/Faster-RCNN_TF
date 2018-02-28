@@ -373,6 +373,19 @@ AP for 2_3 = 0.7100
 AP for 3_3 = 0.8522
 Mean AP = 0.7701
 
+[17.1]
+Add an extra 1x1 convolution to learn "fusion"
+
+After 120K iterations
+Results:
+0.836
+0.678
+0.880
+0.705
+0.711
+0.843
+Mean Ap = 0.775
+
 
 [18]
 The same as [16], but with IR inserted as:
