@@ -88,12 +88,30 @@ class SolverWrapper(object):
                 sess.run(net.bbox_bias_assign, feed_dict={
                          net.bbox_biases: orig_1})
 
-    def _modified_smooth_l1(self, sigma, bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights):
+    def _zerofy_non_class_bbox(self, bbox_pred, lbn):
+        label, batch_size, num_classes = lbn
+        M = batch_size # batch size
+        C = num_classes # number of classes
+        N = 4 # four coordinates per subject
+
+        one_hot_tensor = tf.one_hot(label, num_classes)
+        A2 = tf.reshape(one_hot_tensor, [C, M, 1])
+        A2_tile = tf.tile(A2, [1, 1, N])
+        A2_final = tf.reshape(A2_tile, [M, C * N])
+
+        return tf.multiply(bbox_pred, A2_final)
+
+    def _modified_smooth_l1(self, sigma, bbox_pred, bbox_targets,
+                            bbox_inside_weights, bbox_outside_weights,
+                            lbn=None):
         """
             ResultLoss = outside_weights * SmoothL1(inside_weights * (bbox_pred - bbox_targets))
             SmoothL1(x) = 0.5 * (sigma * x)^2,    if |x| < 1 / sigma^2
                           |x| - 0.5 / sigma^2,    otherwise
         """
+        if (lbn is not None):
+            bbox_pred = self._zerofy_non_class_bbox(bbox_pred, lbn)
+
         sigma2 = sigma * sigma
 
         inside_mul = tf.multiply(
@@ -145,6 +163,7 @@ class SolverWrapper(object):
         # R-CNN
         # classification loss
         cls_score = self.net.get_output('cls_score')
+        batch_size, num_classes = cls_score.get_shape().as_list()
         label = tf.reshape(self.net.get_output('roi-data')[1], [-1])
         cross_entropy = tf.reduce_mean(
             tf.nn.sparse_softmax_cross_entropy_with_logits(logits=cls_score, labels=label))
@@ -160,7 +179,8 @@ class SolverWrapper(object):
         else:
             hl_sigma = 3.0
         smooth_l1 = self._modified_smooth_l1(
-            hl_sigma, bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights)
+            hl_sigma, bbox_pred, bbox_targets, bbox_inside_weights,
+                    bbox_outside_weights, lbn=(label, batch_size, num_classes))
         loss_box = tf.reduce_mean(tf.reduce_sum(
             smooth_l1, reduction_indices=[1]))
 
