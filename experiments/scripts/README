@@ -727,6 +727,29 @@ AP for 2_3 = 0.7614
 AP for 3_3 = 0.9345
 Mean AP = 0.8251
 
+[22.9]
+The same as [22.7] but using the correct regression loss function that excludes
+non-class offsets
+80K
+AP for 1_1 = 0.8784
+AP for 1_2 = 0.7074
+AP for 1_3 = 0.8941
+AP for 2_2 = 0.8200
+AP for 2_3 = 0.7916
+AP for 3_3 = 0.9269
+Mean AP = 0.8364
+
+[22.10]
+The same as [22.7] but using the new regression loss function that use offsets
+weighted by the softmax (class probabilities)
+AP for 1_1 = 0.8861
+AP for 1_2 = 0.6862
+AP for 1_3 = 0.9006
+AP for 2_2 = 0.8278
+AP for 2_3 = 0.8132
+AP for 3_3 = 0.9449
+Mean AP = 0.8432
+
 [14]
 Currently running [14] again (jobid - 2212370) but differences:
 1. using st_pool (bug fixed)
